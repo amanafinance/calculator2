@@ -55,19 +55,22 @@
     .slider {
       width: 100%; margin-top: 5px; appearance: none;
       height: 6px; background: #ddd; border-radius: 5px;
+      position: relative;
     }
     .slider::-webkit-slider-thumb {
       appearance: none; width: 18px; height: 18px;
       background: #95C11F; border-radius: 50%; cursor: pointer; border: 2px solid white;
+      z-index: 2; position: relative;
     }
     .marker {
       position: absolute;
       top: 50%;
       transform: translate(-50%, -50%);
-      width: 8px;
-      height: 8px;
-      background: #bbb;
-      border-radius: 50%;
+      width: 4px;
+      height: 12px;
+      background: #aaa;
+      border-radius: 2px;
+      z-index: 1;
       pointer-events: none;
     }
     .error-message, .helper-text {
