@@ -106,13 +106,12 @@
         errorMessage.style.display = 'none';
       }
 
-      const percent = selectedTariff === 'with' ? markupWithDown[months] : markupWithoutDown[months];
-      const baseFinalCost = price * (1 + percent / 100);
-
       let prepayment = 0, monthly = 0, finalCost = 0, message = "";
 
       if (selectedTariff === 'with') {
-        // динамические границы: 10% – 60% от общей цены
+        const percent = markupWithDown[months];
+        const baseFinalCost = price * (1 + percent / 100);
+
         const minPrepayment = roundUpTo100(baseFinalCost * 0.10);
         const maxPrepayment = roundUpTo100(baseFinalCost * 0.60);
         const defaultPrepayment = roundUpTo100(baseFinalCost * 0.25);
@@ -134,14 +133,17 @@
           monthly = roundUpTo100(remaining / months);
           finalCost = monthly * months + prepayment;
         } else {
-          const remaining = price - (price * (prepayment / baseFinalCost));
-          const remainingWithMarkup = remaining * (1 + markupWithoutDown[months] / 100);
+          const percentAlt = markupWithoutDown[months];
+          const remaining = baseFinalCost - prepayment;
+          const remainingWithMarkup = remaining * (1 + percentAlt / 100);
           monthly = roundUpTo100(remainingWithMarkup / months);
           finalCost = monthly * months + prepayment;
         }
 
         message = `Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${price.toLocaleString()} ₽, Тариф: С первым взносом, Первый взнос: ${prepayment.toLocaleString()} ₽, Срок: ${months} мес.`;
       } else {
+        const percent = markupWithoutDown[months];
+        const baseFinalCost = price * (1 + percent / 100);
         monthly = roundUpTo100(baseFinalCost / months);
         finalCost = monthly * months;
         prepaymentLabel.textContent = "—";
@@ -153,6 +155,28 @@
 
       resultsDiv.innerHTML = `
         <p><strong>Ежемесячный платёж:</strong> ${monthly.toLocaleString()} ₽</p>
-        <p><strong>Стоимость с наценкой:</strong> ${fi
+        <p><strong>Стоимость с наценкой:</strong> ${finalCost.toLocaleString()} ₽</p>
+        <p><strong>Наценка:</strong> ${markup.toLocaleString()} ₽ (${markupPercent}%)</p>
+      `;
 
+      whatsappBtn.href = `https://wa.me/79280222114?text=${encodeURIComponent(message)}`;
+      togglePrepaymentSlider();
+    }
 
+    tariffButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        tariffButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        selectedTariff = button.dataset.tariff;
+        updateCalculator(true);
+      });
+    });
+
+    priceInput.addEventListener('input', () => updateCalculator(true));
+    monthsInput.addEventListener('input', () => updateCalculator(true));
+    prepaymentSlider.addEventListener('input', () => updateCalculator(false));
+
+    updateCalculator(true);
+  </script>
+</body>
+</html>
