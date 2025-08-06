@@ -6,26 +6,8 @@
   <title>Amana Finance — Калькулятор рассрочки</title>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;800&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family:'Manrope',sans-serif;
-      background:#f2f2f2;
-      margin:0;
-      display:flex;
-      justify-content:center;
-      align-items:start;
-      min-height:100vh;
-    }
-    .calculator {
-      width:100%;
-      max-width:460px;
-      background:rgba(255,255,255,0.85);
-      backdrop-filter:blur(10px);
-      border:1px solid rgba(149,193,31,0.2);
-      box-shadow:0 6px 18px rgba(0,0,0,0.08);
-      border-radius:18px;
-      padding:16px;
-      margin:12px;
-    }
+    body {font-family:'Manrope',sans-serif;background:#f2f2f2;margin:0;display:flex;justify-content:center;align-items:start;min-height:100vh;}
+    .calculator{width:100%;max-width:460px;background:rgba(255,255,255,0.85);backdrop-filter:blur(10px);border:1px solid rgba(149,193,31,0.2);box-shadow:0 6px 18px rgba(0,0,0,0.08);border-radius:18px;padding:16px;margin:12px;}
     .header{text-align:center;margin-bottom:8px;}
     .header .title{font-size:24px;font-weight:800;color:#116234;text-transform:uppercase;margin-bottom:2px;}
     .header .subtitle{font-size:13.5px;color:#555;letter-spacing:1px;text-transform:uppercase;font-weight:500;}
@@ -69,7 +51,7 @@
 
     <div id="prepaymentBlock">
       <label for="prepaymentPercent">Первый взнос: <span id="prepaymentLabel">0 ₽</span></label>
-      <input type="range" id="prepaymentPercent" class="slider" min="10" max="60" step="1" value="25" />
+      <input type="range" id="prepaymentPercent" class="slider" min="10" max="70" step="1" value="25" />
     </div>
 
     <div class="output" id="results"></div>
@@ -96,10 +78,10 @@
 
     let selectedTariff = 'with';
 
-    const markupWithDown = {3:9,4:12,5:15,6:18,7:20,8:22,9:24,10:26,11:28,12:30};
-    const markupWithoutDown = {3:14,4:18,5:23,6:28,7:31,8:33,9:37,10:40,11:43,12:46};
+    const markupWithDown = {3: 9,4: 12,5: 15,6: 18,7: 20,8: 22,9: 24,10: 26,11: 28,12: 30};
+    const markupWithoutDown = {3: 14,4: 18,5: 23,6: 28,7: 31,8: 33,9: 37,10: 40,11: 43,12: 46};
 
-    function roundUpTo100(val) { return Math.ceil(val / 100) * 100; }
+    function roundUpTo100(val) {return Math.ceil(val / 100) * 100;}
 
     function togglePrepaymentSlider() {
       prepaymentBlock.style.display = selectedTariff === 'with' ? 'block' : 'none';
@@ -130,28 +112,22 @@
       let prepayment = 0, monthly = 0, finalCost = 0, message = "";
 
       if (selectedTariff === 'with') {
-        // динамические границы: 10–60% от общей цены с наценкой
-        const minPercent = 10;
-        const maxPercent = 60;
-        prepaymentSlider.min = minPercent;
-        prepaymentSlider.max = maxPercent;
-
         if (resetPrepayment) prepaymentSlider.value = 25;
 
         const prepaymentPercent = parseInt(prepaymentSlider.value);
         prepayment = roundUpTo100(baseFinalCost * (prepaymentPercent / 100));
-        prepaymentLabel.textContent = `${prepaymentPercent}% — ${prepayment.toLocaleString()} ₽`;
+        prepaymentLabel.textContent = `${prepayment.toLocaleString()} ₽`;
 
-        // условный первый взнос = ровно 25%
-        const conditionalPrepayment = roundUpTo100(baseFinalCost * 0.25);
+        // условный первый взнос (25% от общей цены с наценкой markupWithDown)
+        const conditionalPrepayment = roundUpTo100(price * (1 + markupWithDown[months]/100) * 0.25);
 
         if (prepayment === conditionalPrepayment) {
-          // считаем по markupWithDown
+          // используем markupWithDown
           const remaining = baseFinalCost - prepayment;
           monthly = roundUpTo100(remaining / months);
           finalCost = monthly * months + prepayment;
         } else {
-          // считаем как в "Без первого взноса"
+          // используем markupWithoutDown
           const remaining = price - prepayment;
           const remainingWithMarkup = remaining * (1 + markupWithoutDown[months] / 100);
           monthly = roundUpTo100(remainingWithMarkup / months);
