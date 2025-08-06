@@ -15,6 +15,10 @@
     .tariff-button{flex:1;padding:8px;background:#f4f4f4;border:1px solid #ccc;border-radius:7px;cursor:pointer;text-align:center;font-weight:500;font-size:13.5px;transition:.3s;}
     .tariff-button.active{background:#95C11F;color:#fff;border-color:#116234;}
     label{display:block;margin:10px 0 5px;font-weight:600;font-size:13.5px;}
+    .price-control{display:flex;align-items:center;gap:6px;}
+    .price-control input{flex:1;}
+    .price-btn{background:#95C11F;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-weight:700;transition:.2s;}
+    .price-btn:hover{background:#116234;}
     input[type="number"]{font-size:15px;padding:9px;width:100%;border:1px solid #ccc;border-radius:7px;}
     .slider{width:100%;margin-top:5px;appearance:none;height:6px;background:#ddd;border-radius:5px;}
     .slider::-webkit-slider-thumb{appearance:none;width:18px;height:18px;background:#95C11F;border-radius:50%;cursor:pointer;border:2px solid white;}
@@ -42,7 +46,11 @@
     </div>
 
     <label for="price">Стоимость товара:</label>
-    <input type="number" id="price" placeholder="не менее 50 000" min="0" />
+    <div class="price-control">
+      <button class="price-btn" id="minusBtn">−</button>
+      <input type="number" id="price" placeholder="не менее 50 000" min="0" />
+      <button class="price-btn" id="plusBtn">+</button>
+    </div>
 
     <div class="error-message" id="errorMessage">Стоимость товара должно быть не менее 50 000₽</div>
 
@@ -51,7 +59,7 @@
 
     <div id="prepaymentBlock">
       <label for="prepaymentPercent">Первый взнос: <span id="prepaymentLabel">0 ₽</span></label>
-      <input type="range" id="prepaymentPercent" class="slider" min="10" max="70" step="1" value="25" />
+      <input type="range" id="prepaymentPercent" class="slider" min="10" max="60" step="1" value="25" />
     </div>
 
     <div class="output" id="results"></div>
@@ -75,98 +83,108 @@
     const whatsappBtn = document.getElementById('whatsapp');
     const errorMessage = document.getElementById('errorMessage');
     const tariffButtons = document.querySelectorAll('.tariff-button');
+    const minusBtn = document.getElementById('minusBtn');
+    const plusBtn = document.getElementById('plusBtn');
 
     let selectedTariff = 'with';
 
-    const markupWithDown = {3: 9,4: 12,5: 15,6: 18,7: 20,8: 22,9: 24,10: 26,11: 28,12: 30};
-    const markupWithoutDown = {3: 14,4: 18,5: 23,6: 28,7: 31,8: 33,9: 37,10: 40,11: 43,12: 46};
+    const markupWithDown = {3:9,4:12,5:15,6:18,7:20,8:22,9:24,10:26,11:28,12:30};
+    const markupWithoutDown = {3:14,4:18,5:23,6:28,7:31,8:33,9:37,10:40,11:43,12:46};
 
-    function roundUpTo100(val) {return Math.ceil(val / 100) * 100;}
+    function roundUpTo100(val){return Math.ceil(val/100)*100;}
 
-    function togglePrepaymentSlider() {
-      prepaymentBlock.style.display = selectedTariff === 'with' ? 'block' : 'none';
+    function togglePrepaymentSlider(){
+      prepaymentBlock.style.display = selectedTariff==='with' ? 'block':'none';
     }
 
-    function updateCalculator(resetPrepayment = false) {
-      const months = parseInt(monthsInput.value);
-      monthsValue.textContent = months;
+    function updateCalculator(resetPrepayment=false){
+      const months=parseInt(monthsInput.value);
+      monthsValue.textContent=months;
 
-      let price = parseInt(priceInput.value);
-      if (isNaN(price) || price < 50000) {
-        errorMessage.style.display = 'block';
-        prepaymentLabel.textContent = "0 ₽";
-        resultsDiv.innerHTML = `
-          <p><strong>Ежемесячный платёж:</strong> 0 ₽</p>
-          <p><strong>Стоимость с наценкой:</strong> 0 ₽</p>
-          <p><strong>Наценка:</strong> 0 ₽ (0%)</p>
-        `;
-        whatsappBtn.href = "https://wa.me/79280222114?text=Здравствуйте, хочу оформить рассрочку.";
+      let price=parseInt(priceInput.value);
+      if(isNaN(price)||price<50000){
+        errorMessage.style.display='block';
+        prepaymentLabel.textContent="0 ₽";
+        resultsDiv.innerHTML=`<p><strong>Ежемесячный платёж:</strong> 0 ₽</p>
+        <p><strong>Стоимость с наценкой:</strong> 0 ₽</p>
+        <p><strong>Наценка:</strong> 0 ₽ (0%)</p>`;
+        whatsappBtn.href="https://wa.me/79280222114?text=Здравствуйте, хочу оформить рассрочку.";
         return;
-      } else {
-        errorMessage.style.display = 'none';
-      }
+      } else errorMessage.style.display='none';
 
-      let percent = selectedTariff === 'with' ? markupWithDown[months] : markupWithoutDown[months];
-      let baseFinalCost = price * (1 + percent / 100);
+      let percent=selectedTariff==='with'?markupWithDown[months]:markupWithoutDown[months];
+      let baseFinalCost=price*(1+percent/100);
 
-      let prepayment = 0, monthly = 0, finalCost = 0, message = "";
+      let prepayment=0,monthly=0,finalCost=0,message="";
 
-      if (selectedTariff === 'with') {
-        if (resetPrepayment) prepaymentSlider.value = 25;
+      if(selectedTariff==='with'){
+        if(resetPrepayment) prepaymentSlider.value=25;
 
-        const prepaymentPercent = parseInt(prepaymentSlider.value);
-        prepayment = roundUpTo100(baseFinalCost * (prepaymentPercent / 100));
-        prepaymentLabel.textContent = `${prepayment.toLocaleString()} ₽`;
+        const prepaymentPercent=parseInt(prepaymentSlider.value);
 
-        // условный первый взнос (25% от общей цены с наценкой markupWithDown)
-        const conditionalPrepayment = roundUpTo100(price * (1 + markupWithDown[months]/100) * 0.25);
+        // условный предоплат = 25% от baseFinalCost
+        const conditionalPrepayment=roundUpTo100(baseFinalCost*0.25);
 
-        if (prepayment === conditionalPrepayment) {
-          // используем markupWithDown
-          const remaining = baseFinalCost - prepayment;
-          monthly = roundUpTo100(remaining / months);
-          finalCost = monthly * months + prepayment;
-        } else {
-          // используем markupWithoutDown
-          const remaining = price - prepayment;
-          const remainingWithMarkup = remaining * (1 + markupWithoutDown[months] / 100);
-          monthly = roundUpTo100(remainingWithMarkup / months);
-          finalCost = monthly * months + prepayment;
+        prepayment=roundUpTo100(baseFinalCost*(prepaymentPercent/100));
+        prepaymentLabel.textContent=`${prepaymentPercent}% — ${prepayment.toLocaleString()} ₽`;
+
+        if(prepayment===conditionalPrepayment){
+          const remaining=baseFinalCost-prepayment;
+          monthly=roundUpTo100(remaining/months);
+          finalCost=monthly*months+prepayment;
+        }else{
+          const remaining=price-prepayment;
+          const remainingWithMarkup=remaining*(1+markupWithoutDown[months]/100);
+          monthly=roundUpTo100(remainingWithMarkup/months);
+          finalCost=monthly*months+prepayment;
         }
 
-        message = `Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${price.toLocaleString()} ₽, Тариф: С первым взносом, Первый взнос: ${prepayment.toLocaleString()} ₽, Срок: ${months} мес.`;
-      } else {
-        monthly = roundUpTo100(baseFinalCost / months);
-        finalCost = monthly * months;
-        prepaymentLabel.textContent = "—";
-        message = `Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${price.toLocaleString()} ₽, Тариф: Без первого взноса, Срок: ${months} мес.`;
+        message=`Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${price.toLocaleString()} ₽, Тариф: С первым взносом, Первый взнос: ${prepayment.toLocaleString()} ₽, Срок: ${months} мес.`;
+      }else{
+        monthly=roundUpTo100(baseFinalCost/months);
+        finalCost=monthly*months;
+        prepaymentLabel.textContent="—";
+        message=`Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${price.toLocaleString()} ₽, Тариф: Без первого взноса, Срок: ${months} мес.`;
       }
 
-      const markup = finalCost - price;
-      const markupPercent = Math.round((markup / price) * 100);
+      const markup=finalCost-price;
+      const markupPercent=Math.round((markup/price)*100);
 
-      resultsDiv.innerHTML = `
+      resultsDiv.innerHTML=`
         <p><strong>Ежемесячный платёж:</strong> ${monthly.toLocaleString()} ₽</p>
         <p><strong>Стоимость с наценкой:</strong> ${finalCost.toLocaleString()} ₽</p>
-        <p><strong>Наценка:</strong> ${markup.toLocaleString()} ₽ (${markupPercent}%)</p>
-      `;
+        <p><strong>Наценка:</strong> ${markup.toLocaleString()} ₽ (${markupPercent}%)</p>`;
 
-      whatsappBtn.href = `https://wa.me/79280222114?text=${encodeURIComponent(message)}`;
+      whatsappBtn.href=`https://wa.me/79280222114?text=${encodeURIComponent(message)}`;
       togglePrepaymentSlider();
     }
 
-    tariffButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        tariffButtons.forEach(btn => btn.classList.remove('active'));
+    tariffButtons.forEach(button=>{
+      button.addEventListener('click',()=>{
+        tariffButtons.forEach(btn=>btn.classList.remove('active'));
         button.classList.add('active');
-        selectedTariff = button.dataset.tariff;
+        selectedTariff=button.dataset.tariff;
         updateCalculator(true);
       });
     });
 
-    priceInput.addEventListener('input', () => updateCalculator(true));
-    monthsInput.addEventListener('input', () => updateCalculator(true));
-    prepaymentSlider.addEventListener('input', () => updateCalculator(false));
+    priceInput.addEventListener('input',()=>updateCalculator(true));
+    monthsInput.addEventListener('input',()=>updateCalculator(true));
+    prepaymentSlider.addEventListener('input',()=>updateCalculator(false));
+
+    minusBtn.addEventListener('click',()=>{
+      let val=parseInt(priceInput.value)||50000;
+      val=Math.max(50000,val-100);
+      priceInput.value=val;
+      updateCalculator(true);
+    });
+
+    plusBtn.addEventListener('click',()=>{
+      let val=parseInt(priceInput.value)||50000;
+      val=val+100;
+      priceInput.value=val;
+      updateCalculator(true);
+    });
 
     updateCalculator(true);
   </script>
