@@ -6,26 +6,8 @@
   <title>Amana Finance — Калькулятор рассрочки</title>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;800&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family:'Manrope',sans-serif;
-      background:#f2f2f2;
-      margin:0;
-      display:flex;
-      justify-content:center;
-      align-items:start;
-      min-height:100vh;
-    }
-    .calculator {
-      width:100%;
-      max-width:460px;
-      background:rgba(255,255,255,0.85);
-      backdrop-filter:blur(10px);
-      border:1px solid rgba(149,193,31,0.2);
-      box-shadow:0 6px 18px rgba(0,0,0,0.08);
-      border-radius:18px;
-      padding:16px;
-      margin:12px;
-    }
+    body {font-family:'Manrope',sans-serif;background:#f2f2f2;margin:0;display:flex;justify-content:center;align-items:start;min-height:100vh;}
+    .calculator{width:100%;max-width:460px;background:rgba(255,255,255,0.85);backdrop-filter:blur(10px);border:1px solid rgba(149,193,31,0.2);box-shadow:0 6px 18px rgba(0,0,0,0.08);border-radius:18px;padding:16px;margin:12px;}
     .header{text-align:center;margin-bottom:8px;}
     .header .title{font-size:24px;font-weight:800;color:#116234;text-transform:uppercase;margin-bottom:2px;}
     .header .subtitle{font-size:13.5px;color:#555;letter-spacing:1px;text-transform:uppercase;font-weight:500;}
@@ -68,8 +50,8 @@
     <input type="range" id="months" class="slider" min="3" max="12" value="3" />
 
     <div id="prepaymentBlock">
-      <label for="prepaymentPercent">Первый взнос: <span id="prepaymentLabel">0 ₽</span></label>
-      <input type="range" id="prepaymentPercent" class="slider" min="10" max="60" step="1" value="25" />
+      <label for="prepaymentSlider">Первый взнос: <span id="prepaymentLabel">0 ₽</span></label>
+      <input type="range" id="prepaymentSlider" class="slider" />
     </div>
 
     <div class="output" id="results"></div>
@@ -87,7 +69,7 @@
     const monthsInput = document.getElementById('months');
     const monthsValue = document.getElementById('monthsValue');
     const prepaymentBlock = document.getElementById('prepaymentBlock');
-    const prepaymentSlider = document.getElementById('prepaymentPercent');
+    const prepaymentSlider = document.getElementById('prepaymentSlider');
     const prepaymentLabel = document.getElementById('prepaymentLabel');
     const resultsDiv = document.getElementById('results');
     const whatsappBtn = document.getElementById('whatsapp');
@@ -124,35 +106,35 @@
         errorMessage.style.display = 'none';
       }
 
-      let percent = selectedTariff === 'with' ? markupWithDown[months] : markupWithoutDown[months];
-      let baseFinalCost = price * (1 + percent / 100);
+      const percent = selectedTariff === 'with' ? markupWithDown[months] : markupWithoutDown[months];
+      const baseFinalCost = price * (1 + percent / 100);
 
       let prepayment = 0, monthly = 0, finalCost = 0, message = "";
 
       if (selectedTariff === 'with') {
-        // динамические границы: 10–60% от общей цены с наценкой
-        const minPercent = 10;
-        const maxPercent = 60;
-        prepaymentSlider.min = minPercent;
-        prepaymentSlider.max = maxPercent;
+        // динамические границы: 10% – 60% от общей цены
+        const minPrepayment = roundUpTo100(baseFinalCost * 0.10);
+        const maxPrepayment = roundUpTo100(baseFinalCost * 0.60);
+        const defaultPrepayment = roundUpTo100(baseFinalCost * 0.25);
 
-        if (resetPrepayment) prepaymentSlider.value = 25;
+        prepaymentSlider.min = minPrepayment;
+        prepaymentSlider.max = maxPrepayment;
+        prepaymentSlider.step = 100;
 
-        const prepaymentPercent = parseInt(prepaymentSlider.value);
-        prepayment = roundUpTo100(baseFinalCost * (prepaymentPercent / 100));
+        if (resetPrepayment) prepaymentSlider.value = defaultPrepayment;
+
+        prepayment = parseInt(prepaymentSlider.value);
+        const prepaymentPercent = Math.round((prepayment / baseFinalCost) * 100);
         prepaymentLabel.textContent = `${prepaymentPercent}% — ${prepayment.toLocaleString()} ₽`;
 
-        // условный первый взнос = ровно 25%
-        const conditionalPrepayment = roundUpTo100(baseFinalCost * 0.25);
+        const conditionalPrepayment = defaultPrepayment;
 
         if (prepayment === conditionalPrepayment) {
-          // считаем по markupWithDown
           const remaining = baseFinalCost - prepayment;
           monthly = roundUpTo100(remaining / months);
           finalCost = monthly * months + prepayment;
         } else {
-          // считаем как в "Без первого взноса"
-          const remaining = price - prepayment;
+          const remaining = price - (price * (prepayment / baseFinalCost));
           const remainingWithMarkup = remaining * (1 + markupWithoutDown[months] / 100);
           monthly = roundUpTo100(remainingWithMarkup / months);
           finalCost = monthly * months + prepayment;
@@ -171,30 +153,6 @@
 
       resultsDiv.innerHTML = `
         <p><strong>Ежемесячный платёж:</strong> ${monthly.toLocaleString()} ₽</p>
-        <p><strong>Стоимость с наценкой:</strong> ${finalCost.toLocaleString()} ₽</p>
-        <p><strong>Наценка:</strong> ${markup.toLocaleString()} ₽ (${markupPercent}%)</p>
-      `;
-
-      whatsappBtn.href = `https://wa.me/79280222114?text=${encodeURIComponent(message)}`;
-      togglePrepaymentSlider();
-    }
-
-    tariffButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        tariffButtons.forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
-        selectedTariff = button.dataset.tariff;
-        updateCalculator(true);
-      });
-    });
-
-    priceInput.addEventListener('input', () => updateCalculator(true));
-    monthsInput.addEventListener('input', () => updateCalculator(true));
-    prepaymentSlider.addEventListener('input', () => updateCalculator(false));
-
-    updateCalculator(true);
-  </script>
-</body>
-</html>
+        <p><strong>Стоимость с наценкой:</strong> ${fi
 
 
