@@ -58,10 +58,11 @@
     }
     .tariff-button.active {background:#95C11F;color:#fff;border-color:#116234;}
     label {display:block;margin:10px 0 5px;font-weight:600;font-size:13.5px;}
-    input[type="number"] {
+    .narrow-input {
       font-size:15px;
       padding:9px;
       width:100%;
+      max-width:260px;
       border:1px solid #ccc;
       border-radius:7px;
     }
@@ -136,7 +137,7 @@
     </div>
 
     <label for="price">Стоимость товара:</label>
-    <input type="number" id="price" placeholder="не менее 50 000" min="0" />
+    <input type="number" id="price" class="narrow-input" placeholder="не менее 50 000" min="0" />
 
     <div class="error-message" id="errorMessage">Стоимость товара должно быть не менее 50 000₽</div>
 
@@ -206,7 +207,6 @@
       let prepayment = 0, monthly = 0, finalCost = 0, message = "";
 
       if (selectedTariff === 'with') {
-        // диапазон ползунка 10–60% от baseFinalCost
         const minPrepayment = roundUpTo100(baseFinalCost * 0.1);
         const maxPrepayment = roundUpTo100(baseFinalCost * 0.6);
 
@@ -220,7 +220,6 @@
         prepayment = parseInt(prepaymentSlider.value);
         prepaymentLabel.textContent = `${prepayment.toLocaleString()} ₽`;
 
-        // условный первый взнос
         const conditionalPrepayment = roundUpTo100(baseFinalCost * 0.25);
 
         if (prepayment === conditionalPrepayment) {
@@ -272,4 +271,3 @@
   </script>
 </body>
 </html>
-
