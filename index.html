@@ -2,269 +2,293 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Amana Finance — Калькулятор рассрочки</title>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;800&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Калькулятор рассрочки</title>
   <style>
-    body {
-      font-family: 'Manrope', sans-serif;
-      background: #f2f2f2;
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: start;
-      min-height: 100vh;
-      padding: 10px;
-    }
-    .calculator {
-      width: 100%;
-      max-width: 480px;
-      background: rgba(255, 255, 255, 0.88);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(149, 193, 31, 0.2);
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-      border-radius: 18px;
-      padding: 18px;
-      margin: 12px;
-    }
-    .header { text-align: center; margin-bottom: 8px; }
-    .header .title {
-      font-size: 26px; font-weight: 800; color: #116234;
-      text-transform: uppercase; margin-bottom: 2px;
-    }
-    .header .subtitle {
-      font-size: 14px; color: #555; letter-spacing: 1px;
-      text-transform: uppercase; font-weight: 500;
-    }
-    .tariff-buttons { display: flex; gap: 8px; margin: 12px 0; }
-    .tariff-button {
-      flex: 1; padding: 8px; background: #f4f4f4; border: 1px solid #ccc;
-      border-radius: 7px; cursor: pointer; text-align: center;
-      font-weight: 500; font-size: 13.5px; transition: .3s; white-space: nowrap;
-    }
-    .tariff-button.active { background: #95C11F; color: #fff; border-color: #116234; }
-    label { display: block; margin: 10px 0 5px; font-weight: 600; font-size: 13.5px; }
-    input[type="number"] {
-      font-size: 15px; padding: 9px; width: 97%;
-      border: 1px solid #ccc; border-radius: 7px;
-    }
-    .slider-container {
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .calculator { max-width: 400px; margin: auto; }
+    .field { margin-bottom: 15px; }
+    .field label { font-weight: bold; display: block; margin-bottom: 5px; }
+    .field input[type=number] { width: 100%; padding: 5px; font-size: 1em; }
+    .slider-container { position: relative; }
+    .slider-container input[type=range] { width: 100%; }
+    /* Оформление ползунков (WebKit-браузеры) */
+    .slider-container input[type=range]::-webkit-slider-thumb { 
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px; height: 20px;
+      background: #4CAF50; /* зелёный бегунок */
+      border-radius: 50%;
+      cursor: pointer;
+      border: none;
       position: relative;
-      width: 100%;
+      z-index: 2;
     }
-    .slider {
-      width: 100%; margin-top: 5px; appearance: none;
-      height: 6px; background: #ddd; border-radius: 5px;
+    .slider-container input[type=range]::-webkit-slider-runnable-track {
+      width: 100%; height: 6px;
+      background: #ddd;
+      border: none;
+      border-radius: 3px;
+    }
+    /* Оформление ползунков (Firefox) */
+    .slider-container input[type=range]::-moz-range-thumb {
+      width: 20px; height: 20px;
+      background: #4CAF50;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
       position: relative;
+      z-index: 2;
     }
-    .slider::-webkit-slider-thumb {
-      appearance: none; width: 18px; height: 18px;
-      background: #95C11F; border-radius: 50%; cursor: pointer; border: 2px solid white;
-      z-index: 2; position: relative;
+    .slider-container input[type=range]::-moz-range-track {
+      width: 100%; height: 6px;
+      background: #ddd;
+      border-radius: 3px;
     }
+    /* Метка-указатель рекомендуемого значения (магнит) */
     .marker {
       position: absolute;
+      width: 10px; height: 10px;
+      background: #666;
+      border-radius: 50%;
       top: 50%;
-      transform: translate(-50%, -50%);
-      width: 4px;
-      height: 12px;
-      background: #aaa;
-      border-radius: 2px;
+      transform: translateY(-50%);
       z-index: 1;
-      pointer-events: none;
     }
-    .error-message, .helper-text {
-      font-size: 12.5px; color: #a94442; background: #fdecea;
-      border: 1px solid #f5c6cb; padding: 8px; margin-top: 10px; border-radius: 6px;
-    }
-    .error-message { display: none; }
-    .output {
-      background: #eaf6ec; border: 1px solid #c6e2c9;
-      padding: 10px; margin-top: 16px; border-radius: 8px; font-size: 14px;
-    }
-    .output p { margin: 5px 0; }
-    .buttons { margin-top: 18px; display: flex; flex-direction: column; gap: 8px; }
-    .buttons a {
-      text-align: center; padding: 12px; background: #95C11F; color: white;
-      font-weight: 600; border-radius: 8px; transition: .3s; font-size: 14px;
-      text-decoration: none;
-    }
-    .buttons a.call { background: #115C30; }
-    .buttons a:hover { transform: scale(1.015); }
-    @media(min-width:768px){
-      body { padding: 30px; }
-      .calculator { max-width: 560px; padding: 24px; }
-      .buttons { flex-direction: row; }
-      .buttons a { flex: 1; }
+    /* Адаптивность для мобильных */
+    @media (max-width: 500px) {
+      .calculator { width: 90%; }
     }
   </style>
 </head>
 <body>
   <div class="calculator">
-    <div class="header">
-      <div class="title">AMANA FINANCE</div>
-      <div class="subtitle">КАЛЬКУЛЯТОР РАССРОЧКИ</div>
+    <!-- Выбор тарифа -->
+    <div class="field">
+      <label>Выберите тариф:</label>
+      <label><input type="radio" name="tariff" value="with" checked> С первым взносом</label>
+      <label style="margin-left: 10px;"><input type="radio" name="tariff" value="without"> Без первого взноса</label>
     </div>
-
-    <div class="tariff-buttons">
-      <div class="tariff-button active" data-tariff="with">С первым взносом</div>
-      <div class="tariff-button" data-tariff="without">Без первого взноса</div>
+    <!-- Поле ввода стоимости товара -->
+    <div class="field">
+      <label for="price-input">Стоимость товара:</label>
+      <input type="number" id="price-input" value="500000" />
     </div>
-
-    <label for="price">Стоимость товара:</label>
-    <input type="number" id="price" placeholder="не менее 50 000" min="0" />
-
-    <div class="error-message" id="errorMessage">Стоимость товара должно быть не менее 50 000₽</div>
-
-    <label for="months">Кол-во месяцев: <span id="monthsValue">3</span></label>
-    <input type="range" id="months" class="slider" min="3" max="12" value="3" />
-
-    <div id="prepaymentBlock">
-      <label for="prepaymentSlider">Первый взнос: <span id="prepaymentLabel">0 ₽</span></label>
-      <div class="slider-container">
-        <input type="range" id="prepaymentSlider" class="slider" min="0" max="0" step="100" value="0" />
-        <div id="marker" class="marker" style="display:none;"></div>
-      </div>
+    <!-- Ползунок количества месяцев -->
+    <div class="field slider-container">
+      <label for="months-range">Кол-во месяцев: <span id="months-value">6</span></label>
+      <input type="range" id="months-range" min="3" max="24" step="1" value="6" />
     </div>
-
-    <div class="output" id="results"></div>
-
-    <div class="helper-text">Обязательные требования: Поручитель и паспорта обеих лиц</div>
-
-    <div class="buttons">
-      <a id="whatsapp" href="#" target="_blank">Написать на WhatsApp</a>
-      <a class="call" href="tel:+79280222114">Позвонить</a>
+    <!-- Блок первого взноса (скрывается/удаляется при необходимости) -->
+    <div class="field slider-container" id="first-payment-block">
+      <label for="initial-range">Первый взнос: <span id="initial-value">0</span> ₽</label>
+      <input type="range" id="initial-range" min="0" step="100" value="0" />
+      <div class="marker" id="initial-marker" style="display: none;"></div>
+    </div>
+    <!-- Результаты расчёта -->
+    <div class="field">
+      <p>Ежемесячный платёж: <span id="monthly-payment">0</span> ₽</p>
+      <p>Стоимость с наценкой: <span id="total-cost">0</span> ₽</p>
+      <p>Наценка: <span id="markup">0</span> ₽</p>
     </div>
   </div>
 
   <script>
-    const priceInput = document.getElementById('price');
-    const monthsInput = document.getElementById('months');
-    const monthsValue = document.getElementById('monthsValue');
-    const prepaymentBlock = document.getElementById('prepaymentBlock');
-    const prepaymentSlider = document.getElementById('prepaymentSlider');
-    const prepaymentLabel = document.getElementById('prepaymentLabel');
-    const resultsDiv = document.getElementById('results');
-    const whatsappBtn = document.getElementById('whatsapp');
-    const errorMessage = document.getElementById('errorMessage');
-    const tariffButtons = document.querySelectorAll('.tariff-button');
-    const marker = document.getElementById('marker');
+    (function() {
+      // Получение элементов интерфейса
+      let firstPaymentBlock = document.getElementById('first-payment-block');
+      let initialRange = document.getElementById('initial-range');
+      let initialValueDisplay = document.getElementById('initial-value');
+      let initialMarker = document.getElementById('initial-marker');
+      const priceInput = document.getElementById('price-input');
+      const monthsRange = document.getElementById('months-range');
+      const monthsValue = document.getElementById('months-value');
+      const monthlyPaymentDisplay = document.getElementById('monthly-payment');
+      const totalCostDisplay = document.getElementById('total-cost');
+      const markupDisplay = document.getElementById('markup');
+      const tariffRadios = document.getElementsByName('tariff');
+      // Переменная для сохранения последнего значения первого взноса
+      let lastInitialValue = initialRange ? parseInt(initialRange.value) : 0;
 
-    let selectedTariff = 'with';
-    let conditionalPrepayment = 0;
-
-    const markupWithDown = {3:9,4:12,5:15,6:18,7:20,8:22,9:24,10:26,11:28,12:30};
-    const markupWithoutDown = {3:14,4:18,5:23,6:28,7:31,8:33,9:37,10:40,11:43,12:46};
-
-    function roundUpTo100(val) {
-      return Math.ceil(val / 100) * 100;
-    }
-
-    function togglePrepaymentSlider() {
-      prepaymentBlock.style.display = selectedTariff === 'with' ? 'block' : 'none';
-    }
-
-    function updateMarkerPosition(min, max) {
-      const range = max - min;
-      const percent = ((conditionalPrepayment - min) / range) * 100;
-      marker.style.left = percent + "%";
-      marker.style.display = "block";
-    }
-
-    function updateCalculator(resetPrepayment = false) {
-      const months = parseInt(monthsInput.value);
-      monthsValue.textContent = months;
-
-      let price = parseInt(priceInput.value);
-      if (isNaN(price) || price < 50000) {
-        errorMessage.style.display = 'block';
-        prepaymentLabel.textContent = "0 ₽";
-        resultsDiv.innerHTML = `
-          <p><strong>Ежемесячный платёж:</strong> 0 ₽</p>
-          <p><strong>Стоимость с наценкой:</strong> 0 ₽</p>
-          <p><strong>Наценка:</strong> 0 ₽ (0%)</p>
-        `;
-        marker.style.display = "none";
-        whatsappBtn.href = "https://wa.me/79280222114?text=Здравствуйте, хочу оформить рассрочку.";
-        return;
-      } else {
-        errorMessage.style.display = 'none';
+      // Функция пересчёта и обновления результатов
+      function updateCalculations() {
+        const price = parseFloat(priceInput.value) || 0;
+        const months = parseInt(monthsRange.value) || 0;
+        // Если блок первого взноса есть, берем его значение, иначе считаем первый взнос = 0
+        let initialPayment = 0;
+        if (initialRange && document.body.contains(initialRange)) {
+          initialPayment = parseFloat(initialRange.value) || 0;
+        }
+        // Расчёт наценки в зависимости от месяцев (примерная процентная ставка 14% годовых)
+        let markupPercent = (14 / 12) * months;
+        if (markupPercent < 0) markupPercent = 0;
+        // Общая стоимость с наценкой (до округления платежа)
+        let rawTotal = price * (1 + markupPercent / 100);
+        // Ежемесячный платёж до округления
+        let rawMonthly = (rawTotal - initialPayment) / (months || 1);
+        // Округляем ежемесячный платёж вниз до ближайших 100 ₽ для красивого числа
+        let monthly = Math.floor(rawMonthly / 100) * 100;
+        if (monthly < 0) monthly = 0;
+        // Пересчитываем итоговую сумму и наценку с учётом округления
+        let totalCost = initialPayment + monthly * (months || 0);
+        let markupAmount = totalCost - price;
+        if (markupAmount < 0) markupAmount = 0;
+        // Обновляем отображение результатов (только суммы в ₽)
+        monthlyPaymentDisplay.textContent = monthly.toLocaleString('ru-RU');
+        totalCostDisplay.textContent = totalCost.toLocaleString('ru-RU');
+        markupDisplay.textContent = markupAmount.toLocaleString('ru-RU');
+        // Обновляем отображение значения первого взноса (в тексте метки)
+        if (initialValueDisplay) {
+          initialValueDisplay.textContent = Math.round(initialPayment).toLocaleString('ru-RU');
+        }
+        // Обновляем положение метки-рекомендации (25% от totalCost)
+        if (initialMarker && document.body.contains(initialMarker)) {
+          // Рассчитываем рекомендуемый первый взнос (25% от общей стоимости с наценкой)
+          let recommended = 0.25 * totalCost;
+          recommended = Math.round(recommended / 100) * 100;
+          const minVal = parseFloat(initialRange.min) || 0;
+          const maxVal = parseFloat(initialRange.max) || 0;
+          if (maxVal > 0) {
+            // Вычисляем позицию метки на треке ползунка
+            let frac = (recommended - minVal) / (maxVal - minVal);
+            if (frac < 0) frac = 0;
+            if (frac > 1) frac = 1;
+            const sliderWidth = initialRange.offsetWidth;
+            const markerX = frac * sliderWidth;
+            initialMarker.style.left = markerX + 'px';
+            initialMarker.style.display = 'block';
+          } else {
+            initialMarker.style.display = 'none';
+          }
+        }
       }
 
-      let percent = selectedTariff === 'with' ? markupWithDown[months] : markupWithoutDown[months];
-      let baseFinalCost = price * (1 + percent / 100);
-
-      let prepayment = 0, monthly = 0, finalCost = 0, message = "";
-
-      if (selectedTariff === 'with') {
-        const minPrepayment = roundUpTo100(baseFinalCost * 0.15);
-        const maxPrepayment = roundUpTo100(baseFinalCost * 0.65);
-
-        prepaymentSlider.min = minPrepayment;
-        prepaymentSlider.max = maxPrepayment;
-
-        conditionalPrepayment = roundUpTo100(baseFinalCost * 0.25);
-        updateMarkerPosition(minPrepayment, maxPrepayment);
-
-        if (resetPrepayment) {
-          prepaymentSlider.value = conditionalPrepayment;
+      // Функция "магнитного" эффекта для ползунка первого взноса
+      function applyMagnet() {
+        if (!initialRange || !document.body.contains(initialRange)) return;
+        const price = parseFloat(priceInput.value) || 0;
+        const months = parseInt(monthsRange.value) || 0;
+        let markupPercent = (14 / 12) * months;
+        if (markupPercent < 0) markupPercent = 0;
+        let rawTotal = price * (1 + markupPercent / 100);
+        // Рассчитываем 25% от общей стоимости (рекомендуемый взнос)
+        let recommended = 0.25 * rawTotal;
+        recommended = Math.round(recommended / 100) * 100;
+        let current = parseFloat(initialRange.value) || 0;
+        if (Math.abs(current - recommended) <= 1000) {
+          // Притягиваем ползунок к рекомендуемому значению, если он достаточно близко (<= 1000 ₽)
+          initialRange.value = recommended;
         }
-
-        // магнит
-        if (Math.abs(prepaymentSlider.value - conditionalPrepayment) <= 500) {
-          prepaymentSlider.value = conditionalPrepayment;
-        }
-
-        prepayment = parseInt(prepaymentSlider.value);
-        prepaymentLabel.textContent = `${prepayment.toLocaleString()} ₽`;
-
-        if (prepayment === conditionalPrepayment) {
-          const remaining = baseFinalCost - prepayment;
-          monthly = roundUpTo100(remaining / months);
-          finalCost = monthly * months + prepayment;
-        } else {
-          const remaining = price - prepayment;
-          const remainingWithMarkup = remaining * (1 + markupWithoutDown[months] / 100);
-          monthly = roundUpTo100(remainingWithMarkup / months);
-          finalCost = monthly * months + prepayment;
-        }
-
-        message = `Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${price.toLocaleString()} ₽, Тариф: С первым взносом, Первый взнос: ${prepayment.toLocaleString()} ₽, Срок: ${months} мес.`;
-      } else {
-        monthly = roundUpTo100(baseFinalCost / months);
-        finalCost = monthly * months;
-        prepaymentLabel.textContent = "—";
-        marker.style.display = "none";
-        message = `Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${price.toLocaleString()} ₽, Тариф: Без первого взноса, Срок: ${months} мес.`;
       }
 
-      const markup = finalCost - price;
-      const markupPercent = Math.round((markup / price) * 100);
+      // Инициализация значений при загрузке страницы
+      if (initialRange) {
+        // Устанавливаем максимальный первый взнос равным стоимости товара
+        initialRange.max = priceInput.value;
+        // Вычисляем рекомендуемый первый взнос (25% от стоимости с наценкой) для стартового значения
+        let months = parseInt(monthsRange.value) || 0;
+        let markupPercent = (14 / 12) * months;
+        if (markupPercent < 0) markupPercent = 0;
+        let rawTotal = parseFloat(priceInput.value) * (1 + markupPercent / 100);
+        let recommended = Math.round((0.25 * rawTotal) / 100) * 100;
+        initialRange.value = recommended;
+        if (initialValueDisplay) {
+          initialValueDisplay.textContent = Math.round(recommended).toLocaleString('ru-RU');
+        }
+        lastInitialValue = recommended;
+      }
+      updateCalculations();  // начальный расчёт
 
-      resultsDiv.innerHTML = `
-        <p><strong>Ежемесячный платёж:</strong> ${monthly.toLocaleString()} ₽</p>
-        <p><strong>Стоимость с наценкой:</strong> ${finalCost.toLocaleString()} ₽</p>
-        <p><strong>Наценка:</strong> ${markup.toLocaleString()} ₽ (${markupPercent}%)</p>
-      `;
+      // Обработчики событий
 
-      whatsappBtn.href = `https://wa.me/79280222114?text=${encodeURIComponent(message)}`;
-      togglePrepaymentSlider();
-    }
+      // Переключение тарифа (радиокнопки)
+      for (let radio of tariffRadios) {
+        radio.addEventListener('change', function() {
+          if (this.value === 'without') {
+            // Тариф без первого взноса: удаляем блок первого взноса из DOM
+            if (firstPaymentBlock && document.body.contains(firstPaymentBlock)) {
+              if (initialRange) {
+                lastInitialValue = parseFloat(initialRange.value) || 0;  // сохраняем текущее значение
+              }
+              firstPaymentBlock.remove();  // удаляем элемент из DOM [oai_citation:1‡developer.mozilla.org](https://developer.mozilla.org/en-US/docs/Web/API/Element/remove#:~:text=The%20,does%20nothing)
+            }
+          } else if (this.value === 'with') {
+            // Тариф с первым взносом: вставляем блок первого взноса обратно, если его нет
+            if (!document.body.contains(firstPaymentBlock)) {
+              const monthsContainer = monthsRange.parentNode;
+              const fpBlock = document.createElement('div');
+              fpBlock.className = 'field slider-container';
+              fpBlock.id = 'first-payment-block';
+              fpBlock.innerHTML = 
+                '<label for="initial-range">Первый взнос: <span id="initial-value">0</span> ₽</label>\
+                 <input type="range" id="initial-range" min="0" step="100" value="0">\
+                 <div class="marker" id="initial-marker" style="display: none;"></div>';
+              // Вставляем блок первого взноса после блока выбора месяцев
+              monthsContainer.parentNode.insertBefore(fpBlock, monthsContainer.nextSibling);
+              firstPaymentBlock = fpBlock;  // обновляем ссылку на новый блок
+              // Обновляем ссылки на элементы внутри нового блока
+              initialRange = document.getElementById('initial-range');
+              initialValueDisplay = document.getElementById('initial-value');
+              initialMarker = document.getElementById('initial-marker');
+              // Устанавливаем максимальное значение ползунка (стоимость товара)
+              initialRange.max = priceInput.value;
+              // Восстанавливаем предыдущее значение первого взноса или рекомендуемое
+              let price = parseFloat(priceInput.value) || 0;
+              let months = parseInt(monthsRange.value) || 0;
+              let markupPercent = (14 / 12) * months;
+              if (markupPercent < 0) markupPercent = 0;
+              let rawTotal = price * (1 + markupPercent / 100);
+              let recommended = Math.round((0.25 * rawTotal) / 100) * 100;
+              initialRange.value = lastInitialValue ? lastInitialValue : recommended;
+              if (initialValueDisplay) {
+                initialValueDisplay.textContent = Math.round(parseFloat(initialRange.value) || 0).toLocaleString('ru-RU');
+              }
+              // Назначаем обработчик для нового ползунка первого взноса
+              initialRange.addEventListener('input', function() {
+                initialValueDisplay.textContent = Math.round(parseFloat(this.value)).toLocaleString('ru-RU');
+                applyMagnet();
+                lastInitialValue = parseFloat(this.value) || 0;
+                updateCalculations();
+              });
+              updateCalculations();  // пересчитываем сразу после добавления блока
+            }
+          }
+          // Пересчитываем результаты при переключении тарифа
+          updateCalculations();
+        });
+      }
 
-    tariffButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        tariffButtons.forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
-        selectedTariff = button.dataset.tariff;
-        updateCalculator(true);
+      // Изменение стоимости товара
+      priceInput.addEventListener('input', function() {
+        // Обновляем максимальное значение ползунка первого взноса под новую цену
+        if (initialRange && document.body.contains(initialRange)) {
+          initialRange.max = this.value;
+          // Если текущий первый взнос превышает новую стоимость, корректируем
+          if (parseFloat(initialRange.value) > parseFloat(this.value)) {
+            initialRange.value = this.value;
+            lastInitialValue = parseFloat(this.value) || 0;
+          }
+        }
+        updateCalculations();
       });
-    });
 
-    priceInput.addEventListener('input', () => updateCalculator(true));
-    monthsInput.addEventListener('input', () => updateCalculator(true));
-    prepaymentSlider.addEventListener('input', () => updateCalculator(false));
+      // Изменение количества месяцев (ползунок)
+      monthsRange.addEventListener('input', function() {
+        monthsValue.textContent = this.value;
+        updateCalculations();
+      });
 
-    updateCalculator(true);
+      // Изменение первого взноса (ползунок)
+      if (initialRange) {
+        initialRange.max = priceInput.value;
+        initialRange.addEventListener('input', function() {
+          initialValueDisplay.textContent = Math.round(parseFloat(this.value)).toLocaleString('ru-RU');
+          applyMagnet();
+          lastInitialValue = parseFloat(this.value) || 0;
+          updateCalculations();
+        });
+      }
+    })();
   </script>
 </body>
 </html>
