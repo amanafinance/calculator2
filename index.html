@@ -52,36 +52,6 @@
       margin-top: -2px;
     }
 
-    .tariff-buttons {
-      display: flex;
-      justify-content: space-between;
-      gap: 8px;
-      margin: 12px 0;
-    }
-
-    .tariff-button {
-      flex: 1;
-      padding: 8px 5px;
-      background-color: #f4f4f4;
-      border: 1px solid #ccc;
-      border-radius: 7px;
-      cursor: pointer;
-      text-align: center;
-      font-weight: 500;
-      font-size: 13.5px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      transition: all 0.3s ease;
-    }
-
-    .tariff-button.active {
-      background-color: #95C11F;
-      color: #fff;
-      border-color: #116234;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-    }
-
     label {
       display: block;
       margin: 10px 0 5px;
@@ -178,7 +148,6 @@
       .buttons {
         flex-direction: row;
       }
-
       .buttons a {
         flex: 1;
       }
@@ -192,11 +161,6 @@
       <div class="subtitle">КАЛЬКУЛЯТОР РАССРОЧКИ</div>
     </div>
 
-    <div class="tariff-buttons">
-      <div class="tariff-button active" data-tariff="with">С первым взносом</div>
-      <div class="tariff-button" data-tariff="without">Без первого взноса</div>
-    </div>
-
     <label for="price">Стоимость товара:</label>
     <input type="number" id="price" placeholder="не менее 50 000" min="0" />
 
@@ -205,10 +169,8 @@
     <label for="months">Кол-во месяцев: <span id="monthsValue">3</span></label>
     <input type="range" id="months" class="slider" min="3" max="12" value="3" />
 
-    <div id="prepaymentBlock">
-      <label for="prepaymentPercent">Первый взнос: <span id="prepaymentLabel">25%</span></label>
-      <input type="range" id="prepaymentPercent" class="slider" min="10" max="90" step="1" value="25" />
-    </div>
+    <label for="prepaymentPercent">Первый взнос: <span id="prepaymentLabel">0 ₽</span></label>
+    <input type="range" id="prepaymentPercent" class="slider" min="10" max="90" step="1" value="25" />
 
     <div class="output" id="results"></div>
 
@@ -224,20 +186,11 @@
     const priceInput = document.getElementById('price');
     const monthsInput = document.getElementById('months');
     const monthsValue = document.getElementById('monthsValue');
+    const prepaymentSlider = document.getElementById('prepaymentPercent');
+    const prepaymentLabel = document.getElementById('prepaymentLabel');
     const resultsDiv = document.getElementById('results');
     const whatsappBtn = document.getElementById('whatsapp');
     const errorMessage = document.getElementById('errorMessage');
-    const tariffButtons = document.querySelectorAll('.tariff-button');
-    const prepaymentBlock = document.getElementById('prepaymentBlock');
-    const prepaymentSlider = document.getElementById('prepaymentPercent');
-    const prepaymentLabel = document.getElementById('prepaymentLabel');
-
-    let selectedTariff = 'with';
-
-    const markupWithDown = {
-      3: 9, 4: 12, 5: 15, 6: 18,
-      7: 20, 8: 22, 9: 24, 10: 26, 11: 28, 12: 30
-    };
 
     const markupWithoutDown = {
       3: 14, 4: 18, 5: 23, 6: 28,
@@ -248,20 +201,15 @@
       return Math.ceil(val / 100) * 100;
     }
 
-    function togglePrepaymentSlider() {
-      prepaymentBlock.style.display = selectedTariff === 'with' ? 'block' : 'none';
-    }
-
     function updateCalculator() {
       const months = parseInt(monthsInput.value);
       monthsValue.textContent = months;
 
       let price = parseInt(priceInput.value);
-
       if (isNaN(price) || price < 50000) {
         errorMessage.style.display = 'block';
+        prepaymentLabel.textContent = "0 ₽";
         resultsDiv.innerHTML = `
-          <p><strong>Первый взнос:</strong> 0 ₽</p>
           <p><strong>Ежемесячный платёж:</strong> 0 ₽</p>
           <p><strong>Стоимость с наценкой:</strong> 0 ₽</p>
           <p><strong>Наценка:</strong> 0 ₽ (0%)</p>
@@ -272,53 +220,32 @@
         errorMessage.style.display = 'none';
       }
 
-      const percent = selectedTariff === 'with' ? markupWithDown[months] : markupWithoutDown[months];
-      let finalCost = price * (1 + percent / 100);
-      let prepayment = 0;
-      let monthly = 0;
-      let message = "";
+      // рассчитываем первый взнос
+      const prepaymentPercent = parseInt(prepaymentSlider.value);
+      let prepayment = roundUpTo100(price * (prepaymentPercent / 100));
+      prepaymentLabel.textContent = `${prepayment.toLocaleString()} ₽`;
 
-      if (selectedTariff === 'with') {
-        const prepaymentPercent = parseInt(prepaymentSlider.value);
-        prepaymentLabel.textContent = `${prepaymentPercent}%`;
-        prepayment = roundUpTo100(finalCost * (prepaymentPercent / 100));
-        const remaining = finalCost - prepayment;
-        monthly = roundUpTo100(remaining / months);
-        finalCost = monthly * months + prepayment;
+      // остаток после первого взноса
+      let remaining = price - prepayment;
+      const percent = markupWithoutDown[months];
+      let remainingWithMarkup = remaining * (1 + percent / 100);
 
-        message = `Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${price.toLocaleString()} ₽, Тариф: С первым взносом, Первый взнос: ${prepayment.toLocaleString()} ₽`;
-      } else {
-        monthly = roundUpTo100(finalCost / months);
-        finalCost = monthly * months;
-
-        message = `Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${price.toLocaleString()} ₽, Тариф: Без первого взноса`;
-      }
+      // ежемесячный платёж и итоговая стоимость
+      let monthly = roundUpTo100(remainingWithMarkup / months);
+      let finalCost = monthly * months + prepayment;
 
       const markup = finalCost - price;
       const markupPercent = Math.round((markup / price) * 100);
 
-      let html = '';
-      if (selectedTariff === 'with') {
-        html += `<p><strong>Первый взнос:</strong> ${prepayment.toLocaleString()} ₽</p>`;
-      }
-      html += `<p><strong>Ежемесячный платёж:</strong> ${monthly.toLocaleString()} ₽</p>`;
-      html += `<p><strong>Стоимость с наценкой:</strong> ${finalCost.toLocaleString()} ₽</p>`;
-      html += `<p><strong>Наценка:</strong> ${markup.toLocaleString()} ₽ (${markupPercent}%)</p>`;
-      resultsDiv.innerHTML = html;
+      resultsDiv.innerHTML = `
+        <p><strong>Ежемесячный платёж:</strong> ${monthly.toLocaleString()} ₽</p>
+        <p><strong>Стоимость с наценкой:</strong> ${finalCost.toLocaleString()} ₽</p>
+        <p><strong>Наценка:</strong> ${markup.toLocaleString()} ₽ (${markupPercent}%)</p>
+      `;
 
+      const message = `Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${price.toLocaleString()} ₽, Первый взнос: ${prepayment.toLocaleString()} ₽, Срок: ${months} мес.`;
       whatsappBtn.href = `https://wa.me/79280222114?text=${encodeURIComponent(message)}`;
-
-      togglePrepaymentSlider();
     }
-
-    tariffButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        tariffButtons.forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
-        selectedTariff = button.dataset.tariff;
-        updateCalculator();
-      });
-    });
 
     priceInput.addEventListener('input', updateCalculator);
     monthsInput.addEventListener('input', updateCalculator);
