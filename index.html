@@ -16,7 +16,6 @@
       align-items: start;
       min-height: 100vh;
     }
-
     .calculator {
       width: 100%;
       max-width: 460px;
@@ -25,132 +24,72 @@
       border: 1px solid rgba(149, 193, 31, 0.2);
       box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
       border-radius: 18px;
-      padding: 16px 16px 20px;
-      box-sizing: border-box;
+      padding: 16px;
       margin: 8px;
     }
-
-    .header {
-      text-align: center;
-      margin-bottom: 6px;
-    }
-
+    .header { text-align: center; margin-bottom: 6px; }
     .header .title {
-      font-size: 24px;
-      font-weight: 800;
-      color: #116234;
-      text-transform: uppercase;
-      margin-bottom: 2px;
+      font-size: 24px; font-weight: 800; color: #116234;
+      text-transform: uppercase; margin-bottom: 2px;
     }
-
     .header .subtitle {
-      font-size: 13.5px;
-      color: #555;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      font-weight: 500;
-      margin-top: -2px;
+      font-size: 13.5px; color: #555; letter-spacing: 1px;
+      text-transform: uppercase; font-weight: 500; margin-top: -2px;
     }
-
-    label {
-      display: block;
-      margin: 10px 0 5px;
-      font-weight: 600;
-      font-size: 13.5px;
+    .tariff-buttons { display: flex; gap: 8px; margin: 12px 0; }
+    .tariff-button {
+      flex: 1; padding: 8px 5px; background: #f4f4f4;
+      border: 1px solid #ccc; border-radius: 7px;
+      cursor: pointer; text-align: center;
+      font-weight: 500; font-size: 13.5px;
+      transition: all 0.3s ease;
     }
-
+    .tariff-button.active {
+      background: #95C11F; color: #fff; border-color: #116234;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    label { display: block; margin: 10px 0 5px; font-weight: 600; font-size: 13.5px; }
     input[type="number"] {
-      font-size: 15px;
-      padding: 9px;
-      width: 100%;
-      border: 1px solid #ccc;
-      border-radius: 7px;
-      box-sizing: border-box;
+      font-size: 15px; padding: 9px; width: 100%;
+      border: 1px solid #ccc; border-radius: 7px;
     }
-
     .slider {
-      width: 100%;
-      margin-top: 5px;
-      appearance: none;
-      height: 6px;
-      background: #ddd;
-      border-radius: 5px;
-      position: relative;
+      width: 100%; margin-top: 5px; appearance: none;
+      height: 6px; background: #ddd; border-radius: 5px;
     }
-
     .slider::-webkit-slider-thumb {
-      appearance: none;
-      width: 18px;
-      height: 18px;
-      background: #95C11F;
-      border-radius: 50%;
-      cursor: pointer;
-      border: 2px solid white;
+      appearance: none; width: 18px; height: 18px;
+      background: #95C11F; border-radius: 50%;
+      cursor: pointer; border: 2px solid white;
       box-shadow: 0 1px 4px rgba(0,0,0,0.15);
     }
-
     .error-message, .helper-text {
-      font-size: 12.5px;
-      color: #a94442;
-      background-color: #fdecea;
-      border: 1px solid #f5c6cb;
-      padding: 8px;
-      margin-top: 10px;
-      border-radius: 6px;
+      font-size: 12.5px; color: #a94442; background: #fdecea;
+      border: 1px solid #f5c6cb; padding: 8px;
+      margin-top: 10px; border-radius: 6px;
     }
-
-    .error-message {
-      display: none;
-    }
-
+    .error-message { display: none; }
     .output {
-      background-color: #eaf6ec;
-      border: 1px solid #c6e2c9;
-      padding: 10px;
-      margin-top: 16px;
-      border-radius: 8px;
+      background: #eaf6ec; border: 1px solid #c6e2c9;
+      padding: 10px; margin-top: 16px; border-radius: 8px;
       font-size: 14px;
     }
-
-    .output p {
-      margin: 5px 0;
-    }
-
-    .buttons {
-      margin-top: 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
+    .output p { margin: 5px 0; }
+    .buttons { margin-top: 18px; display: flex; flex-direction: column; gap: 8px; }
     .buttons a {
-      text-align: center;
-      padding: 12px;
-      background-color: #95C11F;
-      color: white;
+      text-align: center; padding: 12px; background: #95C11F;
+      color: white; font-weight: 600; border-radius: 8px;
+      transition: all 0.3s ease; font-size: 14px;
       text-decoration: none;
-      font-weight: 600;
-      border-radius: 8px;
-      transition: all 0.3s ease;
-      font-size: 14px;
     }
-
-    .buttons a.call {
-      background-color: #115C30;
-    }
-
+    .buttons a.call { background: #115C30; }
     .buttons a:hover {
       transform: scale(1.015);
       box-shadow: 0 3px 8px rgba(0,0,0,0.08);
     }
-
     @media (min-width: 768px) {
-      .buttons {
-        flex-direction: row;
-      }
-      .buttons a {
-        flex: 1;
-      }
+      .buttons { flex-direction: row; }
+      .buttons a { flex: 1; }
     }
   </style>
 </head>
@@ -161,6 +100,11 @@
       <div class="subtitle">КАЛЬКУЛЯТОР РАССРОЧКИ</div>
     </div>
 
+    <div class="tariff-buttons">
+      <div class="tariff-button active" data-tariff="with">С первым взносом</div>
+      <div class="tariff-button" data-tariff="without">Без первого взноса</div>
+    </div>
+
     <label for="price">Стоимость товара:</label>
     <input type="number" id="price" placeholder="не менее 50 000" min="0" />
 
@@ -169,8 +113,10 @@
     <label for="months">Кол-во месяцев: <span id="monthsValue">3</span></label>
     <input type="range" id="months" class="slider" min="3" max="12" value="3" />
 
-    <label for="prepaymentPercent">Первый взнос: <span id="prepaymentLabel">0 ₽</span></label>
-    <input type="range" id="prepaymentPercent" class="slider" min="10" max="90" step="1" value="25" />
+    <div id="prepaymentBlock">
+      <label for="prepaymentPercent">Первый взнос: <span id="prepaymentLabel">0 ₽</span></label>
+      <input type="range" id="prepaymentPercent" class="slider" min="10" max="70" step="1" value="25" />
+    </div>
 
     <div class="output" id="results"></div>
 
@@ -186,11 +132,20 @@
     const priceInput = document.getElementById('price');
     const monthsInput = document.getElementById('months');
     const monthsValue = document.getElementById('monthsValue');
+    const prepaymentBlock = document.getElementById('prepaymentBlock');
     const prepaymentSlider = document.getElementById('prepaymentPercent');
     const prepaymentLabel = document.getElementById('prepaymentLabel');
     const resultsDiv = document.getElementById('results');
     const whatsappBtn = document.getElementById('whatsapp');
     const errorMessage = document.getElementById('errorMessage');
+    const tariffButtons = document.querySelectorAll('.tariff-button');
+
+    let selectedTariff = 'with';
+
+    const markupWithDown = {
+      3: 9, 4: 12, 5: 15, 6: 18,
+      7: 20, 8: 22, 9: 24, 10: 26, 11: 28, 12: 30
+    };
 
     const markupWithoutDown = {
       3: 14, 4: 18, 5: 23, 6: 28,
@@ -201,7 +156,11 @@
       return Math.ceil(val / 100) * 100;
     }
 
-    function updateCalculator() {
+    function togglePrepaymentSlider() {
+      prepaymentBlock.style.display = selectedTariff === 'with' ? 'block' : 'none';
+    }
+
+    function updateCalculator(resetPrepayment = false) {
       const months = parseInt(monthsInput.value);
       monthsValue.textContent = months;
 
@@ -220,19 +179,34 @@
         errorMessage.style.display = 'none';
       }
 
-      // рассчитываем первый взнос
-      const prepaymentPercent = parseInt(prepaymentSlider.value);
-      let prepayment = roundUpTo100(price * (prepaymentPercent / 100));
-      prepaymentLabel.textContent = `${prepayment.toLocaleString()} ₽`;
+      let percent = selectedTariff === 'with' ? markupWithDown[months] : markupWithoutDown[months];
+      let baseFinalCost = price * (1 + percent / 100);
 
-      // остаток после первого взноса
-      let remaining = price - prepayment;
-      const percent = markupWithoutDown[months];
-      let remainingWithMarkup = remaining * (1 + percent / 100);
+      let prepayment = 0, monthly = 0, finalCost = 0, message = "";
 
-      // ежемесячный платёж и итоговая стоимость
-      let monthly = roundUpTo100(remainingWithMarkup / months);
-      let finalCost = monthly * months + prepayment;
+      if (selectedTariff === 'with') {
+        if (resetPrepayment) prepaymentSlider.value = 25;
+
+        // границы ползунка по себестоимости
+        prepaymentSlider.min = 10;
+        prepaymentSlider.max = 70;
+
+        const prepaymentPercent = parseInt(prepaymentSlider.value);
+        prepayment = roundUpTo100(baseFinalCost * (prepaymentPercent / 100));
+        prepaymentLabel.textContent = `${prepayment.toLocaleString()} ₽`;
+
+        const remaining = price - (price * (prepaymentPercent / 100));
+        const remainingWithMarkup = remaining * (1 + markupWithoutDown[months] / 100);
+        monthly = roundUpTo100(remainingWithMarkup / months);
+        finalCost = monthly * months + prepayment;
+
+        message = `Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${price.toLocaleString()} ₽, Тариф: С первым взносом, Первый взнос: ${prepayment.toLocaleString()} ₽, Срок: ${months} мес.`;
+      } else {
+        monthly = roundUpTo100(baseFinalCost / months);
+        finalCost = monthly * months;
+        prepaymentLabel.textContent = `—`;
+        message = `Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${price.toLocaleString()} ₽, Тариф: Без первого взноса, Срок: ${months} мес.`;
+      }
 
       const markup = finalCost - price;
       const markupPercent = Math.round((markup / price) * 100);
@@ -243,15 +217,11 @@
         <p><strong>Наценка:</strong> ${markup.toLocaleString()} ₽ (${markupPercent}%)</p>
       `;
 
-      const message = `Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${price.toLocaleString()} ₽, Первый взнос: ${prepayment.toLocaleString()} ₽, Срок: ${months} мес.`;
       whatsappBtn.href = `https://wa.me/79280222114?text=${encodeURIComponent(message)}`;
+
+      togglePrepaymentSlider();
     }
 
-    priceInput.addEventListener('input', updateCalculator);
-    monthsInput.addEventListener('input', updateCalculator);
-    prepaymentSlider.addEventListener('input', updateCalculator);
+    tariffButtons.forEach(button => {
+      button.addEventL
 
-    updateCalculator();
-  </script>
-</body>
-</html>
