@@ -4,530 +4,451 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Amana Finance — Калькулятор рассрочки</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     * {
-      box-sizing: border-box;
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
     }
-
-    :root {
-      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-      --accent-color: #6366f1;
-      --accent-hover: #4f46e5;
-      --success-color: #10b981;
-      --warning-color: #f59e0b;
-      --error-color: #ef4444;
-      --text-primary: #1f2937;
-      --text-secondary: #6b7280;
-      --bg-primary: #ffffff;
-      --bg-secondary: #f8fafc;
-      --border-color: #e5e7eb;
-      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-    }
-
+    
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #95C11F 0%, #116234 100%);
       min-height: 100vh;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       padding: 20px;
       position: relative;
+      overflow-x: hidden;
     }
-
+    
+    /* Animated background elements */
     body::before {
       content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.05"><circle cx="30" cy="30" r="4"/></g></g></svg>') repeat;
-      pointer-events: none;
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(149, 193, 31, 0.3) 0%, transparent 70%);
+      border-radius: 50%;
+      top: -200px;
+      right: -200px;
+      animation: float 20s ease-in-out infinite;
     }
-
-    .calculator {
-      width: 100%;
-      max-width: 500px;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(20px) saturate(180%);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 24px;
-      padding: 32px;
-      box-shadow: var(--shadow-xl);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .calculator::before {
+    
+    body::after {
       content: '';
       position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
-      pointer-events: none;
-      animation: pulse 4s ease-in-out infinite;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(17, 92, 48, 0.2) 0%, transparent 70%);
+      border-radius: 50%;
+      bottom: -100px;
+      left: -100px;
+      animation: float 15s ease-in-out infinite reverse;
     }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 0.5; transform: scale(1); }
-      50% { opacity: 0.8; transform: scale(1.1); }
+    
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(30px, -30px) scale(1.05); }
+      66% { transform: translate(-20px, 20px) scale(0.95); }
     }
-
+    
+    .calculator {
+      width: 100%;
+      max-width: 520px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 32px;
+      padding: 40px;
+      box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.15),
+        0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+      position: relative;
+      z-index: 1;
+      animation: slideUp 0.6s ease-out;
+    }
+    
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
     .header {
       text-align: center;
-      margin-bottom: 32px;
+      margin-bottom: 35px;
       position: relative;
-      z-index: 1;
     }
-
-    .header .logo {
-      width: 60px;
-      height: 60px;
-      margin: 0 auto 16px;
-      background: var(--primary-gradient);
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: var(--shadow-lg);
-      animation: float 6s ease-in-out infinite;
+    
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 3px;
+      background: linear-gradient(90deg, #95C11F 0%, #116234 100%);
+      border-radius: 2px;
     }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-10px); }
-    }
-
-    .header .logo::after {
-      content: '₽';
-      color: white;
-      font-size: 24px;
-      font-weight: 700;
-    }
-
+    
     .header .title {
-      font-size: 28px;
-      font-weight: 800;
-      background: var(--primary-gradient);
-      background-clip: text;
+      font-size: 32px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #95C11F 0%, #116234 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin-bottom: 8px;
+      background-clip: text;
+      text-transform: uppercase;
       letter-spacing: -0.5px;
+      margin-bottom: 8px;
     }
-
+    
     .header .subtitle {
-      font-size: 14px;
-      color: var(--text-secondary);
-      font-weight: 500;
+      font-size: 13px;
+      color: #666;
       letter-spacing: 2px;
       text-transform: uppercase;
+      font-weight: 600;
     }
-
-    .form-section {
-      position: relative;
-      z-index: 1;
-    }
-
+    
     .tariff-buttons {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+      display: flex;
       gap: 12px;
-      margin-bottom: 32px;
-    }
-
-    .tariff-button {
-      padding: 16px 20px;
-      background: var(--bg-secondary);
-      border: 2px solid var(--border-color);
+      margin: 25px 0;
+      padding: 4px;
+      background: #f0f0f0;
       border-radius: 16px;
+    }
+    
+    .tariff-button {
+      flex: 1;
+      padding: 14px 20px;
+      background: transparent;
+      border: none;
+      border-radius: 12px;
       cursor: pointer;
       text-align: center;
       font-weight: 600;
       font-size: 14px;
+      color: #666;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
       overflow: hidden;
     }
-
+    
     .tariff-button::before {
       content: '';
       position: absolute;
       top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: var(--primary-gradient);
-      transition: left 0.3s ease;
-      z-index: -1;
-    }
-
-    .tariff-button:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
-    }
-
-    .tariff-button.active {
-      background: var(--accent-color);
-      color: white;
-      border-color: var(--accent-color);
-      box-shadow: var(--shadow-md);
-    }
-
-    .tariff-button.active::before {
       left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, #95C11F 0%, #116234 100%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      border-radius: 12px;
     }
-
-    .input-group {
-      margin-bottom: 24px;
+    
+    .tariff-button.active {
+      background: linear-gradient(135deg, #95C11F 0%, #116234 100%);
+      color: white;
+      transform: scale(1.02);
+      box-shadow: 0 4px 15px rgba(149, 193, 31, 0.3);
     }
-
-    .input-label {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
+    
+    .tariff-button:hover:not(.active) {
+      background: white;
+      transform: translateY(-2px);
+    }
+    
+    label {
+      display: block;
+      margin: 20px 0 10px;
       font-weight: 600;
       font-size: 14px;
-      color: var(--text-primary);
+      color: #333;
+      letter-spacing: -0.2px;
     }
-
-    .input-field {
-      width: 100%;
-      padding: 16px 20px;
+    
+    input[type="number"] {
       font-size: 16px;
+      padding: 14px 18px;
+      width: 100%;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      transition: all 0.3s;
       font-weight: 500;
-      border: 2px solid var(--border-color);
-      border-radius: 16px;
-      background: var(--bg-primary);
-      transition: all 0.3s ease;
+      background: white;
+    }
+    
+    input[type="number"]:focus {
       outline: none;
+      border-color: #95C11F;
+      box-shadow: 0 0 0 4px rgba(149, 193, 31, 0.1);
     }
-
-    .input-field:focus {
-      border-color: var(--accent-color);
-      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-      transform: translateY(-1px);
-    }
-
+    
     .slider-container {
-      margin-top: 12px;
+      position: relative;
+      margin-top: 10px;
     }
-
+    
     .slider {
       width: 100%;
-      height: 8px;
-      border-radius: 4px;
-      background: var(--bg-secondary);
-      outline: none;
       appearance: none;
-      cursor: pointer;
-      position: relative;
+      height: 8px;
+      background: linear-gradient(to right, #95C11F 0%, #e0e0e0 0%);
+      border-radius: 5px;
+      outline: none;
+      transition: all 0.3s;
     }
-
+    
     .slider::-webkit-slider-thumb {
       appearance: none;
       width: 24px;
       height: 24px;
+      background: white;
+      border: 3px solid #95C11F;
       border-radius: 50%;
-      background: var(--accent-color);
       cursor: pointer;
-      border: 4px solid white;
-      box-shadow: var(--shadow-md);
-      transition: transform 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      transition: all 0.2s;
     }
-
+    
     .slider::-webkit-slider-thumb:hover {
       transform: scale(1.1);
+      box-shadow: 0 3px 12px rgba(149, 193, 31, 0.4);
     }
-
+    
     .slider::-moz-range-thumb {
       width: 24px;
       height: 24px;
+      background: white;
+      border: 3px solid #95C11F;
       border-radius: 50%;
-      background: var(--accent-color);
       cursor: pointer;
-      border: 4px solid white;
-      box-shadow: var(--shadow-md);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      transition: all 0.2s;
     }
-
-    .months-value {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 32px;
-      height: 32px;
-      background: var(--accent-color);
-      color: white;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 14px;
-    }
-
-    .prepayment-input-inline {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .prepayment-number-input {
-      width: 140px !important;
-      padding: 8px 12px !important;
-      font-size: 14px !important;
-      font-weight: 700;
-      border-radius: 12px !important;
-    }
-
+    
     .error-message, .helper-text {
       font-size: 13px;
       padding: 12px 16px;
       margin-top: 12px;
-      border-radius: 12px;
+      border-radius: 10px;
       font-weight: 500;
-      display: none;
-      animation: slideIn 0.3s ease;
+      animation: shake 0.5s;
     }
-
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
+    
     .error-message {
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.2);
-      color: var(--error-color);
+      color: #d32f2f;
+      background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+      border: 1px solid rgba(211, 47, 47, 0.2);
+      display: none;
     }
-
+    
     .helper-text {
-      background: rgba(59, 130, 246, 0.1);
-      border: 1px solid rgba(59, 130, 246, 0.2);
-      color: #2563eb;
-      display: block;
+      color: #116234;
+      background: linear-gradient(135deg, rgba(149, 193, 31, 0.1) 0%, rgba(17, 92, 48, 0.1) 100%);
+      border: 1px solid rgba(149, 193, 31, 0.3);
     }
-
-    .results {
-      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%);
-      border: 1px solid rgba(16, 185, 129, 0.2);
-      border-radius: 20px;
-      padding: 24px;
-      margin: 32px 0;
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+    
+    .output {
+      background: linear-gradient(135deg, rgba(149, 193, 31, 0.08) 0%, rgba(17, 92, 48, 0.08) 100%);
+      border: 2px solid rgba(149, 193, 31, 0.2);
+      padding: 20px;
+      margin-top: 25px;
+      border-radius: 16px;
       position: relative;
       overflow: hidden;
     }
-
-    .results::before {
+    
+    .output::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: var(--success-gradient);
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(135deg, #95C11F 0%, #116234 100%);
+      border-radius: 16px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: -1;
     }
-
-    .result-item {
+    
+    .output:hover::before {
+      opacity: 0.1;
+    }
+    
+    .output p {
+      margin: 12px 0;
+      font-size: 15px;
+      color: #333;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 0;
-      border-bottom: 1px solid rgba(16, 185, 129, 0.1);
-      font-size: 15px;
     }
-
-    .result-item:last-child {
-      border-bottom: none;
-      font-weight: 700;
-      font-size: 16px;
-    }
-
-    .result-label {
-      color: var(--text-secondary);
-      font-weight: 500;
-    }
-
-    .result-value {
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-
-    .buttons {
-      display: grid;
-      gap: 16px;
-      margin-top: 32px;
-    }
-
-    .btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 16px 24px;
-      border: none;
-      border-radius: 16px;
-      font-size: 16px;
+    
+    .output p strong {
+      color: #116234;
       font-weight: 600;
+    }
+    
+    .output p:last-child {
+      margin-bottom: 0;
+      padding-top: 12px;
+      border-top: 1px solid rgba(149, 193, 31, 0.2);
+    }
+    
+    .buttons {
+      margin-top: 30px;
+      display: flex;
+      gap: 12px;
+    }
+    
+    .buttons a {
+      flex: 1;
+      text-align: center;
+      padding: 16px 24px;
+      font-weight: 600;
+      border-radius: 14px;
       text-decoration: none;
-      cursor: pointer;
+      font-size: 15px;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
       overflow: hidden;
     }
-
-    .btn::before {
+    
+    .buttons a::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.2);
-      transition: left 0.3s ease;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
     }
-
-    .btn:hover::before {
-      left: 100%;
+    
+    .buttons a:hover::before {
+      width: 300px;
+      height: 300px;
     }
-
-    .btn:hover {
+    
+    .buttons a:first-child {
+      background: linear-gradient(135deg, #95C11F 0%, #7ea619 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(149, 193, 31, 0.3);
+    }
+    
+    .buttons a:first-child:hover {
       transform: translateY(-2px);
-      box-shadow: var(--shadow-lg);
+      box-shadow: 0 6px 20px rgba(149, 193, 31, 0.4);
     }
-
-    .btn-whatsapp {
-      background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+    
+    .buttons a.call {
+      background: linear-gradient(135deg, #116234 0%, #0a3d20 100%);
       color: white;
+      box-shadow: 0 4px 15px rgba(17, 92, 48, 0.3);
     }
-
-    .btn-phone {
-      background: var(--primary-gradient);
-      color: white;
+    
+    .buttons a.call:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(17, 92, 48, 0.4);
     }
-
-    .btn-icon {
-      width: 20px;
-      height: 20px;
-      fill: currentColor;
-    }
-
-    @media (min-width: 640px) {
+    
+    /* Mobile optimization */
+    @media(max-width: 767px) {
       .calculator {
-        padding: 40px;
-        max-width: 560px;
-      }
-      
-      .buttons {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .calculator {
-        margin: 10px;
-        padding: 24px;
+        padding: 30px 24px;
+        border-radius: 24px;
       }
       
       .header .title {
-        font-size: 24px;
+        font-size: 28px;
       }
       
-      .tariff-buttons {
-        grid-template-columns: 1fr;
+      .buttons {
+        flex-direction: column;
       }
+      
+      .buttons a {
+        width: 100%;
+      }
+    }
+    
+    /* Loading animation for price input */
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(149, 193, 31, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(149, 193, 31, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(149, 193, 31, 0); }
+    }
+    
+    input[type="number"]:focus {
+      animation: pulse 1.5s infinite;
     }
   </style>
 </head>
 <body>
   <div class="calculator">
     <div class="header">
-      <div class="logo"></div>
       <div class="title">AMANA FINANCE</div>
-      <div class="subtitle">Калькулятор рассрочки</div>
+      <div class="subtitle">КАЛЬКУЛЯТОР РАССРОЧКИ</div>
     </div>
 
-    <div class="form-section">
-      <div class="tariff-buttons">
-        <div class="tariff-button active" data-tariff="with">С первым взносом</div>
-        <div class="tariff-button" data-tariff="without">Без первого взноса</div>
-      </div>
+    <div class="tariff-buttons">
+      <div class="tariff-button active" data-tariff="with">С первым взносом</div>
+      <div class="tariff-button" data-tariff="without">Без первого взноса</div>
+    </div>
 
-      <div class="input-group">
-        <label class="input-label" for="price">Стоимость товара</label>
-        <input type="number" id="price" class="input-field" placeholder="не менее 50 000" min="0" />
-        <div class="error-message" id="errorMessage">Стоимость товара должно быть не менее 50 000₽</div>
-      </div>
+    <label for="price">Стоимость товара:</label>
+    <input type="number" id="price" placeholder="Минимум 50 000 ₽" min="0" />
+    <div class="error-message" id="errorMessage">Стоимость товара должна быть не менее 50 000₽</div>
 
-      <div class="input-group">
-        <label class="input-label" for="months">
-          Количество месяцев
-          <span class="months-value" id="monthsValue">3</span>
-        </label>
-        <div class="slider-container">
-          <input type="range" id="months" class="slider" min="3" max="12" value="3" />
-        </div>
-      </div>
+    <label for="months">Количество месяцев: <span id="monthsValue" style="color: #95C11F; font-weight: 700;">3</span></label>
+    <div class="slider-container">
+      <input type="range" id="months" class="slider" min="3" max="12" value="3" />
+    </div>
 
-      <div class="input-group" id="prepaymentBlock">
-        <label class="input-label">
-          <div class="prepayment-input-inline">
-            <span>Первый взнос</span>
-            <input type="number" id="prepaymentInput" class="input-field prepayment-number-input" step="100" />
-          </div>
-        </label>
-        <div class="error-message" id="prepaymentError"></div>
-        <div class="slider-container">
-          <input type="range" id="prepaymentSlider" class="slider" min="0" max="0" step="100" value="0" />
-        </div>
+    <div id="prepaymentBlock">
+      <label for="prepaymentSlider">Первый взнос:
+        <input type="number" id="prepaymentInput" step="100"
+               style="width: 140px; font-weight: 600; font-size: 15px; margin-left: 10px; display: inline-block; padding: 10px 14px;" />
+      </label>
+      <div class="error-message" id="prepaymentError" style="display: none;"></div>
+      <div class="slider-container">
+        <input type="range" id="prepaymentSlider" class="slider" min="0" max="0" step="100" value="0" />
       </div>
+    </div>
 
-      <div class="results" id="results">
-        <div class="result-item">
-          <span class="result-label">Первый взнос:</span>
-          <span class="result-value">0 ₽</span>
-        </div>
-        <div class="result-item">
-          <span class="result-label">Ежемесячный платёж:</span>
-          <span class="result-value">0 ₽</span>
-        </div>
-        <div class="result-item">
-          <span class="result-label">Стоимость с наценкой:</span>
-          <span class="result-value">0 ₽</span>
-        </div>
-        <div class="result-item">
-          <span class="result-label">Наценка:</span>
-          <span class="result-value">0 ₽ (0%)</span>
-        </div>
-      </div>
+    <div class="output" id="results">
+      <p><strong>Первый взнос:</strong> <span>0 ₽</span></p>
+      <p><strong>Ежемесячный платёж:</strong> <span>0 ₽</span></p>
+      <p><strong>Стоимость с наценкой:</strong> <span>0 ₽</span></p>
+      <p><strong>Наценка:</strong> <span>0 ₽ (0%)</span></p>
+    </div>
 
-      <div class="helper-text">
-        <strong>Обязательные требования:</strong> Поручитель и паспорта обеих лиц
-      </div>
+    <div class="helper-text">📋 Обязательные требования: Поручитель и паспорта обеих лиц</div>
 
-      <div class="buttons">
-        <a id="whatsapp" href="#" target="_blank" class="btn btn-whatsapp">
-          <svg class="btn-icon" viewBox="0 0 24 24">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.891 3.488"/>
-          </svg>
-          Написать на WhatsApp
-        </a>
-        <a class="btn btn-phone" href="tel:+79280222114">
-          <svg class="btn-icon" viewBox="0 0 24 24">
-            <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
-          </svg>
-          Позвонить
-        </a>
-      </div>
+    <div class="buttons">
+      <a id="whatsapp" href="#" target="_blank">💬 Написать в WhatsApp</a>
+      <a class="call" href="tel:+79280222114">📞 Позвонить</a>
     </div>
   </div>
 
@@ -552,25 +473,39 @@
 
     const roundUpTo100 = val => Math.ceil(val / 100) * 100;
 
+    // Update slider gradient
+    function updateSliderGradient(slider) {
+      const min = slider.min;
+      const max = slider.max;
+      const val = slider.value;
+      const percentage = ((val - min) / (max - min)) * 100;
+      slider.style.background = `linear-gradient(to right, #95C11F 0%, #95C11F ${percentage}%, #e0e0e0 ${percentage}%, #e0e0e0 100%)`;
+    }
+
     function togglePrepaymentSlider() {
       prepaymentBlock.style.display = selectedTariff === 'with' ? 'block' : 'none';
+    }
+
+    function formatNumber(num) {
+      return num.toLocaleString('ru-RU');
     }
 
     function updateCalculator(resetPrepayment = false) {
       const months = parseInt(monthsInput.value);
       monthsValue.textContent = months;
+      updateSliderGradient(monthsInput);
 
       const price = parseInt(priceInput.value);
       if (isNaN(price) || price < 50000) {
         errorMessage.style.display = 'block';
-        errorMessage.textContent = 'Стоимость товара должно быть не менее 50 000₽';
+        errorMessage.textContent = 'Стоимость товара должна быть не менее 50 000₽';
         prepaymentInput.value = 0;
         prepaymentError.style.display = 'none';
         resultsDiv.innerHTML = `
-          <div class="result-item"><span class="result-label">Первый взнос:</span><span class="result-value">0 ₽</span></div>
-          <div class="result-item"><span class="result-label">Ежемесячный платёж:</span><span class="result-value">0 ₽</span></div>
-          <div class="result-item"><span class="result-label">Стоимость с наценкой:</span><span class="result-value">0 ₽</span></div>
-          <div class="result-item"><span class="result-label">Наценка:</span><span class="result-value">0 ₽ (0%)</span></div>
+          <p><strong>Первый взнос:</strong> <span>0 ₽</span></p>
+          <p><strong>Ежемесячный платёж:</strong> <span>0 ₽</span></p>
+          <p><strong>Стоимость с наценкой:</strong> <span>0 ₽</span></p>
+          <p><strong>Наценка:</strong> <span>0 ₽ (0%)</span></p>
         `;
         whatsappBtn.href = "https://wa.me/79280222114?text=Здравствуйте, хочу оформить рассрочку.";
         togglePrepaymentSlider();
@@ -602,6 +537,7 @@
 
         prepayment = parseInt(prepaymentSlider.value);
         prepaymentInput.value = prepayment;
+        updateSliderGradient(prepaymentSlider);
 
         if (prepayment === conditionalPrepayment) {
           const remaining = baseFinalCost - prepayment;
@@ -614,24 +550,24 @@
           finalCost = monthly * months + prepayment;
         }
 
-        message = `Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${price.toLocaleString()} ₽, Тариф: С первым взносом, Первый взнос: ${prepayment.toLocaleString()} ₽, Срок: ${months} мес.`;
+        message = `Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${formatNumber(price)} ₽, Тариф: С первым взносом, Первый взнос: ${formatNumber(prepayment)} ₽, Срок: ${months} мес.`;
 
       } else {
         monthly = roundUpTo100(baseFinalCost / months);
         finalCost = monthly * months;
         prepaymentInput.value = "0";
         prepayment = 0;
-        message = `Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${price.toLocaleString()} ₽, Тариф: Без первого взноса, Срок: ${months} мес.`;
+        message = `Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${formatNumber(price)} ₽, Тариф: Без первого взноса, Срок: ${months} мес.`;
       }
 
       const markup = finalCost - price;
       const markupPercent = Math.round((markup / price) * 100);
 
       resultsDiv.innerHTML = `
-        <div class="result-item"><span class="result-label">Первый взнос:</span><span class="result-value">${prepayment.toLocaleString()} ₽</span></div>
-        <div class="result-item"><span class="result-label">Ежемесячный платёж:</span><span class="result-value">${monthly.toLocaleString()} ₽</span></div>
-        <div class="result-item"><span class="result-label">Стоимость с наценкой:</span><span class="result-value">${finalCost.toLocaleString()} ₽</span></div>
-        <div class="result-item"><span class="result-label">Наценка:</span><span class="result-value">${markup.toLocaleString()} ₽ (${markupPercent}%)</span></div>
+        <p><strong>Первый взнос:</strong> <span style="color: #95C11F; font-weight: 700;">${formatNumber(prepayment)} ₽</span></p>
+        <p><strong>Ежемесячный платёж:</strong> <span style="color: #116234; font-weight: 700;">${formatNumber(monthly)} ₽</span></p>
+        <p><strong>Стоимость с наценкой:</strong> <span style="font-weight: 600;">${formatNumber(finalCost)} ₽</span></p>
+        <p><strong>Наценка:</strong> <span>${formatNumber(markup)} ₽ (${markupPercent}%)</span></p>
       `;
 
       whatsappBtn.href = `https://wa.me/79280222114?text=${encodeURIComponent(message)}`;
@@ -650,7 +586,10 @@
 
     priceInput.addEventListener('input', () => updateCalculator(true));
     monthsInput.addEventListener('input', () => updateCalculator(true));
-    prepaymentSlider.addEventListener('input', () => updateCalculator(false));
+    prepaymentSlider.addEventListener('input', () => {
+      updateSliderGradient(prepaymentSlider);
+      updateCalculator(false);
+    });
 
     prepaymentInput.addEventListener('input', () => {
       const val = roundUpTo100(parseInt(prepaymentInput.value || '0'));
@@ -660,14 +599,17 @@
       if (val >= min && val <= max) {
         prepaymentError.style.display = 'none';
         prepaymentSlider.value = val;
+        updateSliderGradient(prepaymentSlider);
         updateCalculator(false);
       } else {
-        prepaymentError.textContent = `Первый взнос должен быть от ${min.toLocaleString()}₽ до ${max.toLocaleString()}₽`;
+        prepaymentError.textContent = `Первый взнос должен быть от ${formatNumber(min)}₽ до ${formatNumber(max)}₽`;
         prepaymentError.style.display = 'block';
       }
     });
 
+    // Initialize
     updateCalculator(true);
+    updateSliderGradient(monthsInput);
   </script>
 </body>
 </html>
