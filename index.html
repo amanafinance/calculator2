@@ -362,12 +362,15 @@
     .output strong {
       color: #166534;
       font-weight: 600;
+      flex-shrink: 0;
     }
 
     .output-value {
       font-weight: 700;
       font-size: 16px;
       color: #15803D;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .buttons {
@@ -510,7 +513,7 @@
     </div>
 
     <div class="input-group">
-      <label for="months">Количество месяцев: <span id="monthsValue">3</span></label>
+      <label for="months" id="monthsLabel">Срок: 3 месяца</label>
       <div class="slider-container">
         <input type="range" id="months" class="slider" min="3" max="12" value="3" />
         <div class="months-display">
@@ -557,7 +560,7 @@
   <script>
     const priceInput = document.getElementById('price');
     const monthsInput = document.getElementById('months');
-    const monthsValue = document.getElementById('monthsValue');
+    const monthsLabel = document.getElementById('monthsLabel');
     const prepaymentBlock = document.getElementById('prepaymentBlock');
     const prepaymentSlider = document.getElementById('prepaymentSlider');
     const prepaymentInput = document.getElementById('prepaymentInput');
@@ -593,7 +596,11 @@
 
     function updateCalculator(resetPrepayment = false) {
       const months = parseInt(monthsInput.value);
-      monthsValue.textContent = months;
+      
+      // Обновляем текст лейбла в зависимости от количества месяцев
+      const monthText = months === 1 ? 'месяц' : (months < 5 ? 'месяца' : 'месяцев');
+      monthsLabel.textContent = `Срок: ${months} ${monthText}`;
+      
       updateMonthLabels(months);
 
       const price = parseInt(priceInput.value);
