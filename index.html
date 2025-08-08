@@ -287,9 +287,7 @@
       border-left: 4px solid #EA580C;
       display: none;
       animation: pulseGlow 2s ease-in-out infinite;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      line-height: 1.4;
     }
 
     @keyframes shake {
@@ -358,6 +356,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 20px;
     }
 
     .output strong {
@@ -507,7 +506,7 @@
       <div class="input-wrapper">
         <input type="number" id="price" placeholder="не менее 50 000 ₽" min="0" />
       </div>
-      <div class="error-message" id="errorMessage">⚠️ Стоимость товара должна быть не менее 50 000₽</div>
+      <div class="error-message" id="errorMessage">⚠️ Стоимость товара должна быть<br>не менее 50 000₽</div>
     </div>
 
     <div class="input-group">
