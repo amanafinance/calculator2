@@ -1,1526 +1,833 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Система учета рассрочки</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Amana Finance — Учёт рассрочки</title>
+  <!-- Шрифт -->
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+  <!-- Firebase SDK v10 (модульные CDN) -->
+  <script type="module">
+    // ====== UI (минимализм, мобильный first) ======
+    const css = `
+      :root{
+        --primary: rgb(149,193,31);
+        --secondary: rgb(17,92,48);
+        --bg:#f7f8f9;
+        --card:#fff;
+        --text:#1b1b1b;
+        --muted:#8a8f98;
+        --danger:#d93636;
+        --ok:#1a7f37;
+        --border:#e6e8eb;
+        --radius:14px;
+      }
+      *{box-sizing:border-box}
+      html,body{height:100%}
+      body{
+        margin:0; font-family:Manrope,system-ui,-apple-system,Segoe UI,Roboto;
+        background:linear-gradient(135deg, rgba(149,193,31,.08), rgba(17,92,48,.08)) fixed, var(--bg);
+        color:var(--text);
+      }
+      header{
+        position:sticky; top:0; z-index:20;
+        background:rgba(255,255,255,.86); backdrop-filter:saturate(1.2) blur(10px);
+        border-bottom:1px solid var(--border);
+      }
+      .wrap{max-width:1100px;margin:0 auto;padding:12px 16px;}
+      .brand{display:flex;align-items:center;gap:10px}
+      .brand .dot{width:12px;height:12px;border-radius:50%;background:var(--primary);box-shadow:0 0 0 3px rgba(149,193,31,.2)}
+      h1{font-size:18px;margin:0;font-weight:800;letter-spacing:.3px}
+      .authbar{display:flex;gap:8px;align-items:center;margin-left:auto}
+      .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+      .muted{color:var(--muted);font-size:12px}
+      .btn{
+        border:1px solid var(--border); background:#fff; padding:8px 12px; border-radius:10px; cursor:pointer;
+        font-weight:600;
+      }
+      .btn.primary{background:var(--primary); color:#fff; border-color:transparent}
+      .btn.danger{background:var(--danger); color:#fff; border-color:transparent}
+      .btn.ghost{background:transparent}
+      .grid{display:grid; gap:12px}
+      @media(min-width:900px){ .grid.cols-2{grid-template-columns:1fr 1fr} .grid.cols-3{grid-template-columns:1.2fr 1fr 1fr}}
+      .card{
+        background:var(--card);
+        border:1px solid var(--border);
+        border-radius:var(--radius);
+        padding:14px;
+        box-shadow:0 6px 20px rgba(17,92,48,.06);
+      }
+      .tabs{display:flex; gap:8px; flex-wrap:wrap; margin:12px 0}
+      .tab{padding:8px 12px;border-radius:999px;border:1px solid var(--border);cursor:pointer;font-weight:600}
+      .tab.active{background:var(--secondary); color:#fff; border-color:transparent}
+      label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
+      input,select,textarea{
+        width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border); background:#fff;
+        outline:none; font-size:14px;
+      }
+      .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+      .row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px}
+      .row4{display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px}
+      .list{display:flex; flex-direction:column; gap:10px}
+      .item{
+        border:1px solid var(--border); border-radius:12px; padding:12px; background:#fff; display:grid; gap:8px
+      }
+      .item .top{display:flex; gap:8px; align-items:center; justify-content:space-between}
+      .pill{padding:4px 8px; border-radius:999px; background:#f2f5f7; font-size:12px; color:#59616b}
+      .pill.ok{background:#e8f6ee;color:var(--ok);font-weight:700}
+      .pill.bad{background:#fdecec;color:var(--danger);font-weight:700}
+      .schedule{border-top:1px dashed var(--border); padding-top:8px; display:grid; gap:6px}
+      .schedule .line{display:grid; grid-template-columns:28px 1fr 1fr 1fr 140px; gap:8px; align-items:center}
+      .sep{height:1px;background:var(--border); margin:6px 0}
+      .right{margin-left:auto}
+      .danger-txt{color:var(--danger); font-weight:700}
+      .ok-txt{color:var(--ok); font-weight:700}
+      .hint{font-size:12px;color:var(--muted)}
+      .flex{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+      .nowrap{white-space:nowrap}
+      footer{padding:40px 16px;color:var(--muted);text-align:center}
+      .hidden{display:none!important}
+      .scroll{max-height:60vh; overflow:auto; padding-right:4px}
+      .table{width:100%; border-collapse:collapse}
+      .table th,.table td{padding:8px;border-bottom:1px solid var(--border);font-size:13px;text-align:left}
+      .w80{width:80px}
+      .w120{width:120px}
+    `;
+    const style = document.createElement('style'); style.textContent = css; document.head.appendChild(style);
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
+    // ====== HTML SKELETON ======
+    document.addEventListener('DOMContentLoaded', () => {
+      document.body.innerHTML = `
+        <header>
+          <div class="wrap row">
+            <div class="brand"><div class="dot"></div><h1>AMANA FINANCE — УЧЁТ РАССРОЧКИ</h1></div>
+            <div class="authbar row">
+              <input id="email" placeholder="email" class="w120" />
+              <input id="pass" type="password" placeholder="пароль" class="w120"/>
+              <button class="btn" id="btnSignIn">Войти</button>
+              <button class="btn ghost hidden" id="btnSignOut">Выйти</button>
+              <span class="muted" id="who"></span>
+            </div>
+          </div>
+        </header>
 
-        .login-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
+        <main class="wrap">
+          <div class="tabs">
+            <div class="tab active" data-tab="contracts">Учет</div>
+            <div class="tab" data-tab="cashday">УчетФинансов (дни)</div>
+            <div class="tab" data-tab="cashbox">Касса (сводка)</div>
+            <div class="tab" data-tab="ledger">Операции</div>
+            <div class="tab" data-tab="export">Экспорт</div>
+          </div>
 
-        .login-form {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
+          <!-- УЧЕТ -->
+          <section id="contracts" class="grid cols-2">
+            <div class="card">
+              <h3>Новый договор</h3>
+              <div class="row2">
+                <div><label>ФИО</label><input id="c_fio" /></div>
+                <div><label>Партнер (магазин)</label><input id="c_partner" /></div>
+              </div>
+              <div class="row3">
+                <div><label>Себестоимость ₽</label><input id="c_cost" type="number" min="0"/></div>
+                <div><label>Цена ₽</label><input id="c_price" type="number" min="0"/></div>
+                <div><label>Предоплата ₽</label><input id="c_prepay" type="number" min="0"/></div>
+              </div>
+              <div class="row4">
+                <div><label>Месяцев (1–8)</label><input id="c_months" type="number" min="1" max="8" value="6"/></div>
+                <div><label>Число оплаты</label><input id="c_payday" type="number" min="1" max="28" value="10"/></div>
+                <div><label>Отсрочка (дней)</label><input id="c_defer" type="number" min="0" value="0"/></div>
+                <div><label>Дата покупки</label><input id="c_date" type="date"/></div>
+              </div>
+              <div class="row3">
+                <div><label>Телефон покупателя</label><input id="c_phone" /></div>
+                <div><label>Телефон поручителя</label><input id="c_phone2" /></div>
+                <div><label>Адрес</label><input id="c_addr" /></div>
+              </div>
+              <div class="row2">
+                <div><label>Товар / Комментарий</label><input id="c_item" /></div>
+                <div><label>IMEI / Примечание</label><input id="c_imei" /></div>
+              </div>
+              <div class="sep"></div>
+              <div class="flex">
+                <button class="btn primary" id="btnCreateContract">Создать</button>
+                <span class="hint">Ежемесячный платеж и график создаются автоматически, последний платеж корректируется с учётом округления.</span>
+              </div>
+            </div>
 
-        .login-form h1 {
-            color: #333;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-        }
+            <div class="card">
+              <div class="flex">
+                <h3 style="margin:0">Договоры</h3>
+                <input id="q" placeholder="Поиск: ФИО / партнёр / телефон" />
+                <select id="filterOver">
+                  <option value="">Все</option>
+                  <option value="overdue">Только просрочка</option>
+                  <option value="today">Платёж сегодня</option>
+                  <option value="active">Активные</option>
+                  <option value="closed">Закрытые</option>
+                </select>
+                <button class="btn" id="btnRefresh">Обновить</button>
+              </div>
+              <div class="scroll list" id="contractsList"></div>
+            </div>
+          </section>
 
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
+          <!-- УЧЕТ ФИНАНСОВ (ДНИ) -->
+          <section id="cashday" class="grid cols-2 hidden">
+            <div class="card">
+              <h3>Внести операцию дня</h3>
+              <div class="row3">
+                <div><label>Дата</label><input id="op_date" type="date"/></div>
+                <div>
+                  <label>Тип</label>
+                  <select id="op_kind">
+                    <option value="investment">Вложение</option>
+                    <option value="expense">Расход</option>
+                    <option value="refund">Возврат</option>
+                    <option value="other">Другое</option>
+                  </select>
+                </div>
+                <div><label>Сумма ₽</label><input id="op_amount" type="number" min="0"/></div>
+              </div>
+              <div class="row2">
+                <div><label>Название</label><input id="op_title"/></div>
+                <div><label>Комментарий</label><input id="op_note"/></div>
+              </div>
+              <div class="sep"></div>
+              <div class="flex">
+                <button class="btn primary" id="btnAddLedger">Добавить</button>
+                <span class="hint">Попадает в дневную кассу и сводку «Касса».</span>
+              </div>
+            </div>
 
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #333;
-            font-weight: 500;
-        }
+            <div class="card">
+              <div class="flex">
+                <h3 style="margin:0">Дневная касса</h3>
+                <input id="cd_date" type="date"/>
+                <button class="btn" id="btnRebuildDay">Пересчитать день</button>
+              </div>
+              <div id="cashDayBox" class="list" style="margin-top:8px"></div>
+            </div>
+          </section>
 
-        .form-group input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #e1e1e1;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
+          <!-- КАССА -->
+          <section id="cashbox" class="grid cols-3 hidden">
+            <div class="card">
+              <h3>Период</h3>
+              <div class="row3">
+                <div><label>С</label><input id="k_from" type="date"/></div>
+                <div><label>По</label><input id="k_to" type="date"/></div>
+                <div><label>&nbsp;</label><button class="btn" id="btnBuildKassa">Показать</button></div>
+              </div>
+              <div class="sep"></div>
+              <div id="kassaBox" class="list"></div>
+            </div>
+            <div class="card">
+              <h3>Итоги</h3>
+              <table class="table" id="kassaTotals"></table>
+            </div>
+            <div class="card">
+              <h3>Долги и прибыль</h3>
+              <table class="table" id="kassaProfit"></table>
+            </div>
+          </section>
 
-        .form-group input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
+          <!-- ОПЕРАЦИИ -->
+          <section id="ledger" class="grid hidden">
+            <div class="card">
+              <div class="flex">
+                <h3 style="margin:0">Журнал операций</h3>
+                <input id="lg_from" type="date"/>
+                <input id="lg_to" type="date"/>
+                <button class="btn" id="btnLoadLedger">Показать</button>
+              </div>
+              <table class="table" id="ledgerTable"></table>
+            </div>
+          </section>
 
-        .login-btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
+          <!-- ЭКСПОРТ -->
+          <section id="export" class="hidden">
+            <div class="card">
+              <h3>Экспорт данных</h3>
+              <div class="flex">
+                <button class="btn" id="btnExportJSON">Скачать JSON</button>
+                <span class="hint">Экспортирует clients, contracts, payments, cashDays, ledger.</span>
+              </div>
+            </div>
+          </section>
+        </main>
 
-        .login-btn:hover {
-            transform: translateY(-2px);
-        }
+        <footer>© Amana Finance · Веб-сервис учёта рассрочки</footer>
+      `;
 
-        .main-container {
-            background: #f5f5f5;
-            min-height: 100vh;
-        }
+      // простые табы
+      document.querySelectorAll('.tab').forEach(t=>{
+        t.addEventListener('click', ()=>{
+          document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+          t.classList.add('active');
+          const id=t.dataset.tab;
+          document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));
+          document.getElementById(id).classList.remove('hidden');
+        });
+      });
+    });
 
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
+    // ====== HELPERS ======
+    const fmt = (n)=> (n??0).toLocaleString('ru-RU');
+    const todayStr = ()=> new Date().toISOString().slice(0,10);
+    const toDateStr = (d)=> new Date(d).toISOString().slice(0,10);
+    const addMonthsKeepDay = (d, m, payDay=10)=> {
+      const dt = new Date(d);
+      const baseDay = Math.min(+payDay||10, 28);
+      dt.setDate(baseDay);
+      dt.setMonth(dt.getMonth()+m);
+      return toDateStr(dt);
+    };
+    const ceil100 = (n)=> Math.ceil((n??0)/100)*100;
 
-        .header h1 {
-            font-size: 1.8em;
-        }
+    // Роли
+    let currentUser = null;
+    let currentRole = 'manager'; // по умолчанию
+    const setRole = async (auth, db) => {
+      if(!auth.currentUser){ currentRole='manager'; return; }
+      // роль храним в users/{uid}.role
+      const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+      const ref = doc(db,'users', auth.currentUser.uid);
+      const snap = await getDoc(ref);
+      currentRole = snap.exists() ? (snap.data().role || 'manager') : 'manager';
+    };
 
-        .logout-btn {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
+    // ====== FIREBASE APP ======
+    import {
+      initializeApp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      getFirestore, collection, addDoc, doc, getDoc, setDoc, getDocs, query, where,
+      orderBy, limit, updateDoc, serverTimestamp, Timestamp, onSnapshot
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        .logout-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
+    // ==== ВСТАВЬ СВОЙ КОНФИГ ТУТ ====
+    const firebaseConfig = {
+      // !!! ЗАМЕНИ на свой (из консоли Firebase)
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
 
-        .navigation {
-            background: white;
-            padding: 0;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-        .nav-tabs {
-            display: flex;
-            list-style: none;
-        }
+    // ====== AUTH UI ======
+    document.addEventListener('click', (e)=>{
+      if(e.target.id==='btnSignIn'){
+        const email = document.getElementById('email').value.trim();
+        const pass = document.getElementById('pass').value.trim();
+        signInWithEmailAndPassword(auth, email, pass).catch(err=>alert(err.message));
+      }
+      if(e.target.id==='btnSignOut'){
+        signOut(auth);
+      }
+    });
 
-        .nav-tabs li {
-            flex: 1;
-        }
+    onAuthStateChanged(auth, async (u)=>{
+      currentUser = u;
+      const who = document.getElementById('who');
+      document.getElementById('btnSignOut').classList.toggle('hidden', !u);
+      document.getElementById('btnSignIn').classList.toggle('hidden', !!u);
+      if(u){
+        await setRole(auth, db);
+        who.textContent = `${u.email} · роль: ${currentRole}`;
+        initApp();
+      } else {
+        who.textContent = '';
+      }
+    });
 
-        .nav-tabs button {
-            width: 100%;
-            padding: 15px 20px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 500;
-            color: #666;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s;
-        }
+    // ====== DATA LAYERS ======
+    const colClients   = ()=> collection(db,'clients');
+    const colContracts = ()=> collection(db,'contracts');
+    const colPayments  = ()=> collection(db,'payments');
+    const colCashDays  = ()=> collection(db,'cashDays');
+    const colLedger    = ()=> collection(db,'ledger');
 
-        .nav-tabs button.active {
-            color: #667eea;
-            border-bottom-color: #667eea;
-            background: #f8f9ff;
-        }
+    // ====== CONTRACTS (УЧЕТ) ======
+    const state = { contracts:[], clientsMap:new Map() };
 
-        .nav-tabs button:hover {
-            background: #f0f0f0;
-        }
+    async function createContract(){
+      const fio = document.getElementById('c_fio').value.trim();
+      if(!fio){ alert('Укажи ФИО'); return; }
+      const partner = document.getElementById('c_partner').value.trim();
+      const cost = +document.getElementById('c_cost').value||0;
+      const price = +document.getElementById('c_price').value||0;
+      const prepay = +document.getElementById('c_prepay').value||0;
+      let months = Math.max(1, Math.min(8, +document.getElementById('c_months').value||1));
+      const payDay = +document.getElementById('c_payday').value||10;
+      const deferDays = +document.getElementById('c_defer').value||0;
+      const purchaseDate = document.getElementById('c_date').value||todayStr();
+      const phone = document.getElementById('c_phone').value.trim();
+      const phone2 = document.getElementById('c_phone2').value.trim();
+      const addr = document.getElementById('c_addr').value.trim();
+      const item = document.getElementById('c_item').value.trim();
+      const imei = document.getElementById('c_imei').value.trim();
 
-        .content {
-            padding: 20px;
-        }
+      // monthly = округление вверх до 100
+      const base = Math.max(0, price - prepay);
+      let monthly = ceil100(base / months);
 
-        .tab-content {
-            display: none;
-        }
+      // генерируем график
+      const schedule = [];
+      const start = new Date(purchaseDate);
+      // применяем отсрочку к первому платежу, потом равные месяцы
+      const firstDue = new Date(start.getTime() + deferDays*24*3600*1000);
+      let totalPlanned = 0;
 
-        .tab-content.active {
-            display: block;
-        }
+      for(let n=1;n<=months;n++){
+        const due = (n===1)
+          ? toDateStr(new Date(firstDue.getFullYear(), firstDue.getMonth(), Math.min(payDay,28)))
+          : addMonthsKeepDay(firstDue, n-1, payDay);
+        schedule.push({
+          n, planDate: due, planAmount: monthly, paidAmount: 0, paidDate: null, method:null
+        });
+        totalPlanned += monthly;
+      }
+      // корректируем последний взнос под общую сумму (base)
+      const diff = totalPlanned - base;
+      if(schedule.length>0 && diff!==0){
+        schedule[schedule.length-1].planAmount = Math.max(0, schedule[schedule.length-1].planAmount - diff);
+      }
 
-        .card {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
+      // client (создадим/найдем)
+      let clientId = null;
+      // По простому: создаём всегда (или искали бы по ФИО+телу)
+      const cdoc = await addDoc(colClients(), { fio, phone, phone2, addr, imei, createdAt: serverTimestamp() });
+      clientId = cdoc.id;
 
-        .card h2 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 1.5em;
-        }
+      const contract = {
+        clientId, fio, partner, costPrice:cost, price, prepayment:prepay, months,
+        payDay, deferDays, purchaseDate, itemName:item,
+        totals:{ monthlyAmount: monthly, paidTotal: 0, balance: price - prepay, isOverdue:false, discount:0, deductions:0 },
+        schedule, phones:{buyer:phone, guarantor:phone2}, addr,
+        createdAt: serverTimestamp(), status:'active'
+      };
+      await addDoc(colContracts(), contract);
+      alert('Договор создан');
+      await loadContracts();
+      renderContracts();
+    }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
+    function scheduleOverdueFlag(schedule){
+      const today = todayStr();
+      for(const s of schedule){
+        if((s.paidAmount??0) < (s.planAmount??0) && s.planDate < today){ return true; }
+      }
+      return false;
+    }
 
-        .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-        }
+    async function loadContracts(){
+      const qs = document.getElementById('q')?.value.trim().toLowerCase() || '';
+      state.contracts = [];
+      const snap = await getDocs(query(colContracts()));
+      state.contracts = snap.docs.map(d=>({id:d.id, ...d.data()}));
 
-        .stat-card h3 {
-            font-size: 2em;
-            margin-bottom: 5px;
-        }
+      // простая фильтрация по поиску
+      if(qs){
+        state.contracts = state.contracts.filter(c =>
+          (c.fio||'').toLowerCase().includes(qs)
+          || (c.partner||'').toLowerCase().includes(qs)
+          || (c.phones?.buyer||'').toLowerCase().includes(qs)
+        );
+      }
 
-        .stat-card p {
-            opacity: 0.9;
-            font-size: 0.9em;
-        }
+      // флаг просрочки/сегодня
+      state.contracts = state.contracts.map(c=>{
+        c.totals.isOverdue = scheduleOverdueFlag(c.schedule||[]);
+        return c;
+      });
+      // clients map (минимально)
+      state.clientsMap.clear();
+    }
 
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 15px;
-        }
+    function renderContracts(){
+      const list = document.getElementById('contractsList');
+      if(!list) return;
+      const filter = document.getElementById('filterOver')?.value || '';
+      let arr = [...state.contracts];
 
-        .form-group-inline {
-            display: flex;
-            flex-direction: column;
-        }
+      const today = todayStr();
+      if(filter==='overdue') arr = arr.filter(c=>c.totals?.isOverdue);
+      if(filter==='today') arr = arr.filter(c=>(c.schedule||[]).some(s=>s.planDate===today && (s.paidAmount??0)<(s.planAmount??0)));
+      if(filter==='active') arr = arr.filter(c=>c.status!=='closed');
+      if(filter==='closed') arr = arr.filter(c=>c.status==='closed');
 
-        .form-group-inline label {
-            margin-bottom: 5px;
-            color: #333;
-            font-weight: 500;
-            font-size: 14px;
-        }
+      if(arr.length===0){ list.innerHTML = `<div class="muted">Нет данных</div>`; return; }
 
-        .form-group-inline input, .form-group-inline select {
-            padding: 10px;
-            border: 2px solid #e1e1e1;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
+      list.innerHTML = arr.map(c=>{
+        const bal = (c.totals?.balance ?? (c.price - (c.prepayment||0) - (c.totals?.paidTotal||0)));
+        const paid = c.totals?.paidTotal ?? 0;
+        const overdue = c.totals?.isOverdue;
+        const statusPill = overdue ? `<span class="pill bad">ПРОСРОЧКА</span>` :
+                          (bal<=0 ? `<span class="pill ok">ЗАКРЫТ</span>` : `<span class="pill">Активен</span>`);
+        const schedule = (c.schedule||[]).map(s=>{
+          const ok = (s.paidAmount??0) >= (s.planAmount??0);
+          return `
+            <div class="line">
+              <div>#${s.n}</div>
+              <div><span class="${ok?'ok-txt':'danger-txt'}">${ok?'Оплачено':'Не оплачено'}</span><div class="hint">${s.planDate}</div></div>
+              <div>План: <b>${fmt(s.planAmount)}</b> ₽</div>
+              <div>Оплачено: <b>${fmt(s.paidAmount||0)}</b> ₽</div>
+              <div class="right">
+                <div class="flex">
+                  <input type="number" min="0" placeholder="Сумма" id="pay_amt_${c.id}_${s.n}" class="w120">
+                  <select id="pay_m_${c.id}_${s.n}">
+                    <option value="cash">нал</option>
+                    <option value="card">карта</option>
+                    <option value="other">др.</option>
+                  </select>
+                  <input type="date" id="pay_d_${c.id}_${s.n}" value="${todayStr()}" class="w120">
+                  <button class="btn" data-pay="${c.id}:${s.n}">Оплатить</button>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
 
-        .form-group-inline input:focus, .form-group-inline select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
+        return `
+          <div class="item" data-id="${c.id}">
+            <div class="top">
+              <div class="flex">
+                <b>${c.fio||'-'}</b>
+                <span class="pill">${c.partner||'-'}</span>
+                ${statusPill}
+              </div>
+              <div class="flex">
+                <span class="pill">Цена: <b>${fmt(c.price)}</b> ₽</span>
+                <span class="pill">Предоплата: <b>${fmt(c.prepayment)}</b> ₽</span>
+                <span class="pill">Остаток: <b>${fmt(bal)}</b> ₽</span>
+              </div>
+            </div>
+            <div class="hint">Товар: ${c.itemName||'-'} · Себестоимость: ${fmt(c.costPrice||0)} ₽ · Месяцев: ${c.months} · День оплаты: ${c.payDay} · Отсрочка: ${c.deferDays} д.</div>
+            <div class="schedule">${schedule}</div>
+            <div class="sep"></div>
+            <div class="flex">
+              <div class="hint">Тел: ${c.phones?.buyer||'-'} / ${c.phones?.guarantor||'-'} · Адрес: ${c.addr||'-'}</div>
+              <button class="btn ghost right" data-close="${c.id}">Закрыть договор</button>
+              <a class="btn" href="https://wa.me/${(c.phones?.buyer||'').replace(/\D/g,'')}" target="_blank">WhatsApp</a>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
 
-        .btn {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 500;
-            transition: transform 0.2s;
-            margin-right: 10px;
-        }
+    // обработка оплат по взносу
+    document.addEventListener('click', async (e)=>{
+      if(e.target.dataset?.pay){
+        const [cid, n] = e.target.dataset.pay.split(':');
+        const amt = +document.getElementById(`pay_amt_${cid}_${n}`).value || 0;
+        const method = document.getElementById(`pay_m_${cid}_${n}`).value || 'cash';
+        const d = document.getElementById(`pay_d_${cid}_${n}`).value || todayStr();
+        if(amt<=0){ alert('Укажи сумму'); return; }
+        await addInstallmentPayment(cid, +n, amt, method, d);
+        await loadContracts();
+        renderContracts();
+        await rebuildCashDay(d);
+      }
+      if(e.target.id==='btnCreateContract'){ createContract(); }
+      if(e.target.id==='btnRefresh'){ loadContracts().then(renderContracts); }
+      if(e.target.dataset?.close){
+        await updateDoc(doc(db,'contracts', e.target.dataset.close), { status:'closed' });
+        await loadContracts(); renderContracts();
+      }
+    });
 
-        .btn:hover {
-            transform: translateY(-1px);
-        }
+    async function addInstallmentPayment(contractId, n, amount, method, dateStr){
+      // найдём контракт
+      const csnap = await getDoc(doc(db,'contracts', contractId));
+      if(!csnap.exists()) return;
+      const c = {id:csnap.id, ...csnap.data()};
+      // prepayment case: n===0 (не используем здесь; ниже — отдельная форма если надо)
+      // обновим schedule[n]
+      const schedule = (c.schedule||[]).map(x=>({...x}));
+      const idx = schedule.findIndex(x=>x.n===n);
+      if(idx<0){ alert('Не найден взнос'); return; }
+      schedule[idx].paidAmount = (schedule[idx].paidAmount||0) + amount;
+      schedule[idx].paidDate = dateStr;
+      schedule[idx].method = method;
 
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
+      const newPaid = (c.totals?.paidTotal||0) + amount;
+      const newBalance = Math.max(0, (c.price||0) - (c.prepayment||0) - newPaid);
 
-        .btn-success {
-            background: #28a745;
-            color: white;
-        }
+      await updateDoc(doc(db,'contracts', contractId), {
+        schedule, 'totals.paidTotal': newPaid, 'totals.balance': newBalance
+      });
 
-        .btn-warning {
-            background: #ffc107;
-            color: #212529;
-        }
+      // payment документ
+      await addDoc(colPayments(), {
+        contractId, clientId: c.clientId, type:'installment', n, amount, method,
+        date: Timestamp.fromDate(new Date(dateStr)), createdAt: serverTimestamp()
+      });
+    }
 
-        .btn-danger {
-            background: #dc3545;
-            color: white;
-        }
+    // ====== CASHDAY (УчетФинансов) ======
+    document.addEventListener('click', async (e)=>{
+      if(e.target.id==='btnAddLedger'){
+        const date = document.getElementById('op_date').value || todayStr();
+        const kind = document.getElementById('op_kind').value;
+        const amount = +document.getElementById('op_amount').value || 0;
+        const title = document.getElementById('op_title').value.trim();
+        const note = document.getElementById('op_note').value.trim();
+        if(amount<=0){ alert('Укажи сумму'); return; }
+        await addDoc(colLedger(), {
+          date: Timestamp.fromDate(new Date(date)), kind, amount, title, note, createdAt: serverTimestamp()
+        });
+        await rebuildCashDay(date);
+        alert('Операция добавлена');
+      }
+      if(e.target.id==='btnRebuildDay'){
+        const date = document.getElementById('cd_date').value || todayStr();
+        await rebuildCashDay(date);
+        await showCashDay(date);
+      }
+    });
 
-        .table-container {
-            overflow-x: auto;
-            margin-top: 20px;
-        }
+    async function rebuildCashDay(dateStrVal){
+      // агрегируем все payments за день
+      const start = new Date(dateStrVal); start.setHours(0,0,0,0);
+      const end = new Date(dateStrVal); end.setHours(23,59,59,999);
+      // загрузим все payments (для простоты: выборка всех и фильтр по дате)
+      const ps = await getDocs(query(colPayments()));
+      let prepaid=0, installments=0, cash=0, card=0, other=0, returns=0;
+      ps.forEach(d=>{
+        const p = d.data();
+        if(!p.date) return;
+        const t = p.date.toDate();
+        if(t<start||t>end) return;
+        if(p.type==='prepayment') prepaid += p.amount||0;
+        if(p.type==='installment') installments += p.amount||0;
+        if(p.method==='cash') cash += p.amount||0;
+        else if(p.method==='card') card += p.amount||0;
+        else other += p.amount||0;
+        if(p.type==='refund') returns += p.amount||0;
+      });
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
+      // ledger
+      const lg = await getDocs(query(colLedger()));
+      let investments=0, expenses=0, notAccrued=0, fromOtherStore=0;
+      lg.forEach(d=>{
+        const r = d.data();
+        if(!r.date) return;
+        const t = r.date.toDate();
+        if(t<start||t>end) return;
+        if(r.kind==='investment') investments += r.amount||0;
+        else if(r.kind==='expense') expenses += r.amount||0;
+        else if(r.kind==='notAccrued') notAccrued += r.amount||0;
+        else if(r.kind==='fromOtherStore') fromOtherStore += r.amount||0;
+        else if(r.kind==='refund') returns += r.amount||0;
+      });
 
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #e1e1e1;
-        }
+      const dayTotal = prepaid + installments;
+      const financeTotal = cash + card + other - returns; // грубо
+      const docId = dateStrVal.replaceAll('-','');
+      await setDoc(doc(db,'cashDays', docId), {
+        date: Timestamp.fromDate(new Date(dateStrVal)),
+        aggregates: {
+          dayTotal, prepaid, installments, cash, card, other, returns,
+          notAccrued, fromOtherStore, investments, expenses,
+          financeTotal
+        },
+        updatedAt: serverTimestamp()
+      });
+    }
 
-        th {
-            background: #f8f9ff;
-            font-weight: 600;
-            color: #333;
-        }
+    async function showCashDay(dateStrVal){
+      const box = document.getElementById('cashDayBox');
+      const id = dateStrVal.replaceAll('-','');
+      const sn = await getDoc(doc(db,'cashDays', id));
+      if(!sn.exists()){ box.innerHTML = `<div class="muted">Нет данных за день</div>`; return; }
+      const a = sn.data().aggregates||{};
+      box.innerHTML = `
+        <div class="item">
+          <div class="row4">
+            <div>За день: <b>${fmt(a.dayTotal)}</b> ₽</div>
+            <div>Предоплаты: <b>${fmt(a.prepaid)}</b> ₽</div>
+            <div>Взносы: <b>${fmt(a.installments)}</b> ₽</div>
+            <div>Возвраты: <b>${fmt(a.returns)}</b> ₽</div>
+          </div>
+          <div class="row4" style="margin-top:6px">
+            <div>Нал: <b>${fmt(a.cash)}</b> ₽</div>
+            <div>Карта: <b>${fmt(a.card)}</b> ₽</div>
+            <div>Другое: <b>${fmt(a.other)}</b> ₽</div>
+            <div>Финансы (итог): <b>${fmt(a.financeTotal)}</b> ₽</div>
+          </div>
+          <div class="row4" style="margin-top:6px">
+            <div>Вложения: <b>${fmt(a.investments)}</b> ₽</div>
+            <div>Расходы: <b>${fmt(a.expenses)}</b> ₽</div>
+            <div>С другого магазина: <b>${fmt(a.fromOtherStore)}</b> ₽</div>
+            <div>Не начислялось: <b>${fmt(a.notAccrued)}</b> ₽</div>
+          </div>
+        </div>
+      `;
+    }
 
-        tr:hover {
-            background: #f8f9ff;
-        }
+    // ====== KASSA (СВОДКА) ======
+    document.addEventListener('click', async (e)=>{
+      if(e.target.id==='btnBuildKassa'){
+        const from = document.getElementById('k_from').value || todayStr();
+        const to = document.getElementById('k_to').value || todayStr();
+        await buildKassa(from, to);
+      }
+    });
 
-        .status-paid {
-            background: #d4edda;
-            color: #155724;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 500;
-        }
+    async function buildKassa(from, to){
+      const box = document.getElementById('kassaBox');
+      const tbl = document.getElementById('kassaTotals');
+      const prf = document.getElementById('kassaProfit');
 
-        .status-pending {
-            background: #fff3cd;
-            color: #856404;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 500;
-        }
+      // возьмем cashDays по диапазону (простая выборка всех и фильтр)
+      const cds = await getDocs(query(colCashDays()));
+      const f = new Date(from); f.setHours(0,0,0,0);
+      const t = new Date(to); t.setHours(23,59,59,999);
+      let agg = {prepaid:0, installments:0, returns:0, cash:0, card:0, other:0, investments:0, expenses:0, dayTotal:0, financeTotal:0};
+      const rows=[];
+      cds.forEach(d=>{
+        const x = d.data();
+        const dt = x.date?.toDate(); if(!dt) return;
+        if(dt<f || dt>t) return;
+        const a = x.aggregates||{};
+        rows.push({date: toDateStr(dt), ...a});
+        for(const k of Object.keys(agg)) agg[k] += a[k]||0;
+      });
 
-        .status-overdue {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 500;
-        }
+      rows.sort((a,b)=>a.date.localeCompare(b.date));
 
-        .search-bar {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e1e1e1;
-            border-radius: 10px;
-            font-size: 16px;
-            margin-bottom: 20px;
-            transition: border-color 0.3s;
-        }
+      box.innerHTML = `
+        <div class="scroll">
+          <table class="table">
+            <thead><tr>
+              <th>Дата</th><th>За день</th><th>Предоплаты</th><th>Взносы</th><th>Возвраты</th>
+              <th>Нал</th><th>Карта</th><th>Др.</th><th>Вложения</th><th>Расходы</th>
+            </tr></thead>
+            <tbody>
+              ${rows.map(r=>`
+                <tr>
+                  <td>${r.date}</td>
+                  <td>${fmt(r.dayTotal)}</td>
+                  <td>${fmt(r.prepaid)}</td>
+                  <td>${fmt(r.installments)}</td>
+                  <td>${fmt(r.returns)}</td>
+                  <td>${fmt(r.cash)}</td>
+                  <td>${fmt(r.card)}</td>
+                  <td>${fmt(r.other)}</td>
+                  <td>${fmt(r.investments)}</td>
+                  <td>${fmt(r.expenses)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
 
-        .search-bar:focus {
-            outline: none;
-            border-color: #667eea;
-        }
+      tbl.innerHTML = `
+        <tr><th>Показатель</th><th>Сумма ₽</th></tr>
+        <tr><td>Предоплаты</td><td><b>${fmt(agg.prepaid)}</b></td></tr>
+        <tr><td>Взносы</td><td><b>${fmt(agg.installments)}</b></td></tr>
+        <tr><td>Оплачено (итого)</td><td><b>${fmt(agg.prepaid + agg.installments - agg.returns)}</b></td></tr>
+        <tr><td>Возвраты</td><td>${fmt(agg.returns)}</td></tr>
+        <tr><td>Вложения</td><td>${fmt(agg.investments)}</td></tr>
+        <tr><td>Расходы</td><td>${fmt(agg.expenses)}</td></tr>
+        <tr><td>Касса (нал+карта+др.)</td><td><b>${fmt(agg.cash+agg.card+agg.other)}</b></td></tr>
+      `;
 
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-        }
+      // прибыль и долги: по контрактам
+      const cs = await getDocs(query(colContracts()));
+      let gross=0, net=0, debt=0;
+      cs.forEach(d=>{
+        const c = d.data();
+        const profit = (c.price||0)-(c.costPrice||0);
+        gross += Math.max(0, profit);
+        const paid = (c.totals?.paidTotal||0) + (c.prepayment||0);
+        const balance = Math.max(0, (c.price||0) - paid);
+        debt += balance;
+      });
+      net = gross - agg.expenses; // упрощенно: чистая = грязная - расходы
+      prf.innerHTML = `
+        <tr><th>Метрика</th><th>Сумма ₽</th></tr>
+        <tr><td>Грязная прибыль (цена - себестоимость)</td><td><b>${fmt(gross)}</b></td></tr>
+        <tr><td>Чистая прибыль (≈ грязная - расходы)</td><td><b>${fmt(net)}</b></td></tr>
+        <tr><td>Долг клиентов (остаток по активным)</td><td><b>${fmt(debt)}</b></td></tr>
+      `;
+    }
 
-        .modal-content {
-            background: white;
-            margin: 5% auto;
-            padding: 30px;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 600px;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
+    // ====== LEDGER VIEW ======
+    document.addEventListener('click', async (e)=>{
+      if(e.target.id==='btnLoadLedger'){
+        const from = document.getElementById('lg_from').value || todayStr();
+        const to = document.getElementById('lg_to').value || todayStr();
+        await loadLedger(from,to);
+      }
+    });
+    async function loadLedger(from,to){
+      const tbl = document.getElementById('ledgerTable');
+      const f = new Date(from); f.setHours(0,0,0,0);
+      const t = new Date(to); t.setHours(23,59,59,999);
+      const snap = await getDocs(query(colLedger()));
+      const rows = [];
+      snap.forEach(d=>{
+        const x = d.data();
+        const dt = x.date?.toDate(); if(!dt) return;
+        if(dt<f||dt>t) return;
+        rows.push({date: toDateStr(dt), kind:x.kind, amount:x.amount, title:x.title||'', note:x.note||''});
+      });
+      rows.sort((a,b)=>a.date.localeCompare(b.date));
+      tbl.innerHTML = `
+        <thead><tr><th>Дата</th><th>Тип</th><th>Сумма</th><th>Название</th><th>Комментарий</th></tr></thead>
+        <tbody>${rows.map(r=>`<tr><td>${r.date}</td><td>${r.kind}</td><td>${fmt(r.amount)}</td><td>${r.title}</td><td>${r.note}</td></tr>`).join('')}</tbody>
+      `;
+    }
 
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+    // ====== EXPORT ======
+    document.addEventListener('click', async (e)=>{
+      if(e.target.id==='btnExportJSON'){ await exportAll(); }
+    });
+    async function exportAll(){
+      const grab = async (colRef)=>{
+        const arr=[]; const sn=await getDocs(query(colRef)); sn.forEach(d=>arr.push({id:d.id, ...d.data()})); return arr;
+      };
+      const data = {
+        clients: await grab(colClients()),
+        contracts: await grab(colContracts()),
+        payments: await grab(colPayments()),
+        cashDays: await grab(colCashDays()),
+        ledger: await grab(colLedger())
+      };
+      const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `amana_export_${todayStr()}.json`; a.click();
+      URL.revokeObjectURL(url);
+    }
 
-        .close:hover {
-            color: #000;
-        }
+    // ====== INIT ======
+    async function initApp(){
+      // дефолтные даты
+      const dts = [ 'c_date','cd_date','k_from','k_to','lg_from','lg_to','op_date' ];
+      dts.forEach(id=>{ const el=document.getElementById(id); if(el) el.value = todayStr(); });
 
-        @media (max-width: 768px) {
-            .nav-tabs {
-                flex-direction: column;
-            }
+      // кнопки/поиск
+      document.getElementById('q')?.addEventListener('input', ()=>{ loadContracts().then(renderContracts); });
+      document.getElementById('filterOver')?.addEventListener('change', ()=>{ renderContracts(); });
 
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-
-            .modal-content {
-                margin: 10% auto;
-                width: 95%;
-            }
-        }
-    </style>
+      await loadContracts();
+      renderContracts();
+      await showCashDay(todayStr());
+    }
+  </script>
 </head>
-<body>
-    <!-- Основное приложение -->
-    <div class="main-container" id="mainContainer">
-        <div class="header">
-            <h1>Система учета рассрочки</h1>
-            <button class="logout-btn" onclick="logout()">Выйти</button>
-        </div>
-
-        <nav class="navigation">
-            <ul class="nav-tabs">
-                <li><button onclick="showTab('accounting')" class="tab-btn active">Учет</button></li>
-                <li><button onclick="showTab('finance')" class="tab-btn">Финансы</button></li>
-                <li><button onclick="showTab('cashbox')" class="tab-btn">Касса</button></li>
-                <li><button onclick="showTab('payments')" class="tab-btn">Платежи</button></li>
-                <li><button onclick="showTab('analytics')" class="tab-btn">Аналитика</button></li>
-            </ul>
-        </nav>
-
-        <div class="content">
-            <!-- Вкладка Учет -->
-            <div class="tab-content active" id="accounting">
-                <div class="card">
-                    <h2>Учет рассрочки</h2>
-                    
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <h3 id="totalContracts">0</h3>
-                            <p>Всего договоров</p>
-                        </div>
-                        <div class="stat-card">
-                            <h3 id="activeContracts">0</h3>
-                            <p>Активные договоры</p>
-                        </div>
-                        <div class="stat-card">
-                            <h3 id="totalDebt">0 ₽</h3>
-                            <p>Общий долг</p>
-                        </div>
-                        <div class="stat-card">
-                            <h3 id="monthlyPayments">0 ₽</h3>
-                            <p>Платежи за месяц</p>
-                        </div>
-                    </div>
-
-                    <button class="btn btn-primary" onclick="showAddContractModal()">+ Добавить договор</button>
-                    
-                    <input type="text" class="search-bar" placeholder="Поиск по ФИО, номеру телефона или товару..." onkeyup="searchContracts(this.value)">
-                    
-                    <div class="table-container">
-                        <table id="contractsTable">
-                            <thead>
-                                <tr>
-                                    <th>№</th>
-                                    <th>Дата покупки</th>
-                                    <th>ФИО</th>
-                                    <th>Телефон</th>
-                                    <th>Поручитель</th>
-                                    <th>Товар</th>
-                                    <th>Партнер</th>
-                                    <th>Цена</th>
-                                    <th>Предоплата</th>
-                                    <th>Месяцев</th>
-                                    <th>Ежемесячно</th>
-                                    <th>Остаток</th>
-                                    <th>1-й взнос</th>
-                                    <th>2-й взнос</th>
-                                    <th>3-й взнос</th>
-                                    <th>4-й взнос</th>
-                                    <th>5-й взнос</th>
-                                    <th>Просрочка</th>
-                                    <th>Статус</th>
-                                    <th>Действия</th>
-                                </tr>
-                            </thead>
-                            <tbody id="contractsTableBody">
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Вкладка Финансы -->
-            <div class="tab-content" id="finance">
-                <div class="card">
-                    <h2>Учет финансов</h2>
-                    
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <h3 id="dailyRevenue">0 ₽</h3>
-                            <p>Выручка за день</p>
-                        </div>
-                        <div class="stat-card">
-                            <h3 id="monthlyRevenue">0 ₽</h3>
-                            <p>Выручка за месяц</p>
-                        </div>
-                        <div class="stat-card">
-                            <h3 id="totalExpenses">0 ₽</h3>
-                            <p>Расходы</p>
-                        </div>
-                        <div class="stat-card">
-                            <h3 id="netProfit">0 ₽</h3>
-                            <p>Чистая прибыль</p>
-                        </div>
-                    </div>
-
-                    <button class="btn btn-success" onclick="showFinanceModal('income')">+ Добавить доход</button>
-                    <button class="btn btn-danger" onclick="showFinanceModal('expense')">+ Добавить расход</button>
-                    
-                    <div class="table-container">
-                        <table id="financeTable">
-                            <thead>
-                                <tr>
-                                    <th>Дата</th>
-                                    <th>Тип</th>
-                                    <th>Описание</th>
-                                    <th>Сумма</th>
-                                    <th>Источник</th>
-                                    <th>Действия</th>
-                                </tr>
-                            </thead>
-                            <tbody id="financeTableBody">
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Вкладка Касса -->
-            <div class="tab-content" id="cashbox">
-                <div class="card">
-                    <h2>Касса</h2>
-                    
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <h3 id="cashAmount">0 ₽</h3>
-                            <p>Наличные в кассе</p>
-                        </div>
-                        <div class="stat-card">
-                            <h3 id="cardAmount">0 ₽</h3>
-                            <p>Безналичные средства</p>
-                        </div>
-                        <div class="stat-card">
-                            <h3 id="totalAdvance">0 ₽</h3>
-                            <p>Предоплаты</p>
-                        </div>
-                        <div class="stat-card">
-                            <h3 id="totalInstallments">0 ₽</h3>
-                            <p>Взносы</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Вкладка Платежи -->
-            <div class="tab-content" id="payments">
-                <div class="card">
-                    <h2>Платежи</h2>
-                    
-                    <button class="btn btn-primary" onclick="showPaymentModal()">+ Зафиксировать платеж</button>
-                    
-                    <input type="text" class="search-bar" placeholder="Поиск платежей..." onkeyup="searchPayments(this.value)">
-                    
-                    <div class="table-container">
-                        <table id="paymentsTable">
-                            <thead>
-                                <tr>
-                                    <th>Дата</th>
-                                    <th>ФИО клиента</th>
-                                    <th>Размер платежа</th>
-                                    <th>Тип платежа</th>
-                                    <th>Статус</th>
-                                    <th>Действия</th>
-                                </tr>
-                            </thead>
-                            <tbody id="paymentsTableBody">
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Вкладка Аналитика -->
-            <div class="tab-content" id="analytics">
-                <div class="card">
-                    <h2>Аналитика и отчеты</h2>
-                    
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <h3 id="conversionRate">0%</h3>
-                            <p>Конверсия</p>
-                        </div>
-                        <div class="stat-card">
-                            <h3 id="avgContractValue">0 ₽</h3>
-                            <p>Средний чек</p>
-                        </div>
-                        <div class="stat-card">
-                            <h3 id="overdueContracts">0</h3>
-                            <p>Просроченные</p>
-                        </div>
-                        <div class="stat-card">
-                            <h3 id="completedContracts">0</h3>
-                            <p>Завершенные</p>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group-inline">
-                            <label>Период отчета:</label>
-                            <select onchange="updateAnalytics(this.value)">
-                                <option value="week">За неделю</option>
-                                <option value="month" selected>За месяц</option>
-                                <option value="quarter">За квартал</option>
-                                <option value="year">За год</option>
-                            </select>
-                        </div>
-                        <div class="form-group-inline">
-                            <label>&nbsp;</label>
-                            <button class="btn btn-primary" onclick="exportReport()">Экспорт отчета</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Модальные окна -->
-    
-    <!-- Модальное окно добавления договора -->
-    <div class="modal" id="contractModal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('contractModal')">&times;</span>
-            <h2>Новый договор рассрочки</h2>
-            <form id="contractForm">
-                <div class="form-row">
-                    <div class="form-group-inline">
-                        <label>ФИО клиента:</label>
-                        <input type="text" name="clientName" required>
-                    </div>
-                    <div class="form-group-inline">
-                        <label>Телефон покупателя:</label>
-                        <input type="tel" name="clientPhone" required>
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group-inline">
-                        <label>Телефон поручителя:</label>
-                        <input type="tel" name="guarantorPhone">
-                    </div>
-                    <div class="form-group-inline">
-                        <label>Адрес:</label>
-                        <input type="text" name="address">
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group-inline">
-                        <label>Наименование товара:</label>
-                        <input type="text" name="productName" required>
-                    </div>
-                    <div class="form-group-inline">
-                        <label>Партнер:</label>
-                        <select name="partner">
-                            <option value="Хайр Строй">Хайр Строй</option>
-                            <option value="Иса кирпич">Иса кирпич</option>
-                            <option value="Прочий">Прочий</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group-inline">
-                        <label>Себестоимость:</label>
-                        <input type="number" name="costPrice" required>
-                    </div>
-                    <div class="form-group-inline">
-                        <label>Цена продажи:</label>
-                        <input type="number" name="salePrice" required>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group-inline">
-                        <label>Предоплата:</label>
-                        <input type="number" name="downPayment" required>
-                    </div>
-                    <div class="form-group-inline">
-                        <label>Количество месяцев:</label>
-                        <input type="number" name="months" min="1" max="12" required>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group-inline">
-                        <label>IMEI телефона:</label>
-                        <input type="text" name="imei">
-                    </div>
-                    <div class="form-group-inline">
-                        <label>Скидка:</label>
-                        <input type="number" name="discount" value="0">
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group-inline">
-                        <label>&nbsp;</label>
-                        <button type="submit" class="btn btn-primary">Создать договор</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Модальное окно финансовых операций -->
-    <div class="modal" id="financeModal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('financeModal')">&times;</span>
-            <h2 id="financeModalTitle">Финансовая операция</h2>
-            <form id="financeForm">
-                <div class="form-row">
-                    <div class="form-group-inline">
-                        <label>Дата:</label>
-                        <input type="date" name="date" required>
-                    </div>
-                    <div class="form-group-inline">
-                        <label>Тип операции:</label>
-                        <select name="operationType" id="operationType">
-                            <option value="income">Доход</option>
-                            <option value="expense">Расход</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group-inline">
-                        <label>Описание:</label>
-                        <input type="text" name="description" required>
-                    </div>
-                    <div class="form-group-inline">
-                        <label>Сумма:</label>
-                        <input type="number" name="amount" required>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group-inline">
-                        <label>Источник/Назначение:</label>
-                        <select name="source">
-                            <option value="cash">Наличные</option>
-                            <option value="card">Безналичные</option>
-                            <option value="transfer">Перевод</option>
-                            <option value="other">Другое</option>
-                        </select>
-                    </div>
-                    <div class="form-group-inline">
-                        <label>&nbsp;</label>
-                        <button type="submit" class="btn btn-primary">Сохранить</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Модальное окно платежей -->
-    <div class="modal" id="paymentModal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('paymentModal')">&times;</span>
-            <h2>Зафиксировать платеж</h2>
-            <form id="paymentForm">
-                <div class="form-row">
-                    <div class="form-group-inline">
-                        <label>Дата платежа:</label>
-                        <input type="date" name="paymentDate" required>
-                    </div>
-                    <div class="form-group-inline">
-                        <label>ФИО клиента:</label>
-                        <select name="clientId" id="clientSelect" required>
-                            <option value="">Выберите клиента</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group-inline">
-                        <label>Размер платежа:</label>
-                        <input type="number" name="paymentAmount" required>
-                    </div>
-                    <div class="form-group-inline">
-                        <label>Тип платежа:</label>
-                        <select name="paymentType">
-                            <option value="installment">Взнос по рассрочке</option>
-                            <option value="advance">Предоплата</option>
-                            <option value="full">Полная оплата</option>
-                            <option value="partial">Частичная оплата</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group-inline">
-                        <label>Способ оплаты:</label>
-                        <select name="paymentMethod">
-                            <option value="cash">Наличные</option>
-                            <option value="card">Карта</option>
-                            <option value="transfer">Перевод</option>
-                        </select>
-                    </div>
-                    <div class="form-group-inline">
-                        <label>&nbsp;</label>
-                        <button type="submit" class="btn btn-primary">Зафиксировать</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        // Инициализация приложения
-        function initializeApp() {
-            updateDashboard();
-            loadContracts();
-            loadFinance();
-            loadPayments();
-            updateCashbox();
-            updateAnalytics();
-        }
-        // Данные приложения (в реальном приложении это будет база данных)
-        let appData = {
-            contracts: [
-                {
-                    id: 2,
-                    clientName: "Муцуев Иса Шайамахмудович",
-                    clientPhone: "8962 141 77 77",
-                    guarantorPhone: "8928 262 68 68",
-                    address: "Г.Грозный, Ул Старый поселок, 6",
-                    productName: "Айфон 16 про 256 гб",
-                    partner: "Хайр Строй",
-                    costPrice: 100000,
-                    salePrice: 111500,
-                    downPayment: 50000,
-                    months: 5,
-                    monthlyPayment: 12300,
-                    remainingDebt: 49200,
-                    status: "active",
-                    createdDate: "2025-03-02",
-                    imei: "",
-                    discount: 0
-                }
-            ],
-            finance: [
-                {
-                    id: 1,
-                    date: "2025-08-08",
-                    type: "income",
-                    description: "Платеж по рассрочке - Юсупов Ибрагим",
-                    amount: 27500,
-                    source: "cash"
-                },
-                {
-                    id: 2,
-                    date: "2025-08-07",
-                    type: "expense",
-                    description: "Аренда помещения",
-                    amount: 50000,
-                    source: "cash"
-                }
-            ],
-            payments: [
-                {
-                    id: 1,
-                    date: "2025-08-08",
-                    clientName: "Юсупов Ибрагим",
-                    amount: 27500,
-                    type: "installment",
-                    method: "cash",
-                    status: "completed"
-                }
-            ],
-            cashbox: {
-                cash: 881500,
-                card: 0,
-                totalAdvance: 7060300,
-                totalInstallments: 5584400
-            }
-        };
-
-        // Учетные данные для входа
-        const credentials = {
-            admin: "admin123",
-            manager: "manager456",
-            bek: "bek2025"
-        };
-
-        // Функция входа в систему
-        function handleLogin(e) {
-            e.preventDefault();
-            
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
-            
-            console.log('Попытка входа:', username, password); // Для отладки
-            
-            // Проверяем учетные данные
-            if ((username === 'admin' && password === 'admin123') ||
-                (username === 'manager' && password === 'manager456') ||
-                (username === 'bek' && password === 'bek2025')) {
-                
-                console.log('Вход успешен!'); // Для отладки
-                
-                // Скрываем форму входа и показываем основное приложение
-                document.getElementById('loginContainer').style.display = 'none';
-                document.getElementById('mainContainer').style.display = 'block';
-                
-                // Инициализируем данные
-                updateDashboard();
-                loadContracts();
-                loadFinance();
-                loadPayments();
-                updateCashbox();
-                updateAnalytics();
-                
-                alert('Добро пожаловать в систему!');
-            } else {
-                alert('❌ Неверный логин или пароль!\n\n✅ Доступные учетные данные:\n\n👤 Администратор:\n   Логин: admin\n   Пароль: admin123\n\n👤 Менеджер:\n   Логин: manager\n   Пароль: manager456\n\n👤 Бек:\n   Логин: bek\n   Пароль: bek2025');
-                
-                // Очищаем поля
-                document.getElementById('username').value = '';
-                document.getElementById('password').value = '';
-            }
-        }
-
-        // Привязываем обработчик к форме
-        document.addEventListener('DOMContentLoaded', function() {
-            const loginForm = document.getElementById('loginForm');
-            if (loginForm) {
-                loginForm.addEventListener('submit', handleLogin);
-            }
-            
-            // Показываем подсказку через 2 секунды
-            setTimeout(() => {
-                if (document.getElementById('loginContainer').style.display !== 'none') {
-                    console.log('Показываем подсказку с учетными данными');
-                }
-            }, 2000);
-        });
-
-        // Функция выхода (временно отключена)
-        function logout() {
-            if (confirm('Вы уверены, что хотите выйти?')) {
-                location.reload();
-            }
-        }
-
-        // Переключение вкладок
-        function showTab(tabName) {
-            // Скрыть все вкладки
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Убрать активность у всех кнопок
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            // Показать выбранную вкладку
-            document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
-        }
-
-        // Обновление главной панели
-        function updateDashboard() {
-            const totalContracts = appData.contracts.length;
-            const activeContracts = appData.contracts.filter(c => c.status === 'active').length;
-            const totalDebt = appData.contracts.reduce((sum, c) => sum + c.remainingDebt, 0);
-            const monthlyPayments = appData.payments
-                .filter(p => new Date(p.date).getMonth() === new Date().getMonth())
-                .reduce((sum, p) => sum + p.amount, 0);
-
-            document.getElementById('totalContracts').textContent = totalContracts;
-            document.getElementById('activeContracts').textContent = activeContracts;
-            document.getElementById('totalDebt').textContent = totalDebt.toLocaleString() + ' ₽';
-            document.getElementById('monthlyPayments').textContent = monthlyPayments.toLocaleString() + ' ₽';
-        }
-
-        // Загрузка договоров
-        function loadContracts() {
-            const tbody = document.getElementById('contractsTableBody');
-            tbody.innerHTML = '';
-            
-            appData.contracts.forEach((contract, index) => {
-                const row = document.createElement('tr');
-                
-                let statusClass = '';
-                let statusText = '';
-                
-                switch(contract.status) {
-                    case 'paid':
-                        statusClass = 'status-paid';
-                        statusText = 'Оплачен';
-                        break;
-                    case 'active':
-                        statusClass = 'status-pending';
-                        statusText = 'Активен';
-                        break;
-                    case 'overdue':
-                        statusClass = 'status-overdue';
-                        statusText = `Просрочен ${contract.overdueDays} дн.`;
-                        break;
-                }
-
-                // Получаем статусы платежей
-                const payment1 = getPaymentStatus(contract.installments[0]);
-                const payment2 = getPaymentStatus(contract.installments[1]);
-                const payment3 = getPaymentStatus(contract.installments[2]);
-                const payment4 = getPaymentStatus(contract.installments[3]);
-                const payment5 = getPaymentStatus(contract.installments[4]);
-
-                // Рассчитываем просрочку
-                const overdueInfo = calculateOverdue(contract);
-                
-                row.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>${new Date(contract.createdDate).toLocaleDateString()}</td>
-                    <td style="font-weight: 500;">${contract.clientName}</td>
-                    <td>${contract.clientPhone}</td>
-                    <td>${contract.guarantorPhone || '-'}</td>
-                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${contract.productName}">${contract.productName}</td>
-                    <td>${contract.partner}</td>
-                    <td style="font-weight: 600;">${contract.salePrice.toLocaleString()} ₽</td>
-                    <td>${contract.downPayment.toLocaleString()} ₽</td>
-                    <td>${contract.months}</td>
-                    <td style="font-weight: 600; color: #667eea;">${contract.monthlyPayment.toLocaleString()} ₽</td>
-                    <td style="font-weight: 600; color: ${contract.remainingDebt > 0 ? '#dc3545' : '#28a745'};">${contract.remainingDebt.toLocaleString()} ₽</td>
-                    <td>${payment1}</td>
-                    <td>${payment2}</td>
-                    <td>${payment3}</td>
-                    <td>${payment4}</td>
-                    <td>${payment5}</td>
-                    <td style="color: ${overdueInfo.days > 0 ? '#dc3545' : '#28a745'}; font-weight: 600;">${overdueInfo.text}</td>
-                    <td><span class="${statusClass}">${statusText}</span></td>
-                    <td>
-                        <button class="btn btn-warning" onclick="showContractDetails(${contract.id})" style="padding: 6px 12px; font-size: 12px;">Детали</button>
-                        <button class="btn btn-success" onclick="addPaymentForContract(${contract.id})" style="padding: 6px 12px; font-size: 12px;">Платеж</button>
-                    </td>
-                `;
-                
-                // Подсветка строки в зависимости от статуса
-                if (contract.status === 'overdue') {
-                    row.style.backgroundColor = '#fdf2f2';
-                } else if (contract.status === 'paid') {
-                    row.style.backgroundColor = '#f0f9f0';
-                }
-                
-                tbody.appendChild(row);
-            });
-        }
-
-        // Функция для получения статуса платежа
-        function getPaymentStatus(installment) {
-            if (!installment) return '<span style="color: #ccc;">-</span>';
-            
-            const currentDate = new Date();
-            const installmentDate = new Date(installment.date);
-            
-            if (installment.paid) {
-                const paidDate = new Date(installment.paidDate);
-                const isLate = paidDate > installmentDate;
-                return `<span style="color: #28a745; font-weight: 600;">✓ ${paidDate.toLocaleDateString()}${isLate ? ' (поздно)' : ''}</span>`;
-            } else {
-                const isOverdue = currentDate > installmentDate;
-                const daysDiff = Math.floor((currentDate - installmentDate) / (1000 * 60 * 60 * 24));
-                
-                if (isOverdue) {
-                    return `<span style="color: #dc3545; font-weight: 600;">✗ Просрочен ${daysDiff} дн.</span>`;
-                } else {
-                    return `<span style="color: #ffc107; font-weight: 600;">⏳ ${installmentDate.toLocaleDateString()}</span>`;
-                }
-            }
-        }
-
-        // Функция для расчета общей просрочки
-        function calculateOverdue(contract) {
-            const currentDate = new Date();
-            let maxOverdueDays = 0;
-            
-            contract.installments.forEach(installment => {
-                if (!installment.paid) {
-                    const installmentDate = new Date(installment.date);
-                    if (currentDate > installmentDate) {
-                        const daysDiff = Math.floor((currentDate - installmentDate) / (1000 * 60 * 60 * 24));
-                        maxOverdueDays = Math.max(maxOverdueDays, daysDiff);
-                    }
-                }
-            });
-            
-            return {
-                days: maxOverdueDays,
-                text: maxOverdueDays > 0 ? `${maxOverdueDays} дн.` : 'В срок'
-            };
-        }
-
-        // Функция показа деталей договора
-        function showContractDetails(contractId) {
-            const contract = appData.contracts.find(c => c.id === contractId);
-            if (!contract) return;
-            
-            let installmentsList = '';
-            contract.installments.forEach((inst, index) => {
-                const status = inst.paid ? 
-                    `✓ Оплачен ${new Date(inst.paidDate).toLocaleDateString()}` : 
-                    `❌ Не оплачен (до ${new Date(inst.date).toLocaleDateString()})`;
-                    
-                installmentsList += `
-                    <div style="padding: 8px; margin: 4px 0; background: ${inst.paid ? '#f0f9f0' : '#fdf2f2'}; border-radius: 4px;">
-                        <strong>${index + 1}-й взнос:</strong> ${inst.amount.toLocaleString()} ₽ - ${status}
-                    </div>
-                `;
-            });
-            
-            const overdueInfo = calculateOverdue(contract);
-            
-            alert(`ДЕТАЛИ ДОГОВОРА #${contractId}
-            
-📋 Клиент: ${contract.clientName}
-📞 Телефон: ${contract.clientPhone}
-${contract.guarantorPhone ? '👥 Поручитель: ' + contract.guarantorPhone : ''}
-📍 Адрес: ${contract.address || 'Не указан'}
-
-🛍️ Товар: ${contract.productName}
-🏢 Партнер: ${contract.partner}
-💰 Цена: ${contract.salePrice.toLocaleString()} ₽
-💳 Предоплата: ${contract.downPayment.toLocaleString()} ₽
-📅 Месяцев: ${contract.months}
-💵 Ежемесячно: ${contract.monthlyPayment.toLocaleString()} ₽
-💸 Остаток: ${contract.remainingDebt.toLocaleString()} ₽
-
-⏰ Просрочка: ${overdueInfo.text}
-📊 Статус: ${contract.status === 'paid' ? 'Оплачен' : contract.status === 'active' ? 'Активен' : 'Просрочен'}
-
-Детали по взносам будут показаны в отдельном окне...`);
-        }
-
-        // Функция для быстрого добавления платежа
-        function addPaymentForContract(contractId) {
-            const contract = appData.contracts.find(c => c.id === contractId);
-            if (!contract) return;
-            
-            showPaymentModal();
-            // Автоматически выбираем клиента
-            setTimeout(() => {
-                document.getElementById('clientSelect').value = contractId;
-                document.querySelector('#paymentForm input[name="paymentAmount"]').value = contract.monthlyPayment;
-            }, 100);
-        }
-
-        // Поиск договоров
-        function searchContracts(query) {
-            const tbody = document.getElementById('contractsTableBody');
-            const rows = tbody.getElementsByTagName('tr');
-            
-            for (let row of rows) {
-                const text = row.textContent.toLowerCase();
-                if (text.includes(query.toLowerCase())) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            }
-        }
-
-        // Показать модальное окно добавления договора
-        function showAddContractModal() {
-            document.getElementById('contractModal').style.display = 'block';
-            // Установить сегодняшнюю дату
-            const today = new Date().toISOString().split('T')[0];
-            document.querySelector('#contractForm input[name="date"]');
-        }
-
-        // Обработка формы добавления договора
-        document.getElementById('contractForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(e.target);
-            const newContract = {
-                id: appData.contracts.length + 1,
-                clientName: formData.get('clientName'),
-                clientPhone: formData.get('clientPhone'),
-                guarantorPhone: formData.get('guarantorPhone') || '',
-                address: formData.get('address') || '',
-                productName: formData.get('productName'),
-                partner: formData.get('partner'),
-                costPrice: parseInt(formData.get('costPrice')),
-                salePrice: parseInt(formData.get('salePrice')),
-                downPayment: parseInt(formData.get('downPayment')),
-                months: parseInt(formData.get('months')),
-                monthlyPayment: Math.round((parseInt(formData.get('salePrice')) - parseInt(formData.get('downPayment'))) / parseInt(formData.get('months'))),
-                remainingDebt: parseInt(formData.get('salePrice')) - parseInt(formData.get('downPayment')),
-                status: 'active',
-                createdDate: new Date().toISOString().split('T')[0],
-                imei: formData.get('imei') || '',
-                discount: parseInt(formData.get('discount')) || 0
-            };
-            
-            appData.contracts.push(newContract);
-            loadContracts();
-            updateDashboard();
-            closeModal('contractModal');
-            e.target.reset();
-        });
-
-        // Загрузка финансов
-        function loadFinance() {
-            const tbody = document.getElementById('financeTableBody');
-            tbody.innerHTML = '';
-            
-            appData.finance.forEach(item => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${new Date(item.date).toLocaleDateString()}</td>
-                    <td>${item.type === 'income' ? 'Доход' : 'Расход'}</td>
-                    <td>${item.description}</td>
-                    <td style="color: ${item.type === 'income' ? 'green' : 'red'}">
-                        ${item.type === 'income' ? '+' : '-'}${item.amount.toLocaleString()} ₽
-                    </td>
-                    <td>${getSourceText(item.source)}</td>
-                    <td>
-                        <button class="btn btn-danger" onclick="deleteFinanceItem(${item.id})">Удалить</button>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-            
-            updateFinanceStats();
-        }
-
-        function getSourceText(source) {
-            const sources = {
-                'cash': 'Наличные',
-                'card': 'Безналичные',
-                'transfer': 'Перевод',
-                'other': 'Другое'
-            };
-            return sources[source] || source;
-        }
-
-        function updateFinanceStats() {
-            const today = new Date();
-            const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-            
-            const dailyIncome = appData.finance
-                .filter(item => item.type === 'income' && new Date(item.date).toDateString() === today.toDateString())
-                .reduce((sum, item) => sum + item.amount, 0);
-                
-            const monthlyIncome = appData.finance
-                .filter(item => item.type === 'income' && new Date(item.date) >= startOfMonth)
-                .reduce((sum, item) => sum + item.amount, 0);
-                
-            const totalExpenses = appData.finance
-                .filter(item => item.type === 'expense')
-                .reduce((sum, item) => sum + item.amount, 0);
-                
-            const netProfit = monthlyIncome - totalExpenses;
-            
-            document.getElementById('dailyRevenue').textContent = dailyIncome.toLocaleString() + ' ₽';
-            document.getElementById('monthlyRevenue').textContent = monthlyIncome.toLocaleString() + ' ₽';
-            document.getElementById('totalExpenses').textContent = totalExpenses.toLocaleString() + ' ₽';
-            document.getElementById('netProfit').textContent = netProfit.toLocaleString() + ' ₽';
-        }
-
-        // Показать модальное окно финансов
-        function showFinanceModal(type) {
-            document.getElementById('financeModal').style.display = 'block';
-            document.getElementById('financeModalTitle').textContent = type === 'income' ? 'Добавить доход' : 'Добавить расход';
-            document.getElementById('operationType').value = type;
-            
-            // Установить сегодняшнюю дату
-            const today = new Date().toISOString().split('T')[0];
-            document.querySelector('#financeForm input[name="date"]').value = today;
-        }
-
-        // Обработка формы финансов
-        document.getElementById('financeForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(e.target);
-            const newFinanceItem = {
-                id: appData.finance.length + 1,
-                date: formData.get('date'),
-                type: formData.get('operationType'),
-                description: formData.get('description'),
-                amount: parseInt(formData.get('amount')),
-                source: formData.get('source')
-            };
-            
-            appData.finance.push(newFinanceItem);
-            loadFinance();
-            closeModal('financeModal');
-            e.target.reset();
-        });
-
-        // Загрузка платежей
-        function loadPayments() {
-            const tbody = document.getElementById('paymentsTableBody');
-            tbody.innerHTML = '';
-            
-            // Обновляем список клиентов в форме платежей
-            const clientSelect = document.getElementById('clientSelect');
-            clientSelect.innerHTML = '<option value="">Выберите клиента</option>';
-            appData.contracts.forEach(contract => {
-                const option = document.createElement('option');
-                option.value = contract.id;
-                option.textContent = contract.clientName;
-                clientSelect.appendChild(option);
-            });
-            
-            appData.payments.forEach(payment => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${new Date(payment.date).toLocaleDateString()}</td>
-                    <td>${payment.clientName}</td>
-                    <td>${payment.amount.toLocaleString()} ₽</td>
-                    <td>${getPaymentTypeText(payment.type)}</td>
-                    <td><span class="status-${payment.status}">${getStatusText(payment.status)}</span></td>
-                    <td>
-                        <button class="btn btn-danger" onclick="deletePayment(${payment.id})">Удалить</button>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        function getPaymentTypeText(type) {
-            const types = {
-                'installment': 'Взнос по рассрочке',
-                'advance': 'Предоплата',
-                'full': 'Полная оплата',
-                'partial': 'Частичная оплата'
-            };
-            return types[type] || type;
-        }
-
-        function getStatusText(status) {
-            const statuses = {
-                'completed': 'Завершен',
-                'pending': 'Ожидает',
-                'cancelled': 'Отменен'
-            };
-            return statuses[status] || status;
-        }
-
-        // Показать модальное окно платежей
-        function showPaymentModal() {
-            document.getElementById('paymentModal').style.display = 'block';
-            
-            // Установить сегодняшнюю дату
-            const today = new Date().toISOString().split('T')[0];
-            document.querySelector('#paymentForm input[name="paymentDate"]').value = today;
-        }
-
-        // Обработка формы платежей
-        document.getElementById('paymentForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(e.target);
-            const clientId = parseInt(formData.get('clientId'));
-            const client = appData.contracts.find(c => c.id === clientId);
-            
-            if (!client) {
-                alert('Клиент не найден');
-                return;
-            }
-            
-            const newPayment = {
-                id: appData.payments.length + 1,
-                date: formData.get('paymentDate'),
-                clientName: client.clientName,
-                amount: parseInt(formData.get('paymentAmount')),
-                type: formData.get('paymentType'),
-                method: formData.get('paymentMethod'),
-                status: 'completed'
-            };
-            
-            // Обновляем остаток долга у клиента
-            if (formData.get('paymentType') === 'installment' || formData.get('paymentType') === 'partial') {
-                client.remainingDebt = Math.max(0, client.remainingDebt - newPayment.amount);
-                if (client.remainingDebt === 0) {
-                    client.status = 'paid';
-                }
-            }
-            
-            appData.payments.push(newPayment);
-            loadPayments();
-            loadContracts();
-            updateDashboard();
-            closeModal('paymentModal');
-            e.target.reset();
-        });
-
-        // Поиск платежей
-        function searchPayments(query) {
-            const tbody = document.getElementById('paymentsTableBody');
-            const rows = tbody.getElementsByTagName('tr');
-            
-            for (let row of rows) {
-                const text = row.textContent.toLowerCase();
-                if (text.includes(query.toLowerCase())) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            }
-        }
-
-        // Обновление кассы
-        function updateCashbox() {
-            document.getElementById('cashAmount').textContent = appData.cashbox.cash.toLocaleString() + ' ₽';
-            document.getElementById('cardAmount').textContent = appData.cashbox.card.toLocaleString() + ' ₽';
-            document.getElementById('totalAdvance').textContent = appData.cashbox.totalAdvance.toLocaleString() + ' ₽';
-            document.getElementById('totalInstallments').textContent = appData.cashbox.totalInstallments.toLocaleString() + ' ₽';
-        }
-
-        // Обновление аналитики
-        function updateAnalytics(period = 'month') {
-            const totalContracts = appData.contracts.length;
-            const avgContractValue = totalContracts > 0 ? 
-                appData.contracts.reduce((sum, c) => sum + c.salePrice, 0) / totalContracts : 0;
-            const overdueContracts = appData.contracts.filter(c => c.status === 'overdue').length;
-            const completedContracts = appData.contracts.filter(c => c.status === 'paid').length;
-            const conversionRate = totalContracts > 0 ? (completedContracts / totalContracts * 100) : 0;
-            
-            document.getElementById('conversionRate').textContent = conversionRate.toFixed(1) + '%';
-            document.getElementById('avgContractValue').textContent = avgContractValue.toLocaleString() + ' ₽';
-            document.getElementById('overdueContracts').textContent = overdueContracts;
-            document.getElementById('completedContracts').textContent = completedContracts;
-        }
-
-        // Экспорт отчета
-        function exportReport() {
-            const reportData = {
-                contracts: appData.contracts,
-                finance: appData.finance,
-                payments: appData.payments,
-                cashbox: appData.cashbox,
-                generatedAt: new Date().toISOString()
-            };
-            
-            const dataStr = JSON.stringify(reportData, null, 2);
-            const dataBlob = new Blob([dataStr], {type: 'application/json'});
-            const url = URL.createObjectURL(dataBlob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `отчет_${new Date().toISOString().split('T')[0]}.json`;
-            link.click();
-        }
-
-        // Функции для работы с модальными окнами
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-
-        // Закрытие модальных окон при клике вне их
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal')) {
-                event.target.style.display = 'none';
-            }
-        }
-
-        // Функции редактирования и удаления
-        function editContract(id) {
-            const contract = appData.contracts.find(c => c.id === id);
-            if (contract) {
-                alert('Функция редактирования будет добавлена в следующей версии');
-            }
-        }
-
-        function deleteContract(id) {
-            if (confirm('Вы уверены, что хотите удалить этот договор?')) {
-                appData.contracts = appData.contracts.filter(c => c.id !== id);
-                loadContracts();
-                updateDashboard();
-            }
-        }
-
-        function deleteFinanceItem(id) {
-            if (confirm('Вы уверены, что хотите удалить эту финансовую операцию?')) {
-                appData.finance = appData.finance.filter(f => f.id !== id);
-                loadFinance();
-            }
-        }
-
-        function deletePayment(id) {
-            if (confirm('Вы уверены, что хотите удалить этот платеж?')) {
-                appData.payments = appData.payments.filter(p => p.id !== id);
-                loadPayments();
-                updateDashboard();
-            }
-        }
-
-        // Инициализация при загрузке страницы  
-        window.onload = function() {
-            console.log('Система загружена');
-            initializeApp();
-        };
-    </script>
-</body>
+<body></body>
 </html>
-                    id: 1,
-                    clientName: "Юсупов Ибрагим",
-                    clientPhone: "8988 901 44 44",
-                    guarantorPhone: "",
-                    address: "",
-                    productName: "Айфон 16 про макс 512гб",
-                    partner: "Хайр Строй",
-                    costPrice: 125000,
-                    salePrice: 137500,
-                    downPayment: 27500,
-                    months: 4,
-                    monthlyPayment: 27500,
-                    remainingDebt: 0,
-                    status: "paid",
-                    createdDate: "2025-02-28",
-                    imei: "",
-                    discount: 0
-                },
-                {
