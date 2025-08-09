@@ -1,774 +1,1526 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Amana Finance — Калькулятор рассрочки</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      position: relative;
-      overflow-x: hidden;
-    }
-
-    body::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: 
-        radial-gradient(circle at 20% 80%, rgba(120, 255, 214, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(255, 120, 198, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 40% 40%, rgba(149, 193, 31, 0.1) 0%, transparent 50%);
-      animation: backgroundShift 15s ease-in-out infinite alternate;
-    }
-
-    @keyframes backgroundShift {
-      0% { transform: translateX(-20px) translateY(-10px); }
-      100% { transform: translateX(20px) translateY(10px); }
-    }
-
-    .calculator {
-      width: 100%;
-      max-width: 500px;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 24px;
-      padding: 32px;
-      position: relative;
-      z-index: 1;
-      box-shadow: 
-        0 20px 40px rgba(0, 0, 0, 0.1),
-        0 0 80px rgba(149, 193, 31, 0.1);
-      animation: slideUp 0.8s ease-out;
-      transform-origin: center bottom;
-    }
-
-    @keyframes slideUp {
-      0% {
-        transform: translateY(60px);
-        opacity: 0;
-      }
-      100% {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-
-
-
-    .header {
-      text-align: center;
-      margin-bottom: 32px;
-    }
-
-
-
-    .header .title {
-      font-size: 28px;
-      font-weight: 800;
-      background: linear-gradient(135deg, #116234, #95C11F);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 8px;
-      letter-spacing: -0.5px;
-    }
-
-    .header .subtitle {
-      font-size: 14px;
-      color: #64748B;
-      font-weight: 500;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-    }
-
-    .tariff-buttons {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 32px;
-    }
-
-    .tariff-button {
-      padding: 16px;
-      background: rgba(248, 250, 252, 0.8);
-      border: 2px solid transparent;
-      border-radius: 16px;
-      cursor: pointer;
-      text-align: center;
-      font-weight: 600;
-      font-size: 14px;
-      color: #64748B;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    }
-
-    .tariff-button::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(149, 193, 31, 0.1), transparent);
-      transition: left 0.5s ease;
-    }
-
-    .tariff-button:hover::before {
-      left: 100%;
-    }
-
-    .tariff-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(149, 193, 31, 0.15);
-    }
-
-    .tariff-button.active {
-      background: linear-gradient(135deg, #95C11F, #116234);
-      color: white;
-      border-color: rgba(255, 255, 255, 0.3);
-      transform: scale(1.02);
-      box-shadow: 0 12px 30px rgba(149, 193, 31, 0.3);
-    }
-
-    .input-group {
-      margin-bottom: 24px;
-      animation: fadeInUp 0.6s ease-out;
-      animation-fill-mode: both;
-    }
-
-    .input-group:nth-child(3) { animation-delay: 0.1s; }
-    .input-group:nth-child(4) { animation-delay: 0.2s; }
-    .input-group:nth-child(5) { animation-delay: 0.3s; }
-
-    @keyframes fadeInUp {
-      0% {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      font-size: 14px;
-      color: #1E293B;
-    }
-
-    .input-wrapper {
-      position: relative;
-    }
-
-    input[type="number"] {
-      width: 100%;
-      padding: 16px 20px;
-      font-size: 16px;
-      font-weight: 500;
-      border: 2px solid #E2E8F0;
-      border-radius: 12px;
-      background: rgba(248, 250, 252, 0.8);
-      transition: all 0.3s ease;
-      color: #1E293B;
-    }
-
-    input[type="number"]:focus {
-      outline: none;
-      border-color: #95C11F;
-      background: rgba(255, 255, 255, 0.95);
-      box-shadow: 0 0 0 4px rgba(149, 193, 31, 0.1);
-      transform: translateY(-1px);
-    }
-
-    input[type="number"]::placeholder {
-      color: #94A3B8;
-    }
-
-    .slider-container {
-      margin-top: 12px;
-    }
-
-    .slider {
-      width: 100%;
-      height: 8px;
-      border-radius: 4px;
-      background: #E2E8F0;
-      outline: none;
-      appearance: none;
-      cursor: pointer;
-      position: relative;
-    }
-
-    .slider::-webkit-slider-thumb {
-      appearance: none;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #95C11F, #116234);
-      cursor: pointer;
-      border: 3px solid white;
-      box-shadow: 0 4px 12px rgba(149, 193, 31, 0.3);
-      transition: all 0.2s ease;
-    }
-
-    .slider::-webkit-slider-thumb:hover {
-      transform: scale(1.1);
-      box-shadow: 0 6px 20px rgba(149, 193, 31, 0.4);
-    }
-
-    .slider::-moz-range-thumb {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #95C11F, #116234);
-      cursor: pointer;
-      border: 3px solid white;
-      box-shadow: 0 4px 12px rgba(149, 193, 31, 0.3);
-    }
-
-    .months-display {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 8px;
-      font-size: 12px;
-      color: #64748B;
-    }
-
-    .month-label {
-      position: relative;
-    }
-
-    .month-label.active {
-      color: #95C11F;
-      font-weight: 600;
-    }
-
-    .prepayment-input-group {
-      margin-top: 8px;
-    }
-
-    .prepayment-input-group input[type="number"] {
-      width: 200px;
-      padding: 12px 16px;
-      font-size: 14px;
-    }
-
-    .error-message {
-      background: linear-gradient(135deg, #FEF7ED, #FED7AA);
-      color: #EA580C;
-      padding: 12px 16px;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 500;
-      margin-top: 8px;
-      border-left: 4px solid #EA580C;
-      display: none;
-      animation: pulseGlow 2s ease-in-out infinite;
-      line-height: 1.4;
-    }
-
-    @keyframes shake {
-      0%, 20%, 40%, 60%, 80%, 100% { transform: translateX(0); }
-      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-    }
-
-    .helper-text {
-      background: linear-gradient(135deg, #FEF7ED, #FED7AA);
-      color: #EA580C;
-      padding: 12px 16px;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 500;
-      margin: 24px 0;
-      border-left: 4px solid #EA580C;
-      animation: pulseGlow 2s ease-in-out infinite;
-    }
-
-    @keyframes pulseGlow {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(234, 88, 12, 0.1); }
-      50% { box-shadow: 0 0 0 8px rgba(234, 88, 12, 0.05); }
-    }
-
-    .output {
-      background: linear-gradient(135deg, #F0FDF4, #DCFCE7);
-      border: 2px solid #BBF7D0;
-      padding: 24px;
-      border-radius: 16px;
-      margin: 24px 0;
-      animation: resultAppear 0.6s ease-out;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .output::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(149, 193, 31, 0.1), transparent);
-      animation: shimmer 2s ease-in-out infinite;
-    }
-
-    @keyframes shimmer {
-      0% { left: -100%; }
-      100% { left: 100%; }
-    }
-
-    @keyframes resultAppear {
-      0% {
-        opacity: 0;
-        transform: scale(0.95) translateY(10px);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-      }
-    }
-
-    .output p {
-      margin: 12px 0;
-      font-size: 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .output strong {
-      color: #166534;
-      font-weight: 600;
-      flex-shrink: 0;
-    }
-
-    .output-value {
-      font-weight: 700;
-      font-size: 16px;
-      color: #15803D;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    .buttons {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 32px;
-    }
-
-    .btn {
-      padding: 16px 24px;
-      border-radius: 12px;
-      text-decoration: none;
-      text-align: center;
-      font-weight: 600;
-      font-size: 15px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-      border: none;
-      cursor: pointer;
-    }
-
-    .btn::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      transition: width 0.6s ease, height 0.6s ease;
-    }
-
-    .btn:hover::before {
-      width: 300px;
-      height: 300px;
-    }
-
-    .btn-whatsapp {
-      background: linear-gradient(135deg, #25D366, #128C7E);
-      color: white;
-    }
-
-    .btn-whatsapp:hover {
-      transform: translateY(-3px) scale(1.02);
-      box-shadow: 0 12px 30px rgba(37, 211, 102, 0.4);
-    }
-
-    .btn-call {
-      background: linear-gradient(135deg, #116234, #95C11F);
-      color: white;
-    }
-
-    .btn-call:hover {
-      transform: translateY(-3px) scale(1.02);
-      box-shadow: 0 12px 30px rgba(17, 98, 52, 0.4);
-    }
-
-    .btn span {
-      position: relative;
-      z-index: 1;
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-      body {
-        padding: 16px;
-      }
-
-      .calculator {
-        padding: 24px;
-        border-radius: 20px;
-      }
-
-      .header .title {
-        font-size: 24px;
-      }
-
-      .buttons {
-        grid-template-columns: 1fr;
-      }
-
-      .tariff-buttons {
-        grid-template-columns: 1fr;
-      }
-
-      .prepayment-input-group {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
-      }
-
-      .prepayment-input-group input[type="number"] {
-        width: 100%;
-      }
-    }
-
-    /* Accessibility improvements */
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-      }
-    }
-
-    /* Focus styles for better accessibility */
-    .tariff-button:focus-visible,
-    .btn:focus-visible {
-      outline: 2px solid #95C11F;
-      outline-offset: 2px;
-    }
-
-    .slider:focus-visible {
-      box-shadow: 0 0 0 3px rgba(149, 193, 31, 0.3);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Система учета рассрочки</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .login-form {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-form h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e1e1;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .main-container {
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 1.8em;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .navigation {
+            background: white;
+            padding: 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-tabs {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-tabs li {
+            flex: 1;
+        }
+
+        .nav-tabs button {
+            width: 100%;
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .nav-tabs button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .nav-tabs button:hover {
+            background: #f0f0f0;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group-inline {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group-inline label {
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group-inline input, .form-group-inline select {
+            padding: 10px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group-inline input:focus, .form-group-inline select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: transform 0.2s;
+            margin-right: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e1e1e1;
+        }
+
+        th {
+            background: #f8f9ff;
+            font-weight: 600;
+            color: #333;
+        }
+
+        tr:hover {
+            background: #f8f9ff;
+        }
+
+        .status-paid {
+            background: #d4edda;
+            color: #155724;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-overdue {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e1e1;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+
+        .search-bar:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-direction: column;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                margin: 10% auto;
+                width: 95%;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="calculator">
-    <div class="header">
-      <div class="title">AMANA FINANCE</div>
-      <div class="subtitle">Калькулятор рассрочки</div>
-    </div>
-
-    <div class="tariff-buttons">
-      <div class="tariff-button active" data-tariff="with">С первым взносом</div>
-      <div class="tariff-button" data-tariff="without">Без первого взноса</div>
-    </div>
-
-    <div class="input-group">
-      <label for="price">Стоимость товара</label>
-      <div class="input-wrapper">
-        <input type="number" id="price" placeholder="не менее 50 000 ₽" min="0" />
-      </div>
-      <div class="error-message" id="errorMessage">⚠️ Стоимость товара должна быть<br>не менее 50 000₽</div>
-    </div>
-
-    <div class="input-group">
-      <label for="months" id="monthsLabel">Срок: 3 месяца</label>
-      <div class="slider-container">
-        <input type="range" id="months" class="slider" min="3" max="12" value="3" />
-        <div class="months-display">
-          <span class="month-label active">3 мес</span>
-          <span class="month-label">6 мес</span>
-          <span class="month-label">9 мес</span>
-          <span class="month-label">12 мес</span>
+    <!-- Основное приложение -->
+    <div class="main-container" id="mainContainer">
+        <div class="header">
+            <h1>Система учета рассрочки</h1>
+            <button class="logout-btn" onclick="logout()">Выйти</button>
         </div>
-      </div>
+
+        <nav class="navigation">
+            <ul class="nav-tabs">
+                <li><button onclick="showTab('accounting')" class="tab-btn active">Учет</button></li>
+                <li><button onclick="showTab('finance')" class="tab-btn">Финансы</button></li>
+                <li><button onclick="showTab('cashbox')" class="tab-btn">Касса</button></li>
+                <li><button onclick="showTab('payments')" class="tab-btn">Платежи</button></li>
+                <li><button onclick="showTab('analytics')" class="tab-btn">Аналитика</button></li>
+            </ul>
+        </nav>
+
+        <div class="content">
+            <!-- Вкладка Учет -->
+            <div class="tab-content active" id="accounting">
+                <div class="card">
+                    <h2>Учет рассрочки</h2>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3 id="totalContracts">0</h3>
+                            <p>Всего договоров</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 id="activeContracts">0</h3>
+                            <p>Активные договоры</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 id="totalDebt">0 ₽</h3>
+                            <p>Общий долг</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 id="monthlyPayments">0 ₽</h3>
+                            <p>Платежи за месяц</p>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="showAddContractModal()">+ Добавить договор</button>
+                    
+                    <input type="text" class="search-bar" placeholder="Поиск по ФИО, номеру телефона или товару..." onkeyup="searchContracts(this.value)">
+                    
+                    <div class="table-container">
+                        <table id="contractsTable">
+                            <thead>
+                                <tr>
+                                    <th>№</th>
+                                    <th>Дата покупки</th>
+                                    <th>ФИО</th>
+                                    <th>Телефон</th>
+                                    <th>Поручитель</th>
+                                    <th>Товар</th>
+                                    <th>Партнер</th>
+                                    <th>Цена</th>
+                                    <th>Предоплата</th>
+                                    <th>Месяцев</th>
+                                    <th>Ежемесячно</th>
+                                    <th>Остаток</th>
+                                    <th>1-й взнос</th>
+                                    <th>2-й взнос</th>
+                                    <th>3-й взнос</th>
+                                    <th>4-й взнос</th>
+                                    <th>5-й взнос</th>
+                                    <th>Просрочка</th>
+                                    <th>Статус</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody id="contractsTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Вкладка Финансы -->
+            <div class="tab-content" id="finance">
+                <div class="card">
+                    <h2>Учет финансов</h2>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3 id="dailyRevenue">0 ₽</h3>
+                            <p>Выручка за день</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 id="monthlyRevenue">0 ₽</h3>
+                            <p>Выручка за месяц</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 id="totalExpenses">0 ₽</h3>
+                            <p>Расходы</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 id="netProfit">0 ₽</h3>
+                            <p>Чистая прибыль</p>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-success" onclick="showFinanceModal('income')">+ Добавить доход</button>
+                    <button class="btn btn-danger" onclick="showFinanceModal('expense')">+ Добавить расход</button>
+                    
+                    <div class="table-container">
+                        <table id="financeTable">
+                            <thead>
+                                <tr>
+                                    <th>Дата</th>
+                                    <th>Тип</th>
+                                    <th>Описание</th>
+                                    <th>Сумма</th>
+                                    <th>Источник</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody id="financeTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Вкладка Касса -->
+            <div class="tab-content" id="cashbox">
+                <div class="card">
+                    <h2>Касса</h2>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3 id="cashAmount">0 ₽</h3>
+                            <p>Наличные в кассе</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 id="cardAmount">0 ₽</h3>
+                            <p>Безналичные средства</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 id="totalAdvance">0 ₽</h3>
+                            <p>Предоплаты</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 id="totalInstallments">0 ₽</h3>
+                            <p>Взносы</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Вкладка Платежи -->
+            <div class="tab-content" id="payments">
+                <div class="card">
+                    <h2>Платежи</h2>
+                    
+                    <button class="btn btn-primary" onclick="showPaymentModal()">+ Зафиксировать платеж</button>
+                    
+                    <input type="text" class="search-bar" placeholder="Поиск платежей..." onkeyup="searchPayments(this.value)">
+                    
+                    <div class="table-container">
+                        <table id="paymentsTable">
+                            <thead>
+                                <tr>
+                                    <th>Дата</th>
+                                    <th>ФИО клиента</th>
+                                    <th>Размер платежа</th>
+                                    <th>Тип платежа</th>
+                                    <th>Статус</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody id="paymentsTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Вкладка Аналитика -->
+            <div class="tab-content" id="analytics">
+                <div class="card">
+                    <h2>Аналитика и отчеты</h2>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3 id="conversionRate">0%</h3>
+                            <p>Конверсия</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 id="avgContractValue">0 ₽</h3>
+                            <p>Средний чек</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 id="overdueContracts">0</h3>
+                            <p>Просроченные</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 id="completedContracts">0</h3>
+                            <p>Завершенные</p>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group-inline">
+                            <label>Период отчета:</label>
+                            <select onchange="updateAnalytics(this.value)">
+                                <option value="week">За неделю</option>
+                                <option value="month" selected>За месяц</option>
+                                <option value="quarter">За квартал</option>
+                                <option value="year">За год</option>
+                            </select>
+                        </div>
+                        <div class="form-group-inline">
+                            <label>&nbsp;</label>
+                            <button class="btn btn-primary" onclick="exportReport()">Экспорт отчета</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div id="prepaymentBlock" class="input-group">
-      <label for="prepaymentSlider">Первый взнос</label>
-      <div class="prepayment-input-group">
-        <input type="number" id="prepaymentInput" step="100" placeholder="0" />
-      </div>
-      <div class="error-message" id="prepaymentError"></div>
-      <div class="slider-container">
-        <input type="range" id="prepaymentSlider" class="slider" min="0" max="0" step="100" value="0" />
-      </div>
+    <!-- Модальные окна -->
+    
+    <!-- Модальное окно добавления договора -->
+    <div class="modal" id="contractModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('contractModal')">&times;</span>
+            <h2>Новый договор рассрочки</h2>
+            <form id="contractForm">
+                <div class="form-row">
+                    <div class="form-group-inline">
+                        <label>ФИО клиента:</label>
+                        <input type="text" name="clientName" required>
+                    </div>
+                    <div class="form-group-inline">
+                        <label>Телефон покупателя:</label>
+                        <input type="tel" name="clientPhone" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group-inline">
+                        <label>Телефон поручителя:</label>
+                        <input type="tel" name="guarantorPhone">
+                    </div>
+                    <div class="form-group-inline">
+                        <label>Адрес:</label>
+                        <input type="text" name="address">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group-inline">
+                        <label>Наименование товара:</label>
+                        <input type="text" name="productName" required>
+                    </div>
+                    <div class="form-group-inline">
+                        <label>Партнер:</label>
+                        <select name="partner">
+                            <option value="Хайр Строй">Хайр Строй</option>
+                            <option value="Иса кирпич">Иса кирпич</option>
+                            <option value="Прочий">Прочий</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group-inline">
+                        <label>Себестоимость:</label>
+                        <input type="number" name="costPrice" required>
+                    </div>
+                    <div class="form-group-inline">
+                        <label>Цена продажи:</label>
+                        <input type="number" name="salePrice" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group-inline">
+                        <label>Предоплата:</label>
+                        <input type="number" name="downPayment" required>
+                    </div>
+                    <div class="form-group-inline">
+                        <label>Количество месяцев:</label>
+                        <input type="number" name="months" min="1" max="12" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group-inline">
+                        <label>IMEI телефона:</label>
+                        <input type="text" name="imei">
+                    </div>
+                    <div class="form-group-inline">
+                        <label>Скидка:</label>
+                        <input type="number" name="discount" value="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group-inline">
+                        <label>&nbsp;</label>
+                        <button type="submit" class="btn btn-primary">Создать договор</button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <div class="output" id="results">
-      <p><strong>Первый взнос:</strong> <span class="output-value">0 ₽</span></p>
-      <p><strong>Ежемесячный платёж:</strong> <span class="output-value">0 ₽</span></p>
-      <p><strong>Стоимость с наценкой:</strong> <span class="output-value">0 ₽</span></p>
-      <p><strong>Наценка:</strong> <span class="output-value">0 ₽ (0%)</span></p>
+    <!-- Модальное окно финансовых операций -->
+    <div class="modal" id="financeModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('financeModal')">&times;</span>
+            <h2 id="financeModalTitle">Финансовая операция</h2>
+            <form id="financeForm">
+                <div class="form-row">
+                    <div class="form-group-inline">
+                        <label>Дата:</label>
+                        <input type="date" name="date" required>
+                    </div>
+                    <div class="form-group-inline">
+                        <label>Тип операции:</label>
+                        <select name="operationType" id="operationType">
+                            <option value="income">Доход</option>
+                            <option value="expense">Расход</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group-inline">
+                        <label>Описание:</label>
+                        <input type="text" name="description" required>
+                    </div>
+                    <div class="form-group-inline">
+                        <label>Сумма:</label>
+                        <input type="number" name="amount" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group-inline">
+                        <label>Источник/Назначение:</label>
+                        <select name="source">
+                            <option value="cash">Наличные</option>
+                            <option value="card">Безналичные</option>
+                            <option value="transfer">Перевод</option>
+                            <option value="other">Другое</option>
+                        </select>
+                    </div>
+                    <div class="form-group-inline">
+                        <label>&nbsp;</label>
+                        <button type="submit" class="btn btn-primary">Сохранить</button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <div class="helper-text">
-      💡 Обязательные требования: Поручитель и паспорта обеих лиц
+    <!-- Модальное окно платежей -->
+    <div class="modal" id="paymentModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('paymentModal')">&times;</span>
+            <h2>Зафиксировать платеж</h2>
+            <form id="paymentForm">
+                <div class="form-row">
+                    <div class="form-group-inline">
+                        <label>Дата платежа:</label>
+                        <input type="date" name="paymentDate" required>
+                    </div>
+                    <div class="form-group-inline">
+                        <label>ФИО клиента:</label>
+                        <select name="clientId" id="clientSelect" required>
+                            <option value="">Выберите клиента</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group-inline">
+                        <label>Размер платежа:</label>
+                        <input type="number" name="paymentAmount" required>
+                    </div>
+                    <div class="form-group-inline">
+                        <label>Тип платежа:</label>
+                        <select name="paymentType">
+                            <option value="installment">Взнос по рассрочке</option>
+                            <option value="advance">Предоплата</option>
+                            <option value="full">Полная оплата</option>
+                            <option value="partial">Частичная оплата</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group-inline">
+                        <label>Способ оплаты:</label>
+                        <select name="paymentMethod">
+                            <option value="cash">Наличные</option>
+                            <option value="card">Карта</option>
+                            <option value="transfer">Перевод</option>
+                        </select>
+                    </div>
+                    <div class="form-group-inline">
+                        <label>&nbsp;</label>
+                        <button type="submit" class="btn btn-primary">Зафиксировать</button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <div class="buttons">
-      <a id="whatsapp" class="btn btn-whatsapp" href="#" target="_blank">
-        <span>✍️ Написать в WhatsApp</span>
-      </a>
-      <a class="btn btn-call" href="tel:+79280222114">
-        <span>📞 Позвонить</span>
-      </a>
-    </div>
-  </div>
-
-  <script>
-    const priceInput = document.getElementById('price');
-    const monthsInput = document.getElementById('months');
-    const monthsLabel = document.getElementById('monthsLabel');
-    const prepaymentBlock = document.getElementById('prepaymentBlock');
-    const prepaymentSlider = document.getElementById('prepaymentSlider');
-    const prepaymentInput = document.getElementById('prepaymentInput');
-    const prepaymentError = document.getElementById('prepaymentError');
-    const resultsDiv = document.getElementById('results');
-    const whatsappBtn = document.getElementById('whatsapp');
-    const errorMessage = document.getElementById('errorMessage');
-    const tariffButtons = document.querySelectorAll('.tariff-button');
-    const monthLabels = document.querySelectorAll('.month-label');
-
-    let selectedTariff = 'with';
-    let conditionalPrepayment = 0;
-
-    const markupWithDown = {3:9,4:12,5:15,6:18,7:20,8:22,9:24,10:26,11:28,12:30};
-    const markupWithoutDown = {3:14,4:18,5:23,6:28,7:31,8:33,9:37,10:40,11:43,12:46};
-
-    const roundUpTo100 = val => Math.ceil(val / 100) * 100;
-
-    function updateMonthLabels(selectedMonth) {
-      monthLabels.forEach((label, index) => {
-        const monthValue = [3, 6, 9, 12][index];
-        label.classList.toggle('active', monthValue === selectedMonth);
-      });
-    }
-
-    function togglePrepaymentSlider() {
-      const isVisible = selectedTariff === 'with';
-      prepaymentBlock.style.display = isVisible ? 'block' : 'none';
-      if (isVisible) {
-        prepaymentBlock.style.animation = 'fadeInUp 0.4s ease-out';
-      }
-    }
-
-    function updateCalculator(resetPrepayment = false) {
-      const months = parseInt(monthsInput.value);
-      
-      // Обновляем текст лейбла в зависимости от количества месяцев
-      const monthText = months === 1 ? 'месяц' : (months < 5 ? 'месяца' : 'месяцев');
-      monthsLabel.textContent = `Срок: ${months} ${monthText}`;
-      
-      updateMonthLabels(months);
-
-      const price = parseInt(priceInput.value);
-      if (isNaN(price) || price < 50000) {
-        errorMessage.style.display = 'block';
-        prepaymentInput.value = 0;
-        prepaymentError.style.display = 'none';
-        resultsDiv.innerHTML = `
-          <p><strong>Первый взнос:</strong> <span class="output-value">0 ₽</span></p>
-          <p><strong>Ежемесячный платёж:</strong> <span class="output-value">0 ₽</span></p>
-          <p><strong>Стоимость с наценкой:</strong> <span class="output-value">0 ₽</span></p>
-          <p><strong>Наценка:</strong> <span class="output-value">0 ₽ (0%)</span></p>
-        `;
-        whatsappBtn.href = "https://wa.me/79280222114?text=Здравствуйте, хочу оформить рассрочку.";
-        togglePrepaymentSlider();
-        return;
-      } else {
-        errorMessage.style.display = 'none';
-      }
-
-      const percent = selectedTariff === 'with' ? markupWithDown[months] : markupWithoutDown[months];
-      const baseFinalCost = price * (1 + percent / 100);
-
-      let prepayment = 0, monthly = 0, finalCost = 0, message = "";
-
-      if (selectedTariff === 'with') {
-        const minPrepayment = roundUpTo100(baseFinalCost * 0.15);
-        const maxPrepayment = roundUpTo100(baseFinalCost * 0.65);
-        conditionalPrepayment = roundUpTo100(baseFinalCost * 0.25);
-
-        prepaymentSlider.min = minPrepayment;
-        prepaymentSlider.max = maxPrepayment;
-
-        if (resetPrepayment) {
-          prepaymentSlider.value = conditionalPrepayment;
+    <script>
+        // Инициализация приложения
+        function initializeApp() {
+            updateDashboard();
+            loadContracts();
+            loadFinance();
+            loadPayments();
+            updateCashbox();
+            updateAnalytics();
         }
-
-        if (Math.abs(prepaymentSlider.value - conditionalPrepayment) <= conditionalPrepayment * 0.05) {
-          prepaymentSlider.value = conditionalPrepayment;
-        }
-
-        prepayment = parseInt(prepaymentSlider.value);
-        prepaymentInput.value = prepayment;
-
-        if (prepayment === conditionalPrepayment) {
-          const remaining = baseFinalCost - prepayment;
-          monthly = roundUpTo100(remaining / months);
-          finalCost = monthly * months + prepayment;
-        } else {
-          const remaining = price - prepayment;
-          const remainingWithMarkup = remaining * (1 + markupWithoutDown[months] / 100);
-          monthly = roundUpTo100(remainingWithMarkup / months);
-          finalCost = monthly * months + prepayment;
-        }
-
-        message = `Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${price.toLocaleString()} ₽, Тариф: С первым взносом, Первый взнос: ${prepayment.toLocaleString()} ₽, Срок: ${months} мес.`;
-
-      } else {
-        monthly = roundUpTo100(baseFinalCost / months);
-        finalCost = monthly * months;
-        prepaymentInput.value = "0";
-        prepayment = 0;
-        message = `Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${price.toLocaleString()} ₽, Тариф: Без первого взноса, Срок: ${months} мес.`;
-      }
-
-      const markup = finalCost - price;
-      const markupPercent = Math.round((markup / price) * 100);
-
-      resultsDiv.innerHTML = `
-        <p><strong>Первый взнос:</strong> <span class="output-value">${prepayment.toLocaleString()} ₽</span></p>
-        <p><strong>Ежемесячный платёж:</strong> <span class="output-value">${monthly.toLocaleString()} ₽</span></p>
-        <p><strong>Стоимость с наценкой:</strong> <span class="output-value">${finalCost.toLocaleString()} ₽</span></p>
-        <p><strong>Наценка:</strong> <span class="output-value">${markup.toLocaleString()} ₽ (${markupPercent}%)</span></p>
-      `;
-
-      // Trigger animation
-      resultsDiv.style.animation = 'none';
-      setTimeout(() => {
-        resultsDiv.style.animation = 'resultAppear 0.6s ease-out';
-      }, 10);
-
-      whatsappBtn.href = `https://wa.me/79280222114?text=${encodeURIComponent(message)}`;
-      prepaymentError.style.display = 'none';
-      togglePrepaymentSlider();
-    }
-
-    tariffButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        tariffButtons.forEach(btn => {
-          btn.classList.remove('active');
-          btn.style.transform = 'scale(1)';
-        });
-        button.classList.add('active');
-        button.style.transform = 'scale(1.02)';
-        selectedTariff = button.dataset.tariff;
-        updateCalculator(true);
-      });
-    });
-
-    // Add visual feedback for input interactions
-    priceInput.addEventListener('focus', () => {
-      priceInput.parentElement.style.transform = 'translateY(-2px)';
-    });
-
-    priceInput.addEventListener('blur', () => {
-      priceInput.parentElement.style.transform = 'translateY(0)';
-    });
-
-    priceInput.addEventListener('input', () => updateCalculator(true));
-    monthsInput.addEventListener('input', () => updateCalculator(true));
-    prepaymentSlider.addEventListener('input', () => updateCalculator(false));
-
-    prepaymentInput.addEventListener('input', () => {
-      const val = roundUpTo100(parseInt(prepaymentInput.value || '0'));
-      const min = parseInt(prepaymentSlider.min);
-      const max = parseInt(prepaymentSlider.max);
-
-      if (val >= min && val <= max) {
-        prepaymentError.style.display = 'none';
-        prepaymentSlider.value = val;
-        updateCalculator(false);
-      } else {
-        prepaymentError.textContent = `Первый взнос должен быть от ${min.toLocaleString()}₽ до ${max.toLocaleString()}₽`;
-        prepaymentError.style.display = 'block';
-      }
-    });
-
-    // Add ripple effect to buttons
-    document.querySelectorAll('.btn').forEach(button => {
-      button.addEventListener('click', function(e) {
-        const ripple = document.createElement('div');
-        const rect = this.getBoundingClientRect();
-        const size = Math.max(rect.width, rect.height);
-        const x = e.clientX - rect.left - size / 2;
-        const y = e.clientY - rect.top - size / 2;
-        
-        ripple.style.cssText = `
-          position: absolute;
-          width: ${size}px;
-          height: ${size}px;
-          left: ${x}px;
-          top: ${y}px;
-          background: rgba(255, 255, 255, 0.3);
-          border-radius: 50%;
-          transform: scale(0);
-          animation: ripple 0.6s ease-out;
-          pointer-events: none;
-        `;
-        
-        this.appendChild(ripple);
-        
-        const style = document.createElement('style');
-        style.textContent = `
-          @keyframes ripple {
-            to {
-              transform: scale(4);
-              opacity: 0;
+        // Данные приложения (в реальном приложении это будет база данных)
+        let appData = {
+            contracts: [
+                {
+                    id: 2,
+                    clientName: "Муцуев Иса Шайамахмудович",
+                    clientPhone: "8962 141 77 77",
+                    guarantorPhone: "8928 262 68 68",
+                    address: "Г.Грозный, Ул Старый поселок, 6",
+                    productName: "Айфон 16 про 256 гб",
+                    partner: "Хайр Строй",
+                    costPrice: 100000,
+                    salePrice: 111500,
+                    downPayment: 50000,
+                    months: 5,
+                    monthlyPayment: 12300,
+                    remainingDebt: 49200,
+                    status: "active",
+                    createdDate: "2025-03-02",
+                    imei: "",
+                    discount: 0
+                }
+            ],
+            finance: [
+                {
+                    id: 1,
+                    date: "2025-08-08",
+                    type: "income",
+                    description: "Платеж по рассрочке - Юсупов Ибрагим",
+                    amount: 27500,
+                    source: "cash"
+                },
+                {
+                    id: 2,
+                    date: "2025-08-07",
+                    type: "expense",
+                    description: "Аренда помещения",
+                    amount: 50000,
+                    source: "cash"
+                }
+            ],
+            payments: [
+                {
+                    id: 1,
+                    date: "2025-08-08",
+                    clientName: "Юсупов Ибрагим",
+                    amount: 27500,
+                    type: "installment",
+                    method: "cash",
+                    status: "completed"
+                }
+            ],
+            cashbox: {
+                cash: 881500,
+                card: 0,
+                totalAdvance: 7060300,
+                totalInstallments: 5584400
             }
-          }
-        `;
-        document.head.appendChild(style);
-        
-        setTimeout(() => {
-          ripple.remove();
-          style.remove();
-        }, 600);
-      });
-    });
+        };
 
-    updateCalculator(true);
-  </script>
+        // Учетные данные для входа
+        const credentials = {
+            admin: "admin123",
+            manager: "manager456",
+            bek: "bek2025"
+        };
+
+        // Функция входа в систему
+        function handleLogin(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            console.log('Попытка входа:', username, password); // Для отладки
+            
+            // Проверяем учетные данные
+            if ((username === 'admin' && password === 'admin123') ||
+                (username === 'manager' && password === 'manager456') ||
+                (username === 'bek' && password === 'bek2025')) {
+                
+                console.log('Вход успешен!'); // Для отладки
+                
+                // Скрываем форму входа и показываем основное приложение
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('mainContainer').style.display = 'block';
+                
+                // Инициализируем данные
+                updateDashboard();
+                loadContracts();
+                loadFinance();
+                loadPayments();
+                updateCashbox();
+                updateAnalytics();
+                
+                alert('Добро пожаловать в систему!');
+            } else {
+                alert('❌ Неверный логин или пароль!\n\n✅ Доступные учетные данные:\n\n👤 Администратор:\n   Логин: admin\n   Пароль: admin123\n\n👤 Менеджер:\n   Логин: manager\n   Пароль: manager456\n\n👤 Бек:\n   Логин: bek\n   Пароль: bek2025');
+                
+                // Очищаем поля
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+            }
+        }
+
+        // Привязываем обработчик к форме
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', handleLogin);
+            }
+            
+            // Показываем подсказку через 2 секунды
+            setTimeout(() => {
+                if (document.getElementById('loginContainer').style.display !== 'none') {
+                    console.log('Показываем подсказку с учетными данными');
+                }
+            }, 2000);
+        });
+
+        // Функция выхода (временно отключена)
+        function logout() {
+            if (confirm('Вы уверены, что хотите выйти?')) {
+                location.reload();
+            }
+        }
+
+        // Переключение вкладок
+        function showTab(tabName) {
+            // Скрыть все вкладки
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Убрать активность у всех кнопок
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Показать выбранную вкладку
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Обновление главной панели
+        function updateDashboard() {
+            const totalContracts = appData.contracts.length;
+            const activeContracts = appData.contracts.filter(c => c.status === 'active').length;
+            const totalDebt = appData.contracts.reduce((sum, c) => sum + c.remainingDebt, 0);
+            const monthlyPayments = appData.payments
+                .filter(p => new Date(p.date).getMonth() === new Date().getMonth())
+                .reduce((sum, p) => sum + p.amount, 0);
+
+            document.getElementById('totalContracts').textContent = totalContracts;
+            document.getElementById('activeContracts').textContent = activeContracts;
+            document.getElementById('totalDebt').textContent = totalDebt.toLocaleString() + ' ₽';
+            document.getElementById('monthlyPayments').textContent = monthlyPayments.toLocaleString() + ' ₽';
+        }
+
+        // Загрузка договоров
+        function loadContracts() {
+            const tbody = document.getElementById('contractsTableBody');
+            tbody.innerHTML = '';
+            
+            appData.contracts.forEach((contract, index) => {
+                const row = document.createElement('tr');
+                
+                let statusClass = '';
+                let statusText = '';
+                
+                switch(contract.status) {
+                    case 'paid':
+                        statusClass = 'status-paid';
+                        statusText = 'Оплачен';
+                        break;
+                    case 'active':
+                        statusClass = 'status-pending';
+                        statusText = 'Активен';
+                        break;
+                    case 'overdue':
+                        statusClass = 'status-overdue';
+                        statusText = `Просрочен ${contract.overdueDays} дн.`;
+                        break;
+                }
+
+                // Получаем статусы платежей
+                const payment1 = getPaymentStatus(contract.installments[0]);
+                const payment2 = getPaymentStatus(contract.installments[1]);
+                const payment3 = getPaymentStatus(contract.installments[2]);
+                const payment4 = getPaymentStatus(contract.installments[3]);
+                const payment5 = getPaymentStatus(contract.installments[4]);
+
+                // Рассчитываем просрочку
+                const overdueInfo = calculateOverdue(contract);
+                
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${new Date(contract.createdDate).toLocaleDateString()}</td>
+                    <td style="font-weight: 500;">${contract.clientName}</td>
+                    <td>${contract.clientPhone}</td>
+                    <td>${contract.guarantorPhone || '-'}</td>
+                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${contract.productName}">${contract.productName}</td>
+                    <td>${contract.partner}</td>
+                    <td style="font-weight: 600;">${contract.salePrice.toLocaleString()} ₽</td>
+                    <td>${contract.downPayment.toLocaleString()} ₽</td>
+                    <td>${contract.months}</td>
+                    <td style="font-weight: 600; color: #667eea;">${contract.monthlyPayment.toLocaleString()} ₽</td>
+                    <td style="font-weight: 600; color: ${contract.remainingDebt > 0 ? '#dc3545' : '#28a745'};">${contract.remainingDebt.toLocaleString()} ₽</td>
+                    <td>${payment1}</td>
+                    <td>${payment2}</td>
+                    <td>${payment3}</td>
+                    <td>${payment4}</td>
+                    <td>${payment5}</td>
+                    <td style="color: ${overdueInfo.days > 0 ? '#dc3545' : '#28a745'}; font-weight: 600;">${overdueInfo.text}</td>
+                    <td><span class="${statusClass}">${statusText}</span></td>
+                    <td>
+                        <button class="btn btn-warning" onclick="showContractDetails(${contract.id})" style="padding: 6px 12px; font-size: 12px;">Детали</button>
+                        <button class="btn btn-success" onclick="addPaymentForContract(${contract.id})" style="padding: 6px 12px; font-size: 12px;">Платеж</button>
+                    </td>
+                `;
+                
+                // Подсветка строки в зависимости от статуса
+                if (contract.status === 'overdue') {
+                    row.style.backgroundColor = '#fdf2f2';
+                } else if (contract.status === 'paid') {
+                    row.style.backgroundColor = '#f0f9f0';
+                }
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        // Функция для получения статуса платежа
+        function getPaymentStatus(installment) {
+            if (!installment) return '<span style="color: #ccc;">-</span>';
+            
+            const currentDate = new Date();
+            const installmentDate = new Date(installment.date);
+            
+            if (installment.paid) {
+                const paidDate = new Date(installment.paidDate);
+                const isLate = paidDate > installmentDate;
+                return `<span style="color: #28a745; font-weight: 600;">✓ ${paidDate.toLocaleDateString()}${isLate ? ' (поздно)' : ''}</span>`;
+            } else {
+                const isOverdue = currentDate > installmentDate;
+                const daysDiff = Math.floor((currentDate - installmentDate) / (1000 * 60 * 60 * 24));
+                
+                if (isOverdue) {
+                    return `<span style="color: #dc3545; font-weight: 600;">✗ Просрочен ${daysDiff} дн.</span>`;
+                } else {
+                    return `<span style="color: #ffc107; font-weight: 600;">⏳ ${installmentDate.toLocaleDateString()}</span>`;
+                }
+            }
+        }
+
+        // Функция для расчета общей просрочки
+        function calculateOverdue(contract) {
+            const currentDate = new Date();
+            let maxOverdueDays = 0;
+            
+            contract.installments.forEach(installment => {
+                if (!installment.paid) {
+                    const installmentDate = new Date(installment.date);
+                    if (currentDate > installmentDate) {
+                        const daysDiff = Math.floor((currentDate - installmentDate) / (1000 * 60 * 60 * 24));
+                        maxOverdueDays = Math.max(maxOverdueDays, daysDiff);
+                    }
+                }
+            });
+            
+            return {
+                days: maxOverdueDays,
+                text: maxOverdueDays > 0 ? `${maxOverdueDays} дн.` : 'В срок'
+            };
+        }
+
+        // Функция показа деталей договора
+        function showContractDetails(contractId) {
+            const contract = appData.contracts.find(c => c.id === contractId);
+            if (!contract) return;
+            
+            let installmentsList = '';
+            contract.installments.forEach((inst, index) => {
+                const status = inst.paid ? 
+                    `✓ Оплачен ${new Date(inst.paidDate).toLocaleDateString()}` : 
+                    `❌ Не оплачен (до ${new Date(inst.date).toLocaleDateString()})`;
+                    
+                installmentsList += `
+                    <div style="padding: 8px; margin: 4px 0; background: ${inst.paid ? '#f0f9f0' : '#fdf2f2'}; border-radius: 4px;">
+                        <strong>${index + 1}-й взнос:</strong> ${inst.amount.toLocaleString()} ₽ - ${status}
+                    </div>
+                `;
+            });
+            
+            const overdueInfo = calculateOverdue(contract);
+            
+            alert(`ДЕТАЛИ ДОГОВОРА #${contractId}
+            
+📋 Клиент: ${contract.clientName}
+📞 Телефон: ${contract.clientPhone}
+${contract.guarantorPhone ? '👥 Поручитель: ' + contract.guarantorPhone : ''}
+📍 Адрес: ${contract.address || 'Не указан'}
+
+🛍️ Товар: ${contract.productName}
+🏢 Партнер: ${contract.partner}
+💰 Цена: ${contract.salePrice.toLocaleString()} ₽
+💳 Предоплата: ${contract.downPayment.toLocaleString()} ₽
+📅 Месяцев: ${contract.months}
+💵 Ежемесячно: ${contract.monthlyPayment.toLocaleString()} ₽
+💸 Остаток: ${contract.remainingDebt.toLocaleString()} ₽
+
+⏰ Просрочка: ${overdueInfo.text}
+📊 Статус: ${contract.status === 'paid' ? 'Оплачен' : contract.status === 'active' ? 'Активен' : 'Просрочен'}
+
+Детали по взносам будут показаны в отдельном окне...`);
+        }
+
+        // Функция для быстрого добавления платежа
+        function addPaymentForContract(contractId) {
+            const contract = appData.contracts.find(c => c.id === contractId);
+            if (!contract) return;
+            
+            showPaymentModal();
+            // Автоматически выбираем клиента
+            setTimeout(() => {
+                document.getElementById('clientSelect').value = contractId;
+                document.querySelector('#paymentForm input[name="paymentAmount"]').value = contract.monthlyPayment;
+            }, 100);
+        }
+
+        // Поиск договоров
+        function searchContracts(query) {
+            const tbody = document.getElementById('contractsTableBody');
+            const rows = tbody.getElementsByTagName('tr');
+            
+            for (let row of rows) {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(query.toLowerCase())) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        }
+
+        // Показать модальное окно добавления договора
+        function showAddContractModal() {
+            document.getElementById('contractModal').style.display = 'block';
+            // Установить сегодняшнюю дату
+            const today = new Date().toISOString().split('T')[0];
+            document.querySelector('#contractForm input[name="date"]');
+        }
+
+        // Обработка формы добавления договора
+        document.getElementById('contractForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const newContract = {
+                id: appData.contracts.length + 1,
+                clientName: formData.get('clientName'),
+                clientPhone: formData.get('clientPhone'),
+                guarantorPhone: formData.get('guarantorPhone') || '',
+                address: formData.get('address') || '',
+                productName: formData.get('productName'),
+                partner: formData.get('partner'),
+                costPrice: parseInt(formData.get('costPrice')),
+                salePrice: parseInt(formData.get('salePrice')),
+                downPayment: parseInt(formData.get('downPayment')),
+                months: parseInt(formData.get('months')),
+                monthlyPayment: Math.round((parseInt(formData.get('salePrice')) - parseInt(formData.get('downPayment'))) / parseInt(formData.get('months'))),
+                remainingDebt: parseInt(formData.get('salePrice')) - parseInt(formData.get('downPayment')),
+                status: 'active',
+                createdDate: new Date().toISOString().split('T')[0],
+                imei: formData.get('imei') || '',
+                discount: parseInt(formData.get('discount')) || 0
+            };
+            
+            appData.contracts.push(newContract);
+            loadContracts();
+            updateDashboard();
+            closeModal('contractModal');
+            e.target.reset();
+        });
+
+        // Загрузка финансов
+        function loadFinance() {
+            const tbody = document.getElementById('financeTableBody');
+            tbody.innerHTML = '';
+            
+            appData.finance.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${new Date(item.date).toLocaleDateString()}</td>
+                    <td>${item.type === 'income' ? 'Доход' : 'Расход'}</td>
+                    <td>${item.description}</td>
+                    <td style="color: ${item.type === 'income' ? 'green' : 'red'}">
+                        ${item.type === 'income' ? '+' : '-'}${item.amount.toLocaleString()} ₽
+                    </td>
+                    <td>${getSourceText(item.source)}</td>
+                    <td>
+                        <button class="btn btn-danger" onclick="deleteFinanceItem(${item.id})">Удалить</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            updateFinanceStats();
+        }
+
+        function getSourceText(source) {
+            const sources = {
+                'cash': 'Наличные',
+                'card': 'Безналичные',
+                'transfer': 'Перевод',
+                'other': 'Другое'
+            };
+            return sources[source] || source;
+        }
+
+        function updateFinanceStats() {
+            const today = new Date();
+            const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            
+            const dailyIncome = appData.finance
+                .filter(item => item.type === 'income' && new Date(item.date).toDateString() === today.toDateString())
+                .reduce((sum, item) => sum + item.amount, 0);
+                
+            const monthlyIncome = appData.finance
+                .filter(item => item.type === 'income' && new Date(item.date) >= startOfMonth)
+                .reduce((sum, item) => sum + item.amount, 0);
+                
+            const totalExpenses = appData.finance
+                .filter(item => item.type === 'expense')
+                .reduce((sum, item) => sum + item.amount, 0);
+                
+            const netProfit = monthlyIncome - totalExpenses;
+            
+            document.getElementById('dailyRevenue').textContent = dailyIncome.toLocaleString() + ' ₽';
+            document.getElementById('monthlyRevenue').textContent = monthlyIncome.toLocaleString() + ' ₽';
+            document.getElementById('totalExpenses').textContent = totalExpenses.toLocaleString() + ' ₽';
+            document.getElementById('netProfit').textContent = netProfit.toLocaleString() + ' ₽';
+        }
+
+        // Показать модальное окно финансов
+        function showFinanceModal(type) {
+            document.getElementById('financeModal').style.display = 'block';
+            document.getElementById('financeModalTitle').textContent = type === 'income' ? 'Добавить доход' : 'Добавить расход';
+            document.getElementById('operationType').value = type;
+            
+            // Установить сегодняшнюю дату
+            const today = new Date().toISOString().split('T')[0];
+            document.querySelector('#financeForm input[name="date"]').value = today;
+        }
+
+        // Обработка формы финансов
+        document.getElementById('financeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const newFinanceItem = {
+                id: appData.finance.length + 1,
+                date: formData.get('date'),
+                type: formData.get('operationType'),
+                description: formData.get('description'),
+                amount: parseInt(formData.get('amount')),
+                source: formData.get('source')
+            };
+            
+            appData.finance.push(newFinanceItem);
+            loadFinance();
+            closeModal('financeModal');
+            e.target.reset();
+        });
+
+        // Загрузка платежей
+        function loadPayments() {
+            const tbody = document.getElementById('paymentsTableBody');
+            tbody.innerHTML = '';
+            
+            // Обновляем список клиентов в форме платежей
+            const clientSelect = document.getElementById('clientSelect');
+            clientSelect.innerHTML = '<option value="">Выберите клиента</option>';
+            appData.contracts.forEach(contract => {
+                const option = document.createElement('option');
+                option.value = contract.id;
+                option.textContent = contract.clientName;
+                clientSelect.appendChild(option);
+            });
+            
+            appData.payments.forEach(payment => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${new Date(payment.date).toLocaleDateString()}</td>
+                    <td>${payment.clientName}</td>
+                    <td>${payment.amount.toLocaleString()} ₽</td>
+                    <td>${getPaymentTypeText(payment.type)}</td>
+                    <td><span class="status-${payment.status}">${getStatusText(payment.status)}</span></td>
+                    <td>
+                        <button class="btn btn-danger" onclick="deletePayment(${payment.id})">Удалить</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function getPaymentTypeText(type) {
+            const types = {
+                'installment': 'Взнос по рассрочке',
+                'advance': 'Предоплата',
+                'full': 'Полная оплата',
+                'partial': 'Частичная оплата'
+            };
+            return types[type] || type;
+        }
+
+        function getStatusText(status) {
+            const statuses = {
+                'completed': 'Завершен',
+                'pending': 'Ожидает',
+                'cancelled': 'Отменен'
+            };
+            return statuses[status] || status;
+        }
+
+        // Показать модальное окно платежей
+        function showPaymentModal() {
+            document.getElementById('paymentModal').style.display = 'block';
+            
+            // Установить сегодняшнюю дату
+            const today = new Date().toISOString().split('T')[0];
+            document.querySelector('#paymentForm input[name="paymentDate"]').value = today;
+        }
+
+        // Обработка формы платежей
+        document.getElementById('paymentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const clientId = parseInt(formData.get('clientId'));
+            const client = appData.contracts.find(c => c.id === clientId);
+            
+            if (!client) {
+                alert('Клиент не найден');
+                return;
+            }
+            
+            const newPayment = {
+                id: appData.payments.length + 1,
+                date: formData.get('paymentDate'),
+                clientName: client.clientName,
+                amount: parseInt(formData.get('paymentAmount')),
+                type: formData.get('paymentType'),
+                method: formData.get('paymentMethod'),
+                status: 'completed'
+            };
+            
+            // Обновляем остаток долга у клиента
+            if (formData.get('paymentType') === 'installment' || formData.get('paymentType') === 'partial') {
+                client.remainingDebt = Math.max(0, client.remainingDebt - newPayment.amount);
+                if (client.remainingDebt === 0) {
+                    client.status = 'paid';
+                }
+            }
+            
+            appData.payments.push(newPayment);
+            loadPayments();
+            loadContracts();
+            updateDashboard();
+            closeModal('paymentModal');
+            e.target.reset();
+        });
+
+        // Поиск платежей
+        function searchPayments(query) {
+            const tbody = document.getElementById('paymentsTableBody');
+            const rows = tbody.getElementsByTagName('tr');
+            
+            for (let row of rows) {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(query.toLowerCase())) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        }
+
+        // Обновление кассы
+        function updateCashbox() {
+            document.getElementById('cashAmount').textContent = appData.cashbox.cash.toLocaleString() + ' ₽';
+            document.getElementById('cardAmount').textContent = appData.cashbox.card.toLocaleString() + ' ₽';
+            document.getElementById('totalAdvance').textContent = appData.cashbox.totalAdvance.toLocaleString() + ' ₽';
+            document.getElementById('totalInstallments').textContent = appData.cashbox.totalInstallments.toLocaleString() + ' ₽';
+        }
+
+        // Обновление аналитики
+        function updateAnalytics(period = 'month') {
+            const totalContracts = appData.contracts.length;
+            const avgContractValue = totalContracts > 0 ? 
+                appData.contracts.reduce((sum, c) => sum + c.salePrice, 0) / totalContracts : 0;
+            const overdueContracts = appData.contracts.filter(c => c.status === 'overdue').length;
+            const completedContracts = appData.contracts.filter(c => c.status === 'paid').length;
+            const conversionRate = totalContracts > 0 ? (completedContracts / totalContracts * 100) : 0;
+            
+            document.getElementById('conversionRate').textContent = conversionRate.toFixed(1) + '%';
+            document.getElementById('avgContractValue').textContent = avgContractValue.toLocaleString() + ' ₽';
+            document.getElementById('overdueContracts').textContent = overdueContracts;
+            document.getElementById('completedContracts').textContent = completedContracts;
+        }
+
+        // Экспорт отчета
+        function exportReport() {
+            const reportData = {
+                contracts: appData.contracts,
+                finance: appData.finance,
+                payments: appData.payments,
+                cashbox: appData.cashbox,
+                generatedAt: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(reportData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `отчет_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+        }
+
+        // Функции для работы с модальными окнами
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Закрытие модальных окон при клике вне их
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+
+        // Функции редактирования и удаления
+        function editContract(id) {
+            const contract = appData.contracts.find(c => c.id === id);
+            if (contract) {
+                alert('Функция редактирования будет добавлена в следующей версии');
+            }
+        }
+
+        function deleteContract(id) {
+            if (confirm('Вы уверены, что хотите удалить этот договор?')) {
+                appData.contracts = appData.contracts.filter(c => c.id !== id);
+                loadContracts();
+                updateDashboard();
+            }
+        }
+
+        function deleteFinanceItem(id) {
+            if (confirm('Вы уверены, что хотите удалить эту финансовую операцию?')) {
+                appData.finance = appData.finance.filter(f => f.id !== id);
+                loadFinance();
+            }
+        }
+
+        function deletePayment(id) {
+            if (confirm('Вы уверены, что хотите удалить этот платеж?')) {
+                appData.payments = appData.payments.filter(p => p.id !== id);
+                loadPayments();
+                updateDashboard();
+            }
+        }
+
+        // Инициализация при загрузке страницы  
+        window.onload = function() {
+            console.log('Система загружена');
+            initializeApp();
+        };
+    </script>
+</body>
+</html>
+                    id: 1,
+                    clientName: "Юсупов Ибрагим",
+                    clientPhone: "8988 901 44 44",
+                    guarantorPhone: "",
+                    address: "",
+                    productName: "Айфон 16 про макс 512гб",
+                    partner: "Хайр Строй",
+                    costPrice: 125000,
+                    salePrice: 137500,
+                    downPayment: 27500,
+                    months: 4,
+                    monthlyPayment: 27500,
+                    remainingDebt: 0,
+                    status: "paid",
+                    createdDate: "2025-02-28",
+                    imei: "",
+                    discount: 0
+                },
+                {
