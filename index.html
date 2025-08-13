@@ -1,400 +1,389 @@
-```jsx
-import { Sun, Shield, Droplet, Leaf, Star, Sparkles, RefreshCw, Phone, Mail, MapPin } from 'lucide-react';
-
-const App = () => {
-  const features = [
-    {
-      icon: Shield,
-      title: "Максимальная защита",
-      description: "SPF 50+ обеспечивает надежную защиту от UVA и UVB лучей",
-      color: "from-orange-400 to-red-500"
-    },
-    {
-      icon: Droplet,
-      title: "Увлажнение 24 часа",
-      description: "Глубокое увлажнение кожи благодаря гиалуроновой кислоте",
-      color: "from-blue-400 to-cyan-500"
-    },
-    {
-      icon: Leaf,
-      title: "Натуральный состав",
-      description: "Органические ингредиенты, без парабенов и минеральных масел",
-      color: "from-green-400 to-emerald-500"
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Amana Finance — Калькулятор рассрочки</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-  ];
 
-  const testimonials = [
-    {
-      name: "Анна Петрова",
-      role: "Косметолог",
-      content: "Лучший солнцезащитный крем, который я пробовала. Не оставляет белых следов и прекрасно подходит для чувствительной кожи.",
-      rating: 5
-    },
-    {
-      name: "Михаил Сидоров",
-      role: "Турист",
-      content: "Использую уже третий сезон. Отлично защищает на пляже и в горах. Кожа не пересыхает даже после долгого пребывания на солнце.",
-      rating: 5
-    },
-    {
-      name: "Елена Козлова",
-      role: "Мама",
-      content: "Нашла идеальный крем для всей семьи. Дети не против использовать его, а это главное!",
-      rating: 4
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: #1e293b;
     }
-  ];
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
-      {/* Header */}
-      <header className="bg-white shadow-lg sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-2">
-              <Sun className="h-8 w-8 text-orange-500" />
-              <span className="text-2xl font-bold text-gray-800">SunProtect</span>
-            </div>
-            <nav className="hidden md:flex space-x-8">
-              <a href="#features" className="text-gray-600 hover:text-orange-500 transition-colors">Особенности</a>
-              <a href="#how-it-works" className="text-gray-600 hover:text-orange-500 transition-colors">Как работает</a>
-              <a href="#testimonials" className="text-gray-600 hover:text-orange-500 transition-colors">Отзывы</a>
-              <a href="#contact" className="text-gray-600 hover:text-orange-500 transition-colors">Контакты</a>
-            </nav>
-            <button className="bg-orange-500 text-white px-6 py-2 rounded-full hover:bg-orange-600 transition-colors font-medium">
-              Купить сейчас
-            </button>
-          </div>
-        </div>
-      </header>
+    .calculator {
+      width: 100%;
+      max-width: 480px;
+      background: white;
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e2e8f0;
+    }
 
-      {/* Hero Section */}
-      <section className="relative py-20 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col lg:flex-row items-center">
-            <div className="lg:w-1/2 mb-12 lg:mb-0">
-              <div className="bg-orange-100 inline-block px-4 py-2 rounded-full text-orange-800 font-medium mb-6">
-                Новинка сезона
-              </div>
-              <h1 className="text-4xl md:text-6xl font-bold text-gray-800 mb-6 leading-tight">
-                Максимальная защита от солнца
-              </h1>
-              <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                Инновационный солнцезащитный крем с SPF 50+ для всей семьи. 
-                Защитите свою кожу от вредного воздействия ультрафиолета и наслаждайтесь солнцем без опасений.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <button className="bg-orange-500 text-white px-8 py-4 rounded-full hover:bg-orange-600 transition-colors font-semibold text-lg flex items-center justify-center space-x-2">
-                  <Sparkles className="h-5 w-5" />
-                  <span>Купить за 1 299 ₽</span>
-                </button>
-                <button className="border-2 border-orange-500 text-orange-500 px-8 py-4 rounded-full hover:bg-orange-50 transition-colors font-semibold text-lg">
-                  Узнать больше
-                </button>
-              </div>
-              <div className="flex items-center mt-8 space-x-6">
-                <div className="flex items-center">
-                  <Star className="h-5 w-5 text-yellow-400 fill-current" />
-                  <Star className="h-5 w-5 text-yellow-400 fill-current" />
-                  <Star className="h-5 w-5 text-yellow-400 fill-current" />
-                  <Star className="h-5 w-5 text-yellow-400 fill-current" />
-                  <Star className="h-5 w-5 text-yellow-400 fill-current" />
-                  <span className="ml-2 text-gray-600">4.9 (128 отзывов)</span>
-                </div>
-              </div>
-            </div>
-            <div className="lg:w-1/2 relative">
-              <div className="relative">
-                <img 
-                  src="https://placehold.co/500x600/ffedd5/ea580c?text=SunProtect" 
-                  alt="SunProtect солнцезащитный крем" 
-                  className="rounded-2xl shadow-2xl"
-                />
-                <div className="absolute -top-6 -right-6 bg-white p-4 rounded-xl shadow-lg">
-                  <div className="text-2xl font-bold text-orange-500">SPF 50+</div>
-                  <div className="text-sm text-gray-600">Максимальная защита</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-orange-100 to-transparent opacity-50 rounded-full blur-3xl"></div>
-      </section>
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
 
-      {/* Features */}
-      <section id="features" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Почему выбирают SunProtect</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Наши инновационные формулы разработаны для максимальной защиты и ухода за вашей кожей
-            </p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
-              <div key={index} className="bg-gradient-to-br from-gray-50 to-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow border border-gray-100">
-                <div className={`w-16 h-16 bg-gradient-to-r ${feature.color} rounded-xl flex items-center justify-center mb-6 text-white`}>
-                  <feature.icon className="h-8 w-8" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-4">{feature.title}</h3>
-                <p className="text-gray-600 leading-relaxed">{feature.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+    .header .title {
+      font-size: 24px;
+      font-weight: 600;
+      color: #116234;
+      margin-bottom: 4px;
+      letter-spacing: -0.3px;
+    }
 
-      {/* How It Works */}
-      <section id="how-it-works" className="py-20 bg-gradient-to-b from-orange-50 to-amber-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Как работает наш крем</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Простой процесс, обеспечивающий максимальную защиту вашей кожи
-            </p>
-          </div>
-          <div className="grid md:grid-cols-4 gap-8">
-            {[
-              { step: "1", title: "Нанесите", description: "Равномерно нанесите крем за 15-20 минут до выхода на солнце" },
-              { step: "2", title: "Распределите", description: "Тщательно распределите по коже, уделяя внимание чувствительным зонам" },
-              { step: "3", title: "Повторите", description: "Повторяйте нанесение каждые 2 часа или после купания" },
-              { step: "4", title: "Наслаждайтесь", description: "Смело наслаждайтесь солнцем с уверенностью в защите своей кожи" }
-            ].map((item, index) => (
-              <div key={index} className="text-center">
-                <div className="w-16 h-16 bg-orange-500 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
-                  {item.step}
-                </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-3">{item.title}</h3>
-                <p className="text-gray-600">{item.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+    .header .subtitle {
+      font-size: 14px;
+      color: #64748b;
+      font-weight: 400;
+    }
 
-      {/* Ingredients */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6">Натуральный состав</h2>
-              <p className="text-lg text-gray-600 mb-8">
-                Наш солнцезащитный крем содержит только тщательно отобранные ингредиенты, 
-                которые обеспечивают эффективную защиту и уход за кожей.
-              </p>
-              <div className="space-y-4">
-                {[
-                  "Оксид цинка (натуральный физический фильтр)",
-                  "Гиалуроновая кислота (интенсивное увлажнение)",
-                  "Экстракт алоэ вера (успокаивающее действие)",
-                  "Масло ши (питание и восстановление)",
-                  "Витамин E (антиоксидантная защита)"
-                ].map((ingredient, index) => (
-                  <div key={index} className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                    <span className="text-gray-700">{ingredient}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="relative">
-              <img 
-                src="https://placehold.co/500x400/ffedd5/ea580c?text=Ingredients" 
-                alt="Натуральные ингредиенты" 
-                className="rounded-2xl shadow-2xl"
-              />
-              <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-xl shadow-lg">
-                <div className="text-3xl font-bold text-green-600">100%</div>
-                <div className="text-sm text-gray-600">Натуральный состав</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+    .tariff-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
 
-      {/* Testimonials */}
-      <section id="testimonials" className="py-20 bg-gradient-to-b from-amber-50 to-orange-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Что говорят наши клиенты</h2>
-            <p className="text-xl text-gray-600">
-              Присоединяйтесь к тысячам довольных пользователей
-            </p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
-                <div className="flex mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-                  ))}
-                </div>
-                <p className="text-gray-600 mb-6 leading-relaxed">"{testimonial.content}"</p>
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-r from-orange-400 to-red-500 rounded-full flex items-center justify-center text-white font-bold">
-                    {testimonial.name.charAt(0)}
-                  </div>
-                  <div className="ml-4">
-                    <div className="font-bold text-gray-800">{testimonial.name}</div>
-                    <div className="text-sm text-gray-500">{testimonial.role}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+    .tariff-button {
+      padding: 14px 16px;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      cursor: pointer;
+      text-align: center;
+      font-weight: 500;
+      font-size: 15px;
+      color: #64748b;
+      transition: all 0.2s ease;
+      position: relative;
+    }
 
-      {/* CTA */}
-      <section className="py-20 bg-gradient-to-r from-orange-500 to-red-500">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-            Готовы защитить свою кожу?
-          </h2>
-          <p className="text-xl text-orange-100 mb-8 max-w-3xl mx-auto">
-            Получите скидку 20% на первую покупку, используя промокод SUN20
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-white text-orange-500 px-8 py-4 rounded-full hover:bg-gray-100 transition-colors font-semibold text-lg">
-              Купить сейчас
-            </button>
-            <button className="border-2 border-white text-white px-8 py-4 rounded-full hover:bg-white hover:text-orange-500 transition-colors font-semibold text-lg">
-              Подробнее о продукте
-            </button>
-          </div>
-        </div>
-      </section>
+    .tariff-button:hover {
+      background: #e2e8f0;
+    }
 
-      {/* Contact */}
-      <section id="contact" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6">Свяжитесь с нами</h2>
-              <p className="text-lg text-gray-600 mb-8">
-                У вас есть вопросы? Наши специалисты готовы помочь вам выбрать идеальный продукт.
-              </p>
-              <div className="space-y-6">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                    <Phone className="h-6 w-6 text-orange-500" />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-gray-800">Телефон</div>
-                    <div className="text-gray-600">+7 (495) 123-45-67</div>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                    <Mail className="h-6 w-6 text-orange-500" />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-gray-800">Email</div>
-                    <div className="text-gray-600">info@sunprotect.ru</div>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                    <MapPin className="h-6 w-6 text-orange-500" />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-gray-800">Адрес</div>
-                    <div className="text-gray-600">Москва, ул. Солнечная, д. 15</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="bg-gray-50 p-8 rounded-2xl">
-              <form className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Имя</label>
-                  <input 
-                    type="text" 
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    placeholder="Ваше имя"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                  <input 
-                    type="email" 
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    placeholder="Ваш email"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Сообщение</label>
-                  <textarea 
-                    rows="4"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    placeholder="Ваше сообщение"
-                  ></textarea>
-                </div>
-                <button 
-                  type="submit"
-                  className="w-full bg-orange-500 text-white px-8 py-3 rounded-lg hover:bg-orange-600 transition-colors font-semibold"
-                >
-                  Отправить сообщение
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </section>
+    .tariff-button.active {
+      background: #116234;
+      color: white;
+      border-color: #116234;
+      font-weight: 600;
+    }
 
-      {/* Footer */}
-      <footer className="bg-gray-800 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <Sun className="h-6 w-6 text-orange-400" />
-                <span className="text-xl font-bold">SunProtect</span>
-              </div>
-              <p className="text-gray-400">
-                Лучшая защита для вашей кожи. Натуральные формулы для всей семьи.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-4">Продукты</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-orange-400 transition-colors">SunProtect SPF 50+</a></li>
-                <li><a href="#" className="hover:text-orange-400 transition-colors">SunProtect Kids</a></li>
-                <li><a href="#" className="hover:text-orange-400 transition-colors">After Sun</a></li>
-                <li><a href="#" className="hover:text-orange-400 transition-colors">Наборы</a></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-4">Информация</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-orange-400 transition-colors">О нас</a></li>
-                <li><a href="#" className="hover:text-orange-400 transition-colors">Доставка</a></li>
-                <li><a href="#" className="hover:text-orange-400 transition-colors">Возврат</a></li>
-                <li><a href="#" className="hover:text-orange-400 transition-colors">FAQ</a></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-4">Подписка</h3>
-              <p className="text-gray-400 mb-4">Получайте скидки и новости первыми</p>
-              <div className="flex">
-                <input 
-                  type="email" 
-                  placeholder="Ваш email" 
-                  className="px-4 py-2 bg-gray-700 border-0 rounded-l-lg focus:ring-2 focus:ring-orange-500 text-white placeholder-gray-400"
-                />
-                <button className="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-r-lg">
-                  <RefreshCw className="h-5 w-5" />
-                </button>
-              </div>
-            </div>
-          </div>
-          <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 SunProtect. Все права защищены.</p>
-          </div>
-        </div>
-      </footer>
+    .input-group {
+      margin-bottom: 24px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      font-size: 15px;
+      color: #1e293b;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 16px 20px;
+      font-size: 16px;
+      font-weight: 400;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      background: white;
+      transition: all 0.2s ease;
+      color: #1e293b;
+    }
+
+    input[type="number"]:focus {
+      outline: none;
+      border-color: #116234;
+      box-shadow: 0 0 0 3px rgba(17, 98, 52, 0.1);
+    }
+
+    input[type="number"]::placeholder {
+      color: #94a3b8;
+    }
+
+    .slider-container {
+      margin-top: 12px;
+    }
+
+    .slider {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: #e2e8f0;
+      outline: none;
+      appearance: none;
+      cursor: pointer;
+    }
+
+    .slider::-webkit-slider-thumb {
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #116234;
+      cursor: pointer;
+      border: 3px solid white;
+      box-shadow: 0 2px 6px rgba(17, 98, 52, 0.3);
+    }
+
+    .months-display {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    .month-label {
+      position: relative;
+    }
+
+    .month-label.active {
+      color: #116234;
+      font-weight: 500;
+    }
+
+    .prepayment-input-group input[type="number"] {
+      width: 100%;
+    }
+
+    .error-message {
+      background: #fef7ed;
+      color: #ea580c;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 400;
+      margin-top: 8px;
+      border-left: 3px solid #ea580c;
+      display: none;
+    }
+
+    .helper-text {
+      background: #f0fdf4;
+      color: #166534;
+      padding: 14px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 400;
+      margin: 24px 0;
+      border-left: 3px solid #116234;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .output {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 20px;
+      border-radius: 14px;
+      margin: 24px 0;
+    }
+
+    .output p {
+      margin: 10px 0;
+      font-size: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .output strong {
+      color: #1e293b;
+      font-weight: 500;
+    }
+
+    .output-value {
+      font-weight: 600;
+      color: #116234;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 32px;
+    }
+
+    .btn {
+      padding: 16px 24px;
+      border-radius: 12px;
+      text-decoration: none;
+      text-align: center;
+      font-weight: 500;
+      font-size: 15px;
+      transition: all 0.2s ease;
+      border: 1px solid;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-whatsapp {
+      background: #25d366;
+      color: white;
+      border-color: #25d366;
+    }
+
+    .btn-whatsapp:hover {
+      background: #128c7e;
+      border-color: #128c7e;
+      transform: translateY(-1px);
+    }
+
+    .btn-call {
+      background: white;
+      color: #116234;
+      border-color: #116234;
+    }
+
+    .btn-call:hover {
+      background: #f1f5f9;
+      transform: translateY(-1px);
+    }
+
+    @media (min-width: 480px) {
+      .buttons {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        transition: none !important;
+        animation: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <div class="header">
+      <div class="title">AMANA FINANCE</div>
+      <div class="subtitle">Калькулятор рассрочки</div>
     </div>
-  );
-};
 
-export default App;
-```
+    <div class="tariff-buttons">
+      <div class="tariff-button active" data-tariff="with">С первым взносом</div>
+      <div class="tariff-button" data-tariff="without">Без первого взноса</div>
+    </div>
+
+    <div class="input-group">
+      <label for="price">Стоимость товара</label>
+      <div class="input-wrapper">
+        <input type="number" id="price" placeholder="не менее 50 000 ₽" min="0" />
+      </div>
+      <div class="error-message" id="errorMessage">Стоимость товара должна быть не менее 50 000₽</div>
+    </div>
+
+    <div class="input-group">
+      <label for="months" id="monthsLabel">Срок: 3 месяца</label>
+      <div class="slider-container">
+        <input type="range" id="months" class="slider" min="3" max="12" value="3" />
+        <div class="months-display">
+          <span class="month-label active">3 мес</span>
+          <span class="month-label">6 мес</span>
+          <span class="month-label">9 мес</span>
+          <span class="month-label">12 мес</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="prepaymentBlock" class="input-group">
+      <label for="prepaymentSlider">Первый взнос</label>
+      <div class="prepayment-input-group">
+        <input type="number" id="prepaymentInput" step="100" placeholder="0" />
+      </div>
+      <div class="error-message" id="prepaymentError"></div>
+      <div class="slider-container">
+        <input type="range" id="prepaymentSlider" class="slider" min="0" max="0" step="100" value="0" />
+      </div>
+    </div>
+
+    <div class="output" id="results">
+      <p><strong>Первый взнос:</strong> <span class="output-value">0 ₽</span></p>
+      <p><strong>Ежемесячный платёж:</strong> <span class="output-value">0 ₽</span></p>
+      <p><strong>Стоимость с наценкой:</strong> <span class="output-value">0 ₽</span></p>
+      <p><strong>Наценка:</strong> <span class="output-value">0 ₽ (0%)</span></p>
+    </div>
+
+    <div class="helper-text">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#116234" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+      Обязательные требования: Поручитель и паспорта обеих лиц
+    </div>
+
+    <div class="buttons">
+      <a id="whatsapp" class="btn btn-whatsapp" href="#" target="_blank">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+        </svg>
+        Написать в WhatsApp
+      </a>
+      <a class="btn btn-call" href="tel:+79280222114">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.7 15.9 15.9 0 0 1 1.03 3.58 2 2 0 0 1-.45 1.77L9 8.84a20.08 20.08 0 0 1-2.4 2.4 2 2 0 0 1-1.77.45 15.9 15.9 0 0 1-3.58-1.03A2 2 0 0 1 2 4.11v-3a2 2 0 0 1 2.18-2 19.79 19.79 0 0 1 8.63 3.07 19.5 19.5 0 0 1 6 6 19.79 19.79 0 0 1 3.07 8.67A2 2 0 0 1 19.89 22h3a2 2 0 0 1 2 1.7 15.9 15.9 0 0 1-1.03 3.58 2 2 0 0 1-.45 1.77L23 20.84a20.08 20.08 0 0 1-2.4 2.4 2 2 0 0 1-1.77.45 15.9 15.9 0 0 1-3.58-1.03A2 2 0 0 1 14.11 22h-3a2 2 0 0 1-2.18-2 19.79 19.79 0 0 1 3.07-8.67 19.5 19.5 0 0 1 6-6 19.79 19.79 0 0 1 8.67-3.07A2 2 0 0 1 22 4.11z"></path>
+        </svg>
+        Позвонить
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const priceInput = document.getElementById('price');
+    const monthsInput = document.getElementById('months');
+    const monthsLabel = document.getElementById('monthsLabel');
+    const prepaymentBlock = document.getElementById('prepaymentBlock');
+    const prepaymentSlider = document.getElementById('prepaymentSlider');
+    const prepaymentInput = document.getElementById('prepaymentInput');
+    const prepaymentError = document.getElementById('prepaymentError');
+    const resultsDiv = document.getElementById('results');
+    const whatsappBtn = document.getElementById('whatsapp');
+    const errorMessage = document.getElementById('errorMessage');
+    const tariffButtons = document.querySelectorAll('.tariff-button');
+    const monthLabels = document.querySelectorAll('.month-label');
+
+    let selectedTariff = 'with';
+    let conditionalPrepayment = 0;
+
+    const markupWithDown = {3:9,4:12,5:15,6:18,7:20,8:22,9:24,10:26,11:28,12:30};
+    const markupWithoutDown = {3:17,4:21,5:25.5,6:28.5,7:32,8:35,9:38,10:41.5,11:45,12:48};
+    const markupNoDownPayment = {3:14,4:18,5:23,6:28,7:31,8:34,9:37,10:40,11:43,12:46};
+
+    const roundUpTo100 = val => Math.ceil(val / 100) * 100;
+
+    function updateMonthLabels(selectedMonth) {
+      monthLabels.forEach((label, index) => {
+        const monthValue = [3, 6, 9, 12][index];
+        label.classList.toggle('active', monthValue === selectedMonth);
+      });
+    }
+
+    function toggle
