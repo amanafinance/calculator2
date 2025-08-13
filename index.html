@@ -1,833 +1,400 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Amana Finance — Учёт рассрочки</title>
-  <!-- Шрифт -->
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
-  <!-- Firebase SDK v10 (модульные CDN) -->
-  <script type="module">
-    // ====== UI (минимализм, мобильный first) ======
-    const css = `
-      :root{
-        --primary: rgb(149,193,31);
-        --secondary: rgb(17,92,48);
-        --bg:#f7f8f9;
-        --card:#fff;
-        --text:#1b1b1b;
-        --muted:#8a8f98;
-        --danger:#d93636;
-        --ok:#1a7f37;
-        --border:#e6e8eb;
-        --radius:14px;
-      }
-      *{box-sizing:border-box}
-      html,body{height:100%}
-      body{
-        margin:0; font-family:Manrope,system-ui,-apple-system,Segoe UI,Roboto;
-        background:linear-gradient(135deg, rgba(149,193,31,.08), rgba(17,92,48,.08)) fixed, var(--bg);
-        color:var(--text);
-      }
-      header{
-        position:sticky; top:0; z-index:20;
-        background:rgba(255,255,255,.86); backdrop-filter:saturate(1.2) blur(10px);
-        border-bottom:1px solid var(--border);
-      }
-      .wrap{max-width:1100px;margin:0 auto;padding:12px 16px;}
-      .brand{display:flex;align-items:center;gap:10px}
-      .brand .dot{width:12px;height:12px;border-radius:50%;background:var(--primary);box-shadow:0 0 0 3px rgba(149,193,31,.2)}
-      h1{font-size:18px;margin:0;font-weight:800;letter-spacing:.3px}
-      .authbar{display:flex;gap:8px;align-items:center;margin-left:auto}
-      .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-      .muted{color:var(--muted);font-size:12px}
-      .btn{
-        border:1px solid var(--border); background:#fff; padding:8px 12px; border-radius:10px; cursor:pointer;
-        font-weight:600;
-      }
-      .btn.primary{background:var(--primary); color:#fff; border-color:transparent}
-      .btn.danger{background:var(--danger); color:#fff; border-color:transparent}
-      .btn.ghost{background:transparent}
-      .grid{display:grid; gap:12px}
-      @media(min-width:900px){ .grid.cols-2{grid-template-columns:1fr 1fr} .grid.cols-3{grid-template-columns:1.2fr 1fr 1fr}}
-      .card{
-        background:var(--card);
-        border:1px solid var(--border);
-        border-radius:var(--radius);
-        padding:14px;
-        box-shadow:0 6px 20px rgba(17,92,48,.06);
-      }
-      .tabs{display:flex; gap:8px; flex-wrap:wrap; margin:12px 0}
-      .tab{padding:8px 12px;border-radius:999px;border:1px solid var(--border);cursor:pointer;font-weight:600}
-      .tab.active{background:var(--secondary); color:#fff; border-color:transparent}
-      label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
-      input,select,textarea{
-        width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border); background:#fff;
-        outline:none; font-size:14px;
-      }
-      .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
-      .row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px}
-      .row4{display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px}
-      .list{display:flex; flex-direction:column; gap:10px}
-      .item{
-        border:1px solid var(--border); border-radius:12px; padding:12px; background:#fff; display:grid; gap:8px
-      }
-      .item .top{display:flex; gap:8px; align-items:center; justify-content:space-between}
-      .pill{padding:4px 8px; border-radius:999px; background:#f2f5f7; font-size:12px; color:#59616b}
-      .pill.ok{background:#e8f6ee;color:var(--ok);font-weight:700}
-      .pill.bad{background:#fdecec;color:var(--danger);font-weight:700}
-      .schedule{border-top:1px dashed var(--border); padding-top:8px; display:grid; gap:6px}
-      .schedule .line{display:grid; grid-template-columns:28px 1fr 1fr 1fr 140px; gap:8px; align-items:center}
-      .sep{height:1px;background:var(--border); margin:6px 0}
-      .right{margin-left:auto}
-      .danger-txt{color:var(--danger); font-weight:700}
-      .ok-txt{color:var(--ok); font-weight:700}
-      .hint{font-size:12px;color:var(--muted)}
-      .flex{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
-      .nowrap{white-space:nowrap}
-      footer{padding:40px 16px;color:var(--muted);text-align:center}
-      .hidden{display:none!important}
-      .scroll{max-height:60vh; overflow:auto; padding-right:4px}
-      .table{width:100%; border-collapse:collapse}
-      .table th,.table td{padding:8px;border-bottom:1px solid var(--border);font-size:13px;text-align:left}
-      .w80{width:80px}
-      .w120{width:120px}
-    `;
-    const style = document.createElement('style'); style.textContent = css; document.head.appendChild(style);
+```jsx
+import { Sun, Shield, Droplet, Leaf, Star, Sparkles, RefreshCw, Phone, Mail, MapPin } from 'lucide-react';
 
-    // ====== HTML SKELETON ======
-    document.addEventListener('DOMContentLoaded', () => {
-      document.body.innerHTML = `
-        <header>
-          <div class="wrap row">
-            <div class="brand"><div class="dot"></div><h1>AMANA FINANCE — УЧЁТ РАССРОЧКИ</h1></div>
-            <div class="authbar row">
-              <input id="email" placeholder="email" class="w120" />
-              <input id="pass" type="password" placeholder="пароль" class="w120"/>
-              <button class="btn" id="btnSignIn">Войти</button>
-              <button class="btn ghost hidden" id="btnSignOut">Выйти</button>
-              <span class="muted" id="who"></span>
+const App = () => {
+  const features = [
+    {
+      icon: Shield,
+      title: "Максимальная защита",
+      description: "SPF 50+ обеспечивает надежную защиту от UVA и UVB лучей",
+      color: "from-orange-400 to-red-500"
+    },
+    {
+      icon: Droplet,
+      title: "Увлажнение 24 часа",
+      description: "Глубокое увлажнение кожи благодаря гиалуроновой кислоте",
+      color: "from-blue-400 to-cyan-500"
+    },
+    {
+      icon: Leaf,
+      title: "Натуральный состав",
+      description: "Органические ингредиенты, без парабенов и минеральных масел",
+      color: "from-green-400 to-emerald-500"
+    }
+  ];
+
+  const testimonials = [
+    {
+      name: "Анна Петрова",
+      role: "Косметолог",
+      content: "Лучший солнцезащитный крем, который я пробовала. Не оставляет белых следов и прекрасно подходит для чувствительной кожи.",
+      rating: 5
+    },
+    {
+      name: "Михаил Сидоров",
+      role: "Турист",
+      content: "Использую уже третий сезон. Отлично защищает на пляже и в горах. Кожа не пересыхает даже после долгого пребывания на солнце.",
+      rating: 5
+    },
+    {
+      name: "Елена Козлова",
+      role: "Мама",
+      content: "Нашла идеальный крем для всей семьи. Дети не против использовать его, а это главное!",
+      rating: 4
+    }
+  ];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
+      {/* Header */}
+      <header className="bg-white shadow-lg sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center space-x-2">
+              <Sun className="h-8 w-8 text-orange-500" />
+              <span className="text-2xl font-bold text-gray-800">SunProtect</span>
+            </div>
+            <nav className="hidden md:flex space-x-8">
+              <a href="#features" className="text-gray-600 hover:text-orange-500 transition-colors">Особенности</a>
+              <a href="#how-it-works" className="text-gray-600 hover:text-orange-500 transition-colors">Как работает</a>
+              <a href="#testimonials" className="text-gray-600 hover:text-orange-500 transition-colors">Отзывы</a>
+              <a href="#contact" className="text-gray-600 hover:text-orange-500 transition-colors">Контакты</a>
+            </nav>
+            <button className="bg-orange-500 text-white px-6 py-2 rounded-full hover:bg-orange-600 transition-colors font-medium">
+              Купить сейчас
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <section className="relative py-20 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col lg:flex-row items-center">
+            <div className="lg:w-1/2 mb-12 lg:mb-0">
+              <div className="bg-orange-100 inline-block px-4 py-2 rounded-full text-orange-800 font-medium mb-6">
+                Новинка сезона
+              </div>
+              <h1 className="text-4xl md:text-6xl font-bold text-gray-800 mb-6 leading-tight">
+                Максимальная защита от солнца
+              </h1>
+              <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+                Инновационный солнцезащитный крем с SPF 50+ для всей семьи. 
+                Защитите свою кожу от вредного воздействия ультрафиолета и наслаждайтесь солнцем без опасений.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button className="bg-orange-500 text-white px-8 py-4 rounded-full hover:bg-orange-600 transition-colors font-semibold text-lg flex items-center justify-center space-x-2">
+                  <Sparkles className="h-5 w-5" />
+                  <span>Купить за 1 299 ₽</span>
+                </button>
+                <button className="border-2 border-orange-500 text-orange-500 px-8 py-4 rounded-full hover:bg-orange-50 transition-colors font-semibold text-lg">
+                  Узнать больше
+                </button>
+              </div>
+              <div className="flex items-center mt-8 space-x-6">
+                <div className="flex items-center">
+                  <Star className="h-5 w-5 text-yellow-400 fill-current" />
+                  <Star className="h-5 w-5 text-yellow-400 fill-current" />
+                  <Star className="h-5 w-5 text-yellow-400 fill-current" />
+                  <Star className="h-5 w-5 text-yellow-400 fill-current" />
+                  <Star className="h-5 w-5 text-yellow-400 fill-current" />
+                  <span className="ml-2 text-gray-600">4.9 (128 отзывов)</span>
+                </div>
+              </div>
+            </div>
+            <div className="lg:w-1/2 relative">
+              <div className="relative">
+                <img 
+                  src="https://placehold.co/500x600/ffedd5/ea580c?text=SunProtect" 
+                  alt="SunProtect солнцезащитный крем" 
+                  className="rounded-2xl shadow-2xl"
+                />
+                <div className="absolute -top-6 -right-6 bg-white p-4 rounded-xl shadow-lg">
+                  <div className="text-2xl font-bold text-orange-500">SPF 50+</div>
+                  <div className="text-sm text-gray-600">Максимальная защита</div>
+                </div>
+              </div>
             </div>
           </div>
-        </header>
+        </div>
+        <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-orange-100 to-transparent opacity-50 rounded-full blur-3xl"></div>
+      </section>
 
-        <main class="wrap">
-          <div class="tabs">
-            <div class="tab active" data-tab="contracts">Учет</div>
-            <div class="tab" data-tab="cashday">УчетФинансов (дни)</div>
-            <div class="tab" data-tab="cashbox">Касса (сводка)</div>
-            <div class="tab" data-tab="ledger">Операции</div>
-            <div class="tab" data-tab="export">Экспорт</div>
+      {/* Features */}
+      <section id="features" className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Почему выбирают SunProtect</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Наши инновационные формулы разработаны для максимальной защиты и ухода за вашей кожей
+            </p>
           </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <div key={index} className="bg-gradient-to-br from-gray-50 to-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow border border-gray-100">
+                <div className={`w-16 h-16 bg-gradient-to-r ${feature.color} rounded-xl flex items-center justify-center mb-6 text-white`}>
+                  <feature.icon className="h-8 w-8" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-800 mb-4">{feature.title}</h3>
+                <p className="text-gray-600 leading-relaxed">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-          <!-- УЧЕТ -->
-          <section id="contracts" class="grid cols-2">
-            <div class="card">
-              <h3>Новый договор</h3>
-              <div class="row2">
-                <div><label>ФИО</label><input id="c_fio" /></div>
-                <div><label>Партнер (магазин)</label><input id="c_partner" /></div>
+      {/* How It Works */}
+      <section id="how-it-works" className="py-20 bg-gradient-to-b from-orange-50 to-amber-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Как работает наш крем</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Простой процесс, обеспечивающий максимальную защиту вашей кожи
+            </p>
+          </div>
+          <div className="grid md:grid-cols-4 gap-8">
+            {[
+              { step: "1", title: "Нанесите", description: "Равномерно нанесите крем за 15-20 минут до выхода на солнце" },
+              { step: "2", title: "Распределите", description: "Тщательно распределите по коже, уделяя внимание чувствительным зонам" },
+              { step: "3", title: "Повторите", description: "Повторяйте нанесение каждые 2 часа или после купания" },
+              { step: "4", title: "Наслаждайтесь", description: "Смело наслаждайтесь солнцем с уверенностью в защите своей кожи" }
+            ].map((item, index) => (
+              <div key={index} className="text-center">
+                <div className="w-16 h-16 bg-orange-500 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
+                  {item.step}
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 mb-3">{item.title}</h3>
+                <p className="text-gray-600">{item.description}</p>
               </div>
-              <div class="row3">
-                <div><label>Себестоимость ₽</label><input id="c_cost" type="number" min="0"/></div>
-                <div><label>Цена ₽</label><input id="c_price" type="number" min="0"/></div>
-                <div><label>Предоплата ₽</label><input id="c_prepay" type="number" min="0"/></div>
-              </div>
-              <div class="row4">
-                <div><label>Месяцев (1–8)</label><input id="c_months" type="number" min="1" max="8" value="6"/></div>
-                <div><label>Число оплаты</label><input id="c_payday" type="number" min="1" max="28" value="10"/></div>
-                <div><label>Отсрочка (дней)</label><input id="c_defer" type="number" min="0" value="0"/></div>
-                <div><label>Дата покупки</label><input id="c_date" type="date"/></div>
-              </div>
-              <div class="row3">
-                <div><label>Телефон покупателя</label><input id="c_phone" /></div>
-                <div><label>Телефон поручителя</label><input id="c_phone2" /></div>
-                <div><label>Адрес</label><input id="c_addr" /></div>
-              </div>
-              <div class="row2">
-                <div><label>Товар / Комментарий</label><input id="c_item" /></div>
-                <div><label>IMEI / Примечание</label><input id="c_imei" /></div>
-              </div>
-              <div class="sep"></div>
-              <div class="flex">
-                <button class="btn primary" id="btnCreateContract">Создать</button>
-                <span class="hint">Ежемесячный платеж и график создаются автоматически, последний платеж корректируется с учётом округления.</span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Ingredients */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6">Натуральный состав</h2>
+              <p className="text-lg text-gray-600 mb-8">
+                Наш солнцезащитный крем содержит только тщательно отобранные ингредиенты, 
+                которые обеспечивают эффективную защиту и уход за кожей.
+              </p>
+              <div className="space-y-4">
+                {[
+                  "Оксид цинка (натуральный физический фильтр)",
+                  "Гиалуроновая кислота (интенсивное увлажнение)",
+                  "Экстракт алоэ вера (успокаивающее действие)",
+                  "Масло ши (питание и восстановление)",
+                  "Витамин E (антиоксидантная защита)"
+                ].map((ingredient, index) => (
+                  <div key={index} className="flex items-center space-x-3">
+                    <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                    <span className="text-gray-700">{ingredient}</span>
+                  </div>
+                ))}
               </div>
             </div>
-
-            <div class="card">
-              <div class="flex">
-                <h3 style="margin:0">Договоры</h3>
-                <input id="q" placeholder="Поиск: ФИО / партнёр / телефон" />
-                <select id="filterOver">
-                  <option value="">Все</option>
-                  <option value="overdue">Только просрочка</option>
-                  <option value="today">Платёж сегодня</option>
-                  <option value="active">Активные</option>
-                  <option value="closed">Закрытые</option>
-                </select>
-                <button class="btn" id="btnRefresh">Обновить</button>
+            <div className="relative">
+              <img 
+                src="https://placehold.co/500x400/ffedd5/ea580c?text=Ingredients" 
+                alt="Натуральные ингредиенты" 
+                className="rounded-2xl shadow-2xl"
+              />
+              <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-xl shadow-lg">
+                <div className="text-3xl font-bold text-green-600">100%</div>
+                <div className="text-sm text-gray-600">Натуральный состав</div>
               </div>
-              <div class="scroll list" id="contractsList"></div>
             </div>
-          </section>
+          </div>
+        </div>
+      </section>
 
-          <!-- УЧЕТ ФИНАНСОВ (ДНИ) -->
-          <section id="cashday" class="grid cols-2 hidden">
-            <div class="card">
-              <h3>Внести операцию дня</h3>
-              <div class="row3">
-                <div><label>Дата</label><input id="op_date" type="date"/></div>
+      {/* Testimonials */}
+      <section id="testimonials" className="py-20 bg-gradient-to-b from-amber-50 to-orange-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Что говорят наши клиенты</h2>
+            <p className="text-xl text-gray-600">
+              Присоединяйтесь к тысячам довольных пользователей
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <div key={index} className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
+                <div className="flex mb-4">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                  ))}
+                </div>
+                <p className="text-gray-600 mb-6 leading-relaxed">"{testimonial.content}"</p>
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-gradient-to-r from-orange-400 to-red-500 rounded-full flex items-center justify-center text-white font-bold">
+                    {testimonial.name.charAt(0)}
+                  </div>
+                  <div className="ml-4">
+                    <div className="font-bold text-gray-800">{testimonial.name}</div>
+                    <div className="text-sm text-gray-500">{testimonial.role}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-20 bg-gradient-to-r from-orange-500 to-red-500">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+            Готовы защитить свою кожу?
+          </h2>
+          <p className="text-xl text-orange-100 mb-8 max-w-3xl mx-auto">
+            Получите скидку 20% на первую покупку, используя промокод SUN20
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button className="bg-white text-orange-500 px-8 py-4 rounded-full hover:bg-gray-100 transition-colors font-semibold text-lg">
+              Купить сейчас
+            </button>
+            <button className="border-2 border-white text-white px-8 py-4 rounded-full hover:bg-white hover:text-orange-500 transition-colors font-semibold text-lg">
+              Подробнее о продукте
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact */}
+      <section id="contact" className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6">Свяжитесь с нами</h2>
+              <p className="text-lg text-gray-600 mb-8">
+                У вас есть вопросы? Наши специалисты готовы помочь вам выбрать идеальный продукт.
+              </p>
+              <div className="space-y-6">
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                    <Phone className="h-6 w-6 text-orange-500" />
+                  </div>
+                  <div>
+                    <div className="font-semibold text-gray-800">Телефон</div>
+                    <div className="text-gray-600">+7 (495) 123-45-67</div>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                    <Mail className="h-6 w-6 text-orange-500" />
+                  </div>
+                  <div>
+                    <div className="font-semibold text-gray-800">Email</div>
+                    <div className="text-gray-600">info@sunprotect.ru</div>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                    <MapPin className="h-6 w-6 text-orange-500" />
+                  </div>
+                  <div>
+                    <div className="font-semibold text-gray-800">Адрес</div>
+                    <div className="text-gray-600">Москва, ул. Солнечная, д. 15</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="bg-gray-50 p-8 rounded-2xl">
+              <form className="space-y-6">
                 <div>
-                  <label>Тип</label>
-                  <select id="op_kind">
-                    <option value="investment">Вложение</option>
-                    <option value="expense">Расход</option>
-                    <option value="refund">Возврат</option>
-                    <option value="other">Другое</option>
-                  </select>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Имя</label>
+                  <input 
+                    type="text" 
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    placeholder="Ваше имя"
+                  />
                 </div>
-                <div><label>Сумма ₽</label><input id="op_amount" type="number" min="0"/></div>
-              </div>
-              <div class="row2">
-                <div><label>Название</label><input id="op_title"/></div>
-                <div><label>Комментарий</label><input id="op_note"/></div>
-              </div>
-              <div class="sep"></div>
-              <div class="flex">
-                <button class="btn primary" id="btnAddLedger">Добавить</button>
-                <span class="hint">Попадает в дневную кассу и сводку «Касса».</span>
-              </div>
-            </div>
-
-            <div class="card">
-              <div class="flex">
-                <h3 style="margin:0">Дневная касса</h3>
-                <input id="cd_date" type="date"/>
-                <button class="btn" id="btnRebuildDay">Пересчитать день</button>
-              </div>
-              <div id="cashDayBox" class="list" style="margin-top:8px"></div>
-            </div>
-          </section>
-
-          <!-- КАССА -->
-          <section id="cashbox" class="grid cols-3 hidden">
-            <div class="card">
-              <h3>Период</h3>
-              <div class="row3">
-                <div><label>С</label><input id="k_from" type="date"/></div>
-                <div><label>По</label><input id="k_to" type="date"/></div>
-                <div><label>&nbsp;</label><button class="btn" id="btnBuildKassa">Показать</button></div>
-              </div>
-              <div class="sep"></div>
-              <div id="kassaBox" class="list"></div>
-            </div>
-            <div class="card">
-              <h3>Итоги</h3>
-              <table class="table" id="kassaTotals"></table>
-            </div>
-            <div class="card">
-              <h3>Долги и прибыль</h3>
-              <table class="table" id="kassaProfit"></table>
-            </div>
-          </section>
-
-          <!-- ОПЕРАЦИИ -->
-          <section id="ledger" class="grid hidden">
-            <div class="card">
-              <div class="flex">
-                <h3 style="margin:0">Журнал операций</h3>
-                <input id="lg_from" type="date"/>
-                <input id="lg_to" type="date"/>
-                <button class="btn" id="btnLoadLedger">Показать</button>
-              </div>
-              <table class="table" id="ledgerTable"></table>
-            </div>
-          </section>
-
-          <!-- ЭКСПОРТ -->
-          <section id="export" class="hidden">
-            <div class="card">
-              <h3>Экспорт данных</h3>
-              <div class="flex">
-                <button class="btn" id="btnExportJSON">Скачать JSON</button>
-                <span class="hint">Экспортирует clients, contracts, payments, cashDays, ledger.</span>
-              </div>
-            </div>
-          </section>
-        </main>
-
-        <footer>© Amana Finance · Веб-сервис учёта рассрочки</footer>
-      `;
-
-      // простые табы
-      document.querySelectorAll('.tab').forEach(t=>{
-        t.addEventListener('click', ()=>{
-          document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-          t.classList.add('active');
-          const id=t.dataset.tab;
-          document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));
-          document.getElementById(id).classList.remove('hidden');
-        });
-      });
-    });
-
-    // ====== HELPERS ======
-    const fmt = (n)=> (n??0).toLocaleString('ru-RU');
-    const todayStr = ()=> new Date().toISOString().slice(0,10);
-    const toDateStr = (d)=> new Date(d).toISOString().slice(0,10);
-    const addMonthsKeepDay = (d, m, payDay=10)=> {
-      const dt = new Date(d);
-      const baseDay = Math.min(+payDay||10, 28);
-      dt.setDate(baseDay);
-      dt.setMonth(dt.getMonth()+m);
-      return toDateStr(dt);
-    };
-    const ceil100 = (n)=> Math.ceil((n??0)/100)*100;
-
-    // Роли
-    let currentUser = null;
-    let currentRole = 'manager'; // по умолчанию
-    const setRole = async (auth, db) => {
-      if(!auth.currentUser){ currentRole='manager'; return; }
-      // роль храним в users/{uid}.role
-      const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-      const ref = doc(db,'users', auth.currentUser.uid);
-      const snap = await getDoc(ref);
-      currentRole = snap.exists() ? (snap.data().role || 'manager') : 'manager';
-    };
-
-    // ====== FIREBASE APP ======
-    import {
-      initializeApp
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import {
-      getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import {
-      getFirestore, collection, addDoc, doc, getDoc, setDoc, getDocs, query, where,
-      orderBy, limit, updateDoc, serverTimestamp, Timestamp, onSnapshot
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-    // ==== ВСТАВЬ СВОЙ КОНФИГ ТУТ ====
-    const firebaseConfig = {
-      // !!! ЗАМЕНИ на свой (из консоли Firebase)
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT",
-      storageBucket: "YOUR_PROJECT.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    // ====== AUTH UI ======
-    document.addEventListener('click', (e)=>{
-      if(e.target.id==='btnSignIn'){
-        const email = document.getElementById('email').value.trim();
-        const pass = document.getElementById('pass').value.trim();
-        signInWithEmailAndPassword(auth, email, pass).catch(err=>alert(err.message));
-      }
-      if(e.target.id==='btnSignOut'){
-        signOut(auth);
-      }
-    });
-
-    onAuthStateChanged(auth, async (u)=>{
-      currentUser = u;
-      const who = document.getElementById('who');
-      document.getElementById('btnSignOut').classList.toggle('hidden', !u);
-      document.getElementById('btnSignIn').classList.toggle('hidden', !!u);
-      if(u){
-        await setRole(auth, db);
-        who.textContent = `${u.email} · роль: ${currentRole}`;
-        initApp();
-      } else {
-        who.textContent = '';
-      }
-    });
-
-    // ====== DATA LAYERS ======
-    const colClients   = ()=> collection(db,'clients');
-    const colContracts = ()=> collection(db,'contracts');
-    const colPayments  = ()=> collection(db,'payments');
-    const colCashDays  = ()=> collection(db,'cashDays');
-    const colLedger    = ()=> collection(db,'ledger');
-
-    // ====== CONTRACTS (УЧЕТ) ======
-    const state = { contracts:[], clientsMap:new Map() };
-
-    async function createContract(){
-      const fio = document.getElementById('c_fio').value.trim();
-      if(!fio){ alert('Укажи ФИО'); return; }
-      const partner = document.getElementById('c_partner').value.trim();
-      const cost = +document.getElementById('c_cost').value||0;
-      const price = +document.getElementById('c_price').value||0;
-      const prepay = +document.getElementById('c_prepay').value||0;
-      let months = Math.max(1, Math.min(8, +document.getElementById('c_months').value||1));
-      const payDay = +document.getElementById('c_payday').value||10;
-      const deferDays = +document.getElementById('c_defer').value||0;
-      const purchaseDate = document.getElementById('c_date').value||todayStr();
-      const phone = document.getElementById('c_phone').value.trim();
-      const phone2 = document.getElementById('c_phone2').value.trim();
-      const addr = document.getElementById('c_addr').value.trim();
-      const item = document.getElementById('c_item').value.trim();
-      const imei = document.getElementById('c_imei').value.trim();
-
-      // monthly = округление вверх до 100
-      const base = Math.max(0, price - prepay);
-      let monthly = ceil100(base / months);
-
-      // генерируем график
-      const schedule = [];
-      const start = new Date(purchaseDate);
-      // применяем отсрочку к первому платежу, потом равные месяцы
-      const firstDue = new Date(start.getTime() + deferDays*24*3600*1000);
-      let totalPlanned = 0;
-
-      for(let n=1;n<=months;n++){
-        const due = (n===1)
-          ? toDateStr(new Date(firstDue.getFullYear(), firstDue.getMonth(), Math.min(payDay,28)))
-          : addMonthsKeepDay(firstDue, n-1, payDay);
-        schedule.push({
-          n, planDate: due, planAmount: monthly, paidAmount: 0, paidDate: null, method:null
-        });
-        totalPlanned += monthly;
-      }
-      // корректируем последний взнос под общую сумму (base)
-      const diff = totalPlanned - base;
-      if(schedule.length>0 && diff!==0){
-        schedule[schedule.length-1].planAmount = Math.max(0, schedule[schedule.length-1].planAmount - diff);
-      }
-
-      // client (создадим/найдем)
-      let clientId = null;
-      // По простому: создаём всегда (или искали бы по ФИО+телу)
-      const cdoc = await addDoc(colClients(), { fio, phone, phone2, addr, imei, createdAt: serverTimestamp() });
-      clientId = cdoc.id;
-
-      const contract = {
-        clientId, fio, partner, costPrice:cost, price, prepayment:prepay, months,
-        payDay, deferDays, purchaseDate, itemName:item,
-        totals:{ monthlyAmount: monthly, paidTotal: 0, balance: price - prepay, isOverdue:false, discount:0, deductions:0 },
-        schedule, phones:{buyer:phone, guarantor:phone2}, addr,
-        createdAt: serverTimestamp(), status:'active'
-      };
-      await addDoc(colContracts(), contract);
-      alert('Договор создан');
-      await loadContracts();
-      renderContracts();
-    }
-
-    function scheduleOverdueFlag(schedule){
-      const today = todayStr();
-      for(const s of schedule){
-        if((s.paidAmount??0) < (s.planAmount??0) && s.planDate < today){ return true; }
-      }
-      return false;
-    }
-
-    async function loadContracts(){
-      const qs = document.getElementById('q')?.value.trim().toLowerCase() || '';
-      state.contracts = [];
-      const snap = await getDocs(query(colContracts()));
-      state.contracts = snap.docs.map(d=>({id:d.id, ...d.data()}));
-
-      // простая фильтрация по поиску
-      if(qs){
-        state.contracts = state.contracts.filter(c =>
-          (c.fio||'').toLowerCase().includes(qs)
-          || (c.partner||'').toLowerCase().includes(qs)
-          || (c.phones?.buyer||'').toLowerCase().includes(qs)
-        );
-      }
-
-      // флаг просрочки/сегодня
-      state.contracts = state.contracts.map(c=>{
-        c.totals.isOverdue = scheduleOverdueFlag(c.schedule||[]);
-        return c;
-      });
-      // clients map (минимально)
-      state.clientsMap.clear();
-    }
-
-    function renderContracts(){
-      const list = document.getElementById('contractsList');
-      if(!list) return;
-      const filter = document.getElementById('filterOver')?.value || '';
-      let arr = [...state.contracts];
-
-      const today = todayStr();
-      if(filter==='overdue') arr = arr.filter(c=>c.totals?.isOverdue);
-      if(filter==='today') arr = arr.filter(c=>(c.schedule||[]).some(s=>s.planDate===today && (s.paidAmount??0)<(s.planAmount??0)));
-      if(filter==='active') arr = arr.filter(c=>c.status!=='closed');
-      if(filter==='closed') arr = arr.filter(c=>c.status==='closed');
-
-      if(arr.length===0){ list.innerHTML = `<div class="muted">Нет данных</div>`; return; }
-
-      list.innerHTML = arr.map(c=>{
-        const bal = (c.totals?.balance ?? (c.price - (c.prepayment||0) - (c.totals?.paidTotal||0)));
-        const paid = c.totals?.paidTotal ?? 0;
-        const overdue = c.totals?.isOverdue;
-        const statusPill = overdue ? `<span class="pill bad">ПРОСРОЧКА</span>` :
-                          (bal<=0 ? `<span class="pill ok">ЗАКРЫТ</span>` : `<span class="pill">Активен</span>`);
-        const schedule = (c.schedule||[]).map(s=>{
-          const ok = (s.paidAmount??0) >= (s.planAmount??0);
-          return `
-            <div class="line">
-              <div>#${s.n}</div>
-              <div><span class="${ok?'ok-txt':'danger-txt'}">${ok?'Оплачено':'Не оплачено'}</span><div class="hint">${s.planDate}</div></div>
-              <div>План: <b>${fmt(s.planAmount)}</b> ₽</div>
-              <div>Оплачено: <b>${fmt(s.paidAmount||0)}</b> ₽</div>
-              <div class="right">
-                <div class="flex">
-                  <input type="number" min="0" placeholder="Сумма" id="pay_amt_${c.id}_${s.n}" class="w120">
-                  <select id="pay_m_${c.id}_${s.n}">
-                    <option value="cash">нал</option>
-                    <option value="card">карта</option>
-                    <option value="other">др.</option>
-                  </select>
-                  <input type="date" id="pay_d_${c.id}_${s.n}" value="${todayStr()}" class="w120">
-                  <button class="btn" data-pay="${c.id}:${s.n}">Оплатить</button>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                  <input 
+                    type="email" 
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    placeholder="Ваш email"
+                  />
                 </div>
-              </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Сообщение</label>
+                  <textarea 
+                    rows="4"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    placeholder="Ваше сообщение"
+                  ></textarea>
+                </div>
+                <button 
+                  type="submit"
+                  className="w-full bg-orange-500 text-white px-8 py-3 rounded-lg hover:bg-orange-600 transition-colors font-semibold"
+                >
+                  Отправить сообщение
+                </button>
+              </form>
             </div>
-          `;
-        }).join('');
-
-        return `
-          <div class="item" data-id="${c.id}">
-            <div class="top">
-              <div class="flex">
-                <b>${c.fio||'-'}</b>
-                <span class="pill">${c.partner||'-'}</span>
-                ${statusPill}
-              </div>
-              <div class="flex">
-                <span class="pill">Цена: <b>${fmt(c.price)}</b> ₽</span>
-                <span class="pill">Предоплата: <b>${fmt(c.prepayment)}</b> ₽</span>
-                <span class="pill">Остаток: <b>${fmt(bal)}</b> ₽</span>
-              </div>
-            </div>
-            <div class="hint">Товар: ${c.itemName||'-'} · Себестоимость: ${fmt(c.costPrice||0)} ₽ · Месяцев: ${c.months} · День оплаты: ${c.payDay} · Отсрочка: ${c.deferDays} д.</div>
-            <div class="schedule">${schedule}</div>
-            <div class="sep"></div>
-            <div class="flex">
-              <div class="hint">Тел: ${c.phones?.buyer||'-'} / ${c.phones?.guarantor||'-'} · Адрес: ${c.addr||'-'}</div>
-              <button class="btn ghost right" data-close="${c.id}">Закрыть договор</button>
-              <a class="btn" href="https://wa.me/${(c.phones?.buyer||'').replace(/\D/g,'')}" target="_blank">WhatsApp</a>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    // обработка оплат по взносу
-    document.addEventListener('click', async (e)=>{
-      if(e.target.dataset?.pay){
-        const [cid, n] = e.target.dataset.pay.split(':');
-        const amt = +document.getElementById(`pay_amt_${cid}_${n}`).value || 0;
-        const method = document.getElementById(`pay_m_${cid}_${n}`).value || 'cash';
-        const d = document.getElementById(`pay_d_${cid}_${n}`).value || todayStr();
-        if(amt<=0){ alert('Укажи сумму'); return; }
-        await addInstallmentPayment(cid, +n, amt, method, d);
-        await loadContracts();
-        renderContracts();
-        await rebuildCashDay(d);
-      }
-      if(e.target.id==='btnCreateContract'){ createContract(); }
-      if(e.target.id==='btnRefresh'){ loadContracts().then(renderContracts); }
-      if(e.target.dataset?.close){
-        await updateDoc(doc(db,'contracts', e.target.dataset.close), { status:'closed' });
-        await loadContracts(); renderContracts();
-      }
-    });
-
-    async function addInstallmentPayment(contractId, n, amount, method, dateStr){
-      // найдём контракт
-      const csnap = await getDoc(doc(db,'contracts', contractId));
-      if(!csnap.exists()) return;
-      const c = {id:csnap.id, ...csnap.data()};
-      // prepayment case: n===0 (не используем здесь; ниже — отдельная форма если надо)
-      // обновим schedule[n]
-      const schedule = (c.schedule||[]).map(x=>({...x}));
-      const idx = schedule.findIndex(x=>x.n===n);
-      if(idx<0){ alert('Не найден взнос'); return; }
-      schedule[idx].paidAmount = (schedule[idx].paidAmount||0) + amount;
-      schedule[idx].paidDate = dateStr;
-      schedule[idx].method = method;
-
-      const newPaid = (c.totals?.paidTotal||0) + amount;
-      const newBalance = Math.max(0, (c.price||0) - (c.prepayment||0) - newPaid);
-
-      await updateDoc(doc(db,'contracts', contractId), {
-        schedule, 'totals.paidTotal': newPaid, 'totals.balance': newBalance
-      });
-
-      // payment документ
-      await addDoc(colPayments(), {
-        contractId, clientId: c.clientId, type:'installment', n, amount, method,
-        date: Timestamp.fromDate(new Date(dateStr)), createdAt: serverTimestamp()
-      });
-    }
-
-    // ====== CASHDAY (УчетФинансов) ======
-    document.addEventListener('click', async (e)=>{
-      if(e.target.id==='btnAddLedger'){
-        const date = document.getElementById('op_date').value || todayStr();
-        const kind = document.getElementById('op_kind').value;
-        const amount = +document.getElementById('op_amount').value || 0;
-        const title = document.getElementById('op_title').value.trim();
-        const note = document.getElementById('op_note').value.trim();
-        if(amount<=0){ alert('Укажи сумму'); return; }
-        await addDoc(colLedger(), {
-          date: Timestamp.fromDate(new Date(date)), kind, amount, title, note, createdAt: serverTimestamp()
-        });
-        await rebuildCashDay(date);
-        alert('Операция добавлена');
-      }
-      if(e.target.id==='btnRebuildDay'){
-        const date = document.getElementById('cd_date').value || todayStr();
-        await rebuildCashDay(date);
-        await showCashDay(date);
-      }
-    });
-
-    async function rebuildCashDay(dateStrVal){
-      // агрегируем все payments за день
-      const start = new Date(dateStrVal); start.setHours(0,0,0,0);
-      const end = new Date(dateStrVal); end.setHours(23,59,59,999);
-      // загрузим все payments (для простоты: выборка всех и фильтр по дате)
-      const ps = await getDocs(query(colPayments()));
-      let prepaid=0, installments=0, cash=0, card=0, other=0, returns=0;
-      ps.forEach(d=>{
-        const p = d.data();
-        if(!p.date) return;
-        const t = p.date.toDate();
-        if(t<start||t>end) return;
-        if(p.type==='prepayment') prepaid += p.amount||0;
-        if(p.type==='installment') installments += p.amount||0;
-        if(p.method==='cash') cash += p.amount||0;
-        else if(p.method==='card') card += p.amount||0;
-        else other += p.amount||0;
-        if(p.type==='refund') returns += p.amount||0;
-      });
-
-      // ledger
-      const lg = await getDocs(query(colLedger()));
-      let investments=0, expenses=0, notAccrued=0, fromOtherStore=0;
-      lg.forEach(d=>{
-        const r = d.data();
-        if(!r.date) return;
-        const t = r.date.toDate();
-        if(t<start||t>end) return;
-        if(r.kind==='investment') investments += r.amount||0;
-        else if(r.kind==='expense') expenses += r.amount||0;
-        else if(r.kind==='notAccrued') notAccrued += r.amount||0;
-        else if(r.kind==='fromOtherStore') fromOtherStore += r.amount||0;
-        else if(r.kind==='refund') returns += r.amount||0;
-      });
-
-      const dayTotal = prepaid + installments;
-      const financeTotal = cash + card + other - returns; // грубо
-      const docId = dateStrVal.replaceAll('-','');
-      await setDoc(doc(db,'cashDays', docId), {
-        date: Timestamp.fromDate(new Date(dateStrVal)),
-        aggregates: {
-          dayTotal, prepaid, installments, cash, card, other, returns,
-          notAccrued, fromOtherStore, investments, expenses,
-          financeTotal
-        },
-        updatedAt: serverTimestamp()
-      });
-    }
-
-    async function showCashDay(dateStrVal){
-      const box = document.getElementById('cashDayBox');
-      const id = dateStrVal.replaceAll('-','');
-      const sn = await getDoc(doc(db,'cashDays', id));
-      if(!sn.exists()){ box.innerHTML = `<div class="muted">Нет данных за день</div>`; return; }
-      const a = sn.data().aggregates||{};
-      box.innerHTML = `
-        <div class="item">
-          <div class="row4">
-            <div>За день: <b>${fmt(a.dayTotal)}</b> ₽</div>
-            <div>Предоплаты: <b>${fmt(a.prepaid)}</b> ₽</div>
-            <div>Взносы: <b>${fmt(a.installments)}</b> ₽</div>
-            <div>Возвраты: <b>${fmt(a.returns)}</b> ₽</div>
-          </div>
-          <div class="row4" style="margin-top:6px">
-            <div>Нал: <b>${fmt(a.cash)}</b> ₽</div>
-            <div>Карта: <b>${fmt(a.card)}</b> ₽</div>
-            <div>Другое: <b>${fmt(a.other)}</b> ₽</div>
-            <div>Финансы (итог): <b>${fmt(a.financeTotal)}</b> ₽</div>
-          </div>
-          <div class="row4" style="margin-top:6px">
-            <div>Вложения: <b>${fmt(a.investments)}</b> ₽</div>
-            <div>Расходы: <b>${fmt(a.expenses)}</b> ₽</div>
-            <div>С другого магазина: <b>${fmt(a.fromOtherStore)}</b> ₽</div>
-            <div>Не начислялось: <b>${fmt(a.notAccrued)}</b> ₽</div>
           </div>
         </div>
-      `;
-    }
+      </section>
 
-    // ====== KASSA (СВОДКА) ======
-    document.addEventListener('click', async (e)=>{
-      if(e.target.id==='btnBuildKassa'){
-        const from = document.getElementById('k_from').value || todayStr();
-        const to = document.getElementById('k_to').value || todayStr();
-        await buildKassa(from, to);
-      }
-    });
-
-    async function buildKassa(from, to){
-      const box = document.getElementById('kassaBox');
-      const tbl = document.getElementById('kassaTotals');
-      const prf = document.getElementById('kassaProfit');
-
-      // возьмем cashDays по диапазону (простая выборка всех и фильтр)
-      const cds = await getDocs(query(colCashDays()));
-      const f = new Date(from); f.setHours(0,0,0,0);
-      const t = new Date(to); t.setHours(23,59,59,999);
-      let agg = {prepaid:0, installments:0, returns:0, cash:0, card:0, other:0, investments:0, expenses:0, dayTotal:0, financeTotal:0};
-      const rows=[];
-      cds.forEach(d=>{
-        const x = d.data();
-        const dt = x.date?.toDate(); if(!dt) return;
-        if(dt<f || dt>t) return;
-        const a = x.aggregates||{};
-        rows.push({date: toDateStr(dt), ...a});
-        for(const k of Object.keys(agg)) agg[k] += a[k]||0;
-      });
-
-      rows.sort((a,b)=>a.date.localeCompare(b.date));
-
-      box.innerHTML = `
-        <div class="scroll">
-          <table class="table">
-            <thead><tr>
-              <th>Дата</th><th>За день</th><th>Предоплаты</th><th>Взносы</th><th>Возвраты</th>
-              <th>Нал</th><th>Карта</th><th>Др.</th><th>Вложения</th><th>Расходы</th>
-            </tr></thead>
-            <tbody>
-              ${rows.map(r=>`
-                <tr>
-                  <td>${r.date}</td>
-                  <td>${fmt(r.dayTotal)}</td>
-                  <td>${fmt(r.prepaid)}</td>
-                  <td>${fmt(r.installments)}</td>
-                  <td>${fmt(r.returns)}</td>
-                  <td>${fmt(r.cash)}</td>
-                  <td>${fmt(r.card)}</td>
-                  <td>${fmt(r.other)}</td>
-                  <td>${fmt(r.investments)}</td>
-                  <td>${fmt(r.expenses)}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
+      {/* Footer */}
+      <footer className="bg-gray-800 text-white py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-4 gap-8">
+            <div>
+              <div className="flex items-center space-x-2 mb-4">
+                <Sun className="h-6 w-6 text-orange-400" />
+                <span className="text-xl font-bold">SunProtect</span>
+              </div>
+              <p className="text-gray-400">
+                Лучшая защита для вашей кожи. Натуральные формулы для всей семьи.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-4">Продукты</h3>
+              <ul className="space-y-2 text-gray-400">
+                <li><a href="#" className="hover:text-orange-400 transition-colors">SunProtect SPF 50+</a></li>
+                <li><a href="#" className="hover:text-orange-400 transition-colors">SunProtect Kids</a></li>
+                <li><a href="#" className="hover:text-orange-400 transition-colors">After Sun</a></li>
+                <li><a href="#" className="hover:text-orange-400 transition-colors">Наборы</a></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-4">Информация</h3>
+              <ul className="space-y-2 text-gray-400">
+                <li><a href="#" className="hover:text-orange-400 transition-colors">О нас</a></li>
+                <li><a href="#" className="hover:text-orange-400 transition-colors">Доставка</a></li>
+                <li><a href="#" className="hover:text-orange-400 transition-colors">Возврат</a></li>
+                <li><a href="#" className="hover:text-orange-400 transition-colors">FAQ</a></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-4">Подписка</h3>
+              <p className="text-gray-400 mb-4">Получайте скидки и новости первыми</p>
+              <div className="flex">
+                <input 
+                  type="email" 
+                  placeholder="Ваш email" 
+                  className="px-4 py-2 bg-gray-700 border-0 rounded-l-lg focus:ring-2 focus:ring-orange-500 text-white placeholder-gray-400"
+                />
+                <button className="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-r-lg">
+                  <RefreshCw className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+            <p>&copy; 2024 SunProtect. Все права защищены.</p>
+          </div>
         </div>
-      `;
+      </footer>
+    </div>
+  );
+};
 
-      tbl.innerHTML = `
-        <tr><th>Показатель</th><th>Сумма ₽</th></tr>
-        <tr><td>Предоплаты</td><td><b>${fmt(agg.prepaid)}</b></td></tr>
-        <tr><td>Взносы</td><td><b>${fmt(agg.installments)}</b></td></tr>
-        <tr><td>Оплачено (итого)</td><td><b>${fmt(agg.prepaid + agg.installments - agg.returns)}</b></td></tr>
-        <tr><td>Возвраты</td><td>${fmt(agg.returns)}</td></tr>
-        <tr><td>Вложения</td><td>${fmt(agg.investments)}</td></tr>
-        <tr><td>Расходы</td><td>${fmt(agg.expenses)}</td></tr>
-        <tr><td>Касса (нал+карта+др.)</td><td><b>${fmt(agg.cash+agg.card+agg.other)}</b></td></tr>
-      `;
-
-      // прибыль и долги: по контрактам
-      const cs = await getDocs(query(colContracts()));
-      let gross=0, net=0, debt=0;
-      cs.forEach(d=>{
-        const c = d.data();
-        const profit = (c.price||0)-(c.costPrice||0);
-        gross += Math.max(0, profit);
-        const paid = (c.totals?.paidTotal||0) + (c.prepayment||0);
-        const balance = Math.max(0, (c.price||0) - paid);
-        debt += balance;
-      });
-      net = gross - agg.expenses; // упрощенно: чистая = грязная - расходы
-      prf.innerHTML = `
-        <tr><th>Метрика</th><th>Сумма ₽</th></tr>
-        <tr><td>Грязная прибыль (цена - себестоимость)</td><td><b>${fmt(gross)}</b></td></tr>
-        <tr><td>Чистая прибыль (≈ грязная - расходы)</td><td><b>${fmt(net)}</b></td></tr>
-        <tr><td>Долг клиентов (остаток по активным)</td><td><b>${fmt(debt)}</b></td></tr>
-      `;
-    }
-
-    // ====== LEDGER VIEW ======
-    document.addEventListener('click', async (e)=>{
-      if(e.target.id==='btnLoadLedger'){
-        const from = document.getElementById('lg_from').value || todayStr();
-        const to = document.getElementById('lg_to').value || todayStr();
-        await loadLedger(from,to);
-      }
-    });
-    async function loadLedger(from,to){
-      const tbl = document.getElementById('ledgerTable');
-      const f = new Date(from); f.setHours(0,0,0,0);
-      const t = new Date(to); t.setHours(23,59,59,999);
-      const snap = await getDocs(query(colLedger()));
-      const rows = [];
-      snap.forEach(d=>{
-        const x = d.data();
-        const dt = x.date?.toDate(); if(!dt) return;
-        if(dt<f||dt>t) return;
-        rows.push({date: toDateStr(dt), kind:x.kind, amount:x.amount, title:x.title||'', note:x.note||''});
-      });
-      rows.sort((a,b)=>a.date.localeCompare(b.date));
-      tbl.innerHTML = `
-        <thead><tr><th>Дата</th><th>Тип</th><th>Сумма</th><th>Название</th><th>Комментарий</th></tr></thead>
-        <tbody>${rows.map(r=>`<tr><td>${r.date}</td><td>${r.kind}</td><td>${fmt(r.amount)}</td><td>${r.title}</td><td>${r.note}</td></tr>`).join('')}</tbody>
-      `;
-    }
-
-    // ====== EXPORT ======
-    document.addEventListener('click', async (e)=>{
-      if(e.target.id==='btnExportJSON'){ await exportAll(); }
-    });
-    async function exportAll(){
-      const grab = async (colRef)=>{
-        const arr=[]; const sn=await getDocs(query(colRef)); sn.forEach(d=>arr.push({id:d.id, ...d.data()})); return arr;
-      };
-      const data = {
-        clients: await grab(colClients()),
-        contracts: await grab(colContracts()),
-        payments: await grab(colPayments()),
-        cashDays: await grab(colCashDays()),
-        ledger: await grab(colLedger())
-      };
-      const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = `amana_export_${todayStr()}.json`; a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    // ====== INIT ======
-    async function initApp(){
-      // дефолтные даты
-      const dts = [ 'c_date','cd_date','k_from','k_to','lg_from','lg_to','op_date' ];
-      dts.forEach(id=>{ const el=document.getElementById(id); if(el) el.value = todayStr(); });
-
-      // кнопки/поиск
-      document.getElementById('q')?.addEventListener('input', ()=>{ loadContracts().then(renderContracts); });
-      document.getElementById('filterOver')?.addEventListener('change', ()=>{ renderContracts(); });
-
-      await loadContracts();
-      renderContracts();
-      await showCashDay(todayStr());
-    }
-  </script>
-</head>
-<body></body>
-</html>
+export default App;
+```
