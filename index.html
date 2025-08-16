@@ -1,61 +1,174 @@
-.calculator {
-        padding: 24px;
-        border-radius: 20px;
-      }
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-      .calculator .calc-header .calc-title {
-        font-size: 24px;
-      }
+  <title>Автомобили в рассрочку | AutoCredit - Простое оформление без банков</title>
+  <meta name="description" content="Покупай автомобили в рассрочку без банков. Простые условия, быстрое одобрение. Онлайн-калькулятор.">
 
-      .calc-buttons {
-        grid-template-columns: 1fr;
-      }
+  <meta property="og:title" content="Автомобили в рассрочку | AutoCredit">
+  <meta property="og:description" content="Покупай автомобили в рассрочку без банков">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://example.com">
+  <meta property="og:image" content="https://example.com/og-image.jpg">
 
-      .tariff-buttons {
-        grid-template-columns: 1fr;
-      }
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-      .prepayment-input-group {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
-      }
-
-      .prepayment-input-group input[type="number"] {
-        width: 100%;
-      }
+  <style>
+    :root{
+      --primary-color:#1a365d;--primary-light:#2d5a87;--secondary-color:#e53e3e;--accent-color:#fd7f28;
+      --text-dark:#1a202c;--text-light:#718096;--bg-light:#f7fafc;--white:#fff;
+      --gradient-primary:linear-gradient(135deg,#1a365d 0%,#2d5a87 100%);
+      --gradient-secondary:linear-gradient(135deg,#e53e3e 0%,#fd7f28 100%);
+      --shadow-soft:0 4px 16px rgba(0,0,0,.1);--shadow-medium:0 8px 25px rgba(0,0,0,.15);
+      --border-radius:12px;--transition:all .3s cubic-bezier(.4,0,.2,1)
     }
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.6;color:var(--text-dark);background:#fff}
 
-    /* Accessibility improvements */
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-      }
-    }
+    .container{max-width:1200px;margin:0 auto;padding:0 20px}
+    .section{padding:80px 0}
+    .section-title{font-size:2.5rem;font-weight:700;text-align:center;margin-bottom:1rem}
+    .section-subtitle{font-size:1.1rem;text-align:center;color:var(--text-light);margin:0 auto 3rem;max-width:640px}
 
-    /* Focus styles for better accessibility */
-    .tariff-button:focus-visible,
-    .calc-btn:focus-visible {
-      outline: 2px solid var(--primary-color);
-      outline-offset: 2px;
-    }
+    .btn{display:inline-flex;align-items:center;justify-content:center;padding:16px 32px;font-weight:600;border-radius:12px;cursor:pointer;border:none;text-decoration:none;transition:var(--transition)}
+    .btn-primary{background:var(--gradient-primary);color:#fff}
+    .btn-secondary{background:var(--gradient-secondary);color:#fff}
+    .btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-medium)}
 
-    .slider:focus-visible {
-      box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.3);
+    .header{position:fixed;top:0;width:100%;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);z-index:1000;box-shadow:0 2px 20px rgba(0,0,0,.1)}
+    .header-content{display:flex;align-items:center;justify-content:space-between;padding:1rem 0}
+    .logo{font-size:1.5rem;font-weight:800;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .header-actions{display:flex;gap:1rem;align-items:center}
+    .header-phone{font-weight:600;color:var(--text-dark);text-decoration:none}
+
+    .hero{background:var(--gradient-primary);color:#fff;padding:120px 0 80px;position:relative;overflow:hidden}
+    .hero::before{content:"";position:absolute;inset:0;background:url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><path d="M200,300 Q400,100 600,300 T1000,300 L1000,1000 L0,1000 Z" fill="rgba(255,255,255,0.05)"/></svg>') no-repeat center/cover;opacity:.3}
+    .hero-content{position:relative;text-align:center;max-width:800px;margin:0 auto}
+    .hero-title{font-size:3.5rem;font-weight:800;margin-bottom:1.5rem;line-height:1.2}
+    .hero-subtitle{font-size:1.3rem;margin-bottom:2rem;opacity:.9}
+    .hero-cta{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+
+    .benefits{background:var(--bg-light)}
+    .benefits-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:2rem}
+    .benefit-card{background:#fff;padding:2rem;border-radius:12px;text-align:center;box-shadow:var(--shadow-soft);transition:var(--transition)}
+    .benefit-card:hover{transform:translateY(-5px);box-shadow:var(--shadow-medium)}
+    .benefit-icon{font-size:3rem;margin-bottom:1rem}
+    .benefit-title{font-size:1.2rem;font-weight:600;margin-bottom:.5rem}
+    .benefit-text{color:var(--text-light)}
+
+    .cars-showcase{padding:80px 0}
+    .cars-filters{display:flex;justify-content:center;gap:1rem;margin-bottom:3rem;flex-wrap:wrap}
+    .filter-btn{padding:.5rem 1rem;background:#fff;border:2px solid var(--primary-color);color:var(--primary-color);border-radius:25px;cursor:pointer;transition:var(--transition)}
+    .filter-btn.active,.filter-btn:hover{background:var(--primary-color);color:#fff}
+    .cars-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem}
+    .car-card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:var(--shadow-soft);transition:var(--transition)}
+    .car-card:hover{transform:translateY(-5px);box-shadow:var(--shadow-medium)}
+    .car-image{width:100%;height:200px;background:linear-gradient(45deg,#f0f0f0,#e0e0e0);display:flex;align-items:center;justify-content:center;font-size:3rem;color:var(--text-light)}
+    .car-info{padding:1.5rem}
+    .car-title{font-size:1.3rem;font-weight:600;margin-bottom:.5rem}
+    .car-price{font-size:1.5rem;font-weight:700;color:var(--secondary-color);margin-bottom:1rem}
+    .car-specs{display:flex;gap:1rem;margin-bottom:1.5rem;font-size:.9rem;color:var(--text-light)}
+
+    .how-it-works{background:var(--bg-light)}
+    .steps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:2rem}
+    .step{text-align:center}
+    .step-number{width:60px;height:60px;background:var(--gradient-primary);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:700;margin:0 auto 1rem}
+    .step-title{font-size:1.2rem;font-weight:600;margin-bottom:.5rem}
+    .step-text{color:var(--text-light)}
+
+    .calculator-section{padding:80px 0;background:#fff}
+    .calculator{width:100%;max-width:500px;background:rgba(255,255,255,.95);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.2);border-radius:24px;padding:32px;margin:0 auto;box-shadow:0 20px 40px rgba(0,0,0,.1),0 0 80px rgba(26,54,93,.1);animation:slideUp .8s ease-out}
+    @keyframes slideUp{from{transform:translateY(60px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .calc-header{text-align:center;margin-bottom:32px}
+    .calc-title{font-size:28px;font-weight:800;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px;letter-spacing:-.5px}
+    .calc-subtitle{font-size:14px;color:#64748B;font-weight:500;letter-spacing:2px;text-transform:uppercase}
+
+    .tariff-buttons{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:32px}
+    .tariff-button{padding:16px;background:rgba(248,250,252,.8);border:2px solid transparent;border-radius:16px;cursor:pointer;text-align:center;font-weight:600;font-size:14px;color:#64748B;transition:var(--transition);position:relative;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+    .tariff-button:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(26,54,93,.15)}
+    .tariff-button.active{background:var(--gradient-primary);color:#fff;border-color:rgba(255,255,255,.3);transform:scale(1.02);box-shadow:0 12px 30px rgba(26,54,93,.3)}
+
+    .input-group{margin-bottom:24px}
+    .calculator label{display:block;margin-bottom:8px;font-weight:600;font-size:14px;color:#1E293B}
+    .input-wrapper{position:relative}
+    .calculator input[type="number"]{width:100%;padding:16px 20px;font-size:16px;font-weight:500;border:2px solid #E2E8F0;border-radius:12px;background:rgba(248,250,252,.8);transition:.3s;color:#1E293B}
+    .calculator input[type="number"]:focus{outline:none;border-color:var(--primary-color);background:rgba(255,255,255,.95);box-shadow:0 0 0 4px rgba(26,54,93,.1)}
+    .calculator input[type="number"]::placeholder{color:#94A3B8}
+
+    .slider-container{margin-top:12px}
+    .slider{width:100%;height:8px;border-radius:4px;background:#E2E8F0;appearance:none;cursor:pointer;position:relative}
+    .slider::-webkit-slider-thumb{appearance:none;width:24px;height:24px;border-radius:50%;background:var(--gradient-primary);border:3px solid #fff;box-shadow:0 4px 12px rgba(26,54,93,.3)}
+    .slider::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--gradient-primary);border:3px solid #fff;box-shadow:0 4px 12px rgba(26,54,93,.3)}
+    .months-display{display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:#64748B}
+    .month-label.active{color:var(--primary-color);font-weight:600}
+
+    .prepayment-input-group{margin-top:8px;display:flex;align-items:center;gap:12px}
+    .prepayment-input-group input[type="number"]{width:200px;padding:12px 16px;font-size:14px}
+
+    .error-message{background:linear-gradient(135deg,#FEF7ED,#FED7AA);color:#EA580C;padding:12px 16px;border-radius:10px;font-size:13px;font-weight:500;margin-top:8px;border-left:4px solid #EA580C;display:none}
+    .helper-text{background:linear-gradient(135deg,#FEF7ED,#FED7AA);color:#EA580C;padding:12px 16px;border-radius:10px;font-size:13px;font-weight:500;margin:24px 0;border-left:4px solid #EA580C}
+
+    .output{background:linear-gradient(135deg,#F0FDF4,#DCFCE7);border:2px solid #BBF7D0;padding:24px;border-radius:16px;margin:24px 0;position:relative;overflow:hidden}
+    .output p{margin:12px 0;font-size:15px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .output strong{color:#166534;font-weight:600;flex:1}
+    .output-value{font-weight:700;font-size:16px;color:#15803D;white-space:nowrap}
+
+    .calc-buttons{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:32px}
+    .calc-btn{padding:16px 24px;border-radius:12px;text-decoration:none;text-align:center;font-weight:600;font-size:15px;transition:var(--transition);position:relative;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center}
+    .calc-btn-whatsapp{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff}
+    .calc-btn-call{background:var(--gradient-primary);color:#fff}
+
+    .faq{background:var(--bg-light)}
+    .faq-list{max-width:800px;margin:0 auto}
+    .faq-item{background:#fff;border-radius:12px;margin-bottom:1rem;overflow:hidden;box-shadow:var(--shadow-soft)}
+    .faq-question{padding:1.5rem;cursor:pointer;font-weight:600;display:flex;justify-content:space-between;align-items:center;transition:var(--transition)}
+    .faq-question:hover{background:var(--bg-light)}
+    .faq-answer{padding:0 1.5rem 1.5rem;color:var(--text-light);display:none}
+    .faq-answer.active{display:block}
+
+    .trust{padding:80px 0}
+    .trust-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:3rem}
+    .review{background:#fff;padding:2rem;border-radius:12px;box-shadow:var(--shadow-soft);margin-bottom:1rem}
+    .review-text{font-style:italic;margin-bottom:1rem}
+    .review-author{font-weight:600;color:var(--primary-color)}
+    .partners-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:2rem;margin-top:2rem}
+    .partner-logo{height:60px;background:var(--bg-light);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--text-light);font-weight:600}
+
+    .contact{background:var(--gradient-primary);color:#fff}
+    .contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:3rem}
+    .contact-form{background:rgba(255,255,255,.1);padding:2rem;border-radius:12px}
+    .form-group{margin-bottom:1rem}
+    .form-group label{display:block;margin-bottom:.5rem;font-weight:500}
+    .form-group input,.form-group textarea{width:100%;padding:.75rem;border:none;border-radius:12px;background:rgba(255,255,255,.9);color:var(--text-dark)}
+
+    .footer{background:var(--text-dark);color:#fff;text-align:center;padding:2rem 0}
+
+    @media (max-width:768px){
+      .section{padding:60px 0}
+      .section-title{font-size:2rem}
+      .hero-title{font-size:2.5rem}
+      .hero-subtitle{font-size:1.1rem}
+      .hero-cta{flex-direction:column}
+      .header-actions{display:none}
+      .calculator{padding:24px;border-radius:20px}
+      .calc-title{font-size:24px}
+      .calc-buttons{grid-template-columns:1fr}
+      .tariff-buttons{grid-template-columns:1fr}
+      .prepayment-input-group{flex-direction:column;align-items:stretch;gap:8px}
+      .prepayment-input-group input[type="number"]{width:100%}
     }
   </style>
 </head>
 <body>
-  <!-- Header -->
   <header class="header">
     <div class="container">
       <div class="header-content">
-        <!-- TODO: Замени на реальный логотип -->
         <div class="logo">AutoCredit</div>
         <div class="header-actions">
-          <!-- TODO: Обнови номер телефона -->
           <a href="tel:+79280222114" class="header-phone">+7 (928) 022-21-14</a>
           <a href="#calculator" class="btn btn-primary">Рассчитать</a>
         </div>
@@ -63,7 +176,6 @@
     </div>
   </header>
 
-  <!-- Hero Section -->
   <section class="hero">
     <div class="container">
       <div class="hero-content">
@@ -77,263 +189,113 @@
     </div>
   </section>
 
-  <!-- Benefits Section -->
   <section class="benefits section">
     <div class="container">
       <h2 class="section-title">Почему выбирают нас</h2>
       <p class="section-subtitle">Простые условия покупки автомобиля в рассрочку</p>
-      
       <div class="benefits-grid">
-        <div class="benefit-card">
-          <div class="benefit-icon">🏦</div>
-          <h3 class="benefit-title">Без банков</h3>
-          <p class="benefit-text">Прямая рассрочка от дилера без кредитных организаций</p>
-        </div>
-        
-        <div class="benefit-card">
-          <div class="benefit-icon">📋</div>
-          <h3 class="benefit-title">Простые условия</h3>
-          <p class="benefit-text">Минимум документов - только паспорт и поручитель</p>
-        </div>
-        
-        <div class="benefit-card">
-          <div class="benefit-icon">⚡</div>
-          <h3 class="benefit-title">Быстрое одобрение</h3>
-          <p class="benefit-text">Решение по заявке в течение 30 минут</p>
-        </div>
-        
-        <div class="benefit-card">
-          <div class="benefit-icon">🤝</div>
-          <h3 class="benefit-title">Надёжность</h3>
-          <p class="benefit-text">Работаем официально, все документы в порядке</p>
-        </div>
+        <div class="benefit-card"><div class="benefit-icon">🏦</div><h3 class="benefit-title">Без банков</h3><p class="benefit-text">Прямая рассрочка от дилера без кредитных организаций</p></div>
+        <div class="benefit-card"><div class="benefit-icon">📋</div><h3 class="benefit-title">Простые условия</h3><p class="benefit-text">Минимум документов — только паспорт и поручитель</p></div>
+        <div class="benefit-card"><div class="benefit-icon">⚡</div><h3 class="benefit-title">Быстрое одобрение</h3><p class="benefit-text">Решение по заявке в течение 30 минут</p></div>
+        <div class="benefit-card"><div class="benefit-icon">🤝</div><h3 class="benefit-title">Надёжность</h3><p class="benefit-text">Работаем официально, все документы в порядке</p></div>
       </div>
     </div>
   </section>
 
-  <!-- Cars Showcase -->
   <section id="cars" class="cars-showcase section">
     <div class="container">
       <h2 class="section-title">Наши автомобили</h2>
       <p class="section-subtitle">Выберите автомобиль и рассчитайте рассрочку</p>
-      
+
       <div class="cars-filters">
         <button class="filter-btn active" data-filter="all">Все</button>
         <button class="filter-btn" data-filter="sedan">Седаны</button>
         <button class="filter-btn" data-filter="suv">Кроссоверы</button>
         <button class="filter-btn" data-filter="hatchback">Хэтчбеки</button>
       </div>
-      
+
       <div class="cars-grid">
-        <!-- 
-        📋 ИНСТРУКЦИЯ ПО ДОБАВЛЕНИЮ АВТОМОБИЛЕЙ:
-        
-        1. Создайте папку "images" рядом с HTML файлом
-        2. Добавьте фотографии автомобилей в эту папку
-        3. Замените src="images/placeholder.jpg" на реальные пути к фото
-        4. Обновите название, цену и характеристики в каждой карточке
-        5. Не забудьте изменить data-price (цена БЕЗ пробелов для калькулятора)
-        -->
-        
         <div class="car-card" data-category="sedan">
-          <div class="car-image">
-            <!-- TODO: Замени на реальное фото: src="images/hyundai-solaris.jpg" -->
-            <img src="images/placeholder.jpg" alt="Hyundai Solaris" loading="lazy" 
-                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-            <div class="placeholder" style="display: none;">🚗</div>
-          </div>
+          <div class="car-image">🚗</div>
           <div class="car-info">
             <h3 class="car-title">Hyundai Solaris</h3>
-            <!-- TODO: Измени цену здесь (с пробелами для отображения) -->
             <div class="car-price">850 000 ₽</div>
-            <div class="car-specs">
-              <!-- TODO: Обнови характеристики -->
-              <span>1.6л</span>        <!-- Объем двигателя -->
-              <span>АКПП</span>        <!-- Коробка передач -->
-              <span>2023г</span>       <!-- Год выпуска -->
-            </div>
-            <!-- TODO: Обнови цену в data-price (БЕЗ пробелов!) -->
-            <button class="btn btn-primary calculate-car" data-price="850000">
-              Рассчитать для этого авто
-            </button>
-          </div>
-        </div>
-        
-        <div class="car-card" data-category="suv">
-          <div class="car-image">
-            <!-- TODO: Замени на: src="images/kia-sportage.jpg" -->
-            <img src="images/placeholder.jpg" alt="Kia Sportage" loading="lazy" 
-                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-            <div class="placeholder" style="display: none;">🚙</div>
-          </div>
-          <div class="car-info">
-            <h3 class="car-title">Kia Sportage</h3>
-            <!-- TODO: Измени цену -->
-            <div class="car-price">1 650 000 ₽</div>
-            <div class="car-specs">
-              <span>2.0л</span>
-              <span>АКПП</span>
-              <span>2023г</span>
-            </div>
-            <!-- TODO: Обнови data-price -->
-            <button class="btn btn-primary calculate-car" data-price="1650000">
-              Рассчитать для этого авто
-            </button>
-          </div>
-        </div>
-        
-        <div class="car-card" data-category="hatchback">
-          <div class="car-image">
-            <!-- TODO: Замени на: src="images/volkswagen-polo.jpg" -->
-            <img src="images/placeholder.jpg" alt="Volkswagen Polo" loading="lazy" 
-                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-            <div class="placeholder" style="display: none;">🚗</div>
-          </div>
-          <div class="car-info">
-            <h3 class="car-title">Volkswagen Polo</h3>
-            <div class="car-price">950 000 ₽</div>
-            <div class="car-specs">
-              <span>1.6л</span>
-              <span>МКПП</span>
-              <span>2023г</span>
-            </div>
-            <button class="btn btn-primary calculate-car" data-price="950000">
-              Рассчитать для этого авто
-            </button>
-          </div>
-        </div>
-        
-        <div class="car-card" data-category="sedan">
-          <div class="car-image">
-            <!-- TODO: Замени на: src="images/toyota-camry.jpg" -->
-            <img src="images/placeholder.jpg" alt="Toyota Camry" loading="lazy" 
-                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-            <div class="placeholder" style="display: none;">🚗</div>
-          </div>
-          <div class="car-info">
-            <h3 class="car-title">Toyota Camry</h3>
-            <div class="car-price">2 100 000 ₽</div>
-            <div class="car-specs">
-              <span>2.5л</span>
-              <span>АКПП</span>
-              <span>2023г</span>
-            </div>
-            <button class="btn btn-primary calculate-car" data-price="2100000">
-              Рассчитать для этого авто
-            </button>
-          </div>
-        </div>
-        
-        <div class="car-card" data-category="suv">
-          <div class="car-image">
-            <!-- TODO: Замени на: src="images/mazda-cx5.jpg" -->
-            <img src="images/placeholder.jpg" alt="Mazda CX-5" loading="lazy" 
-                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-            <div class="placeholder" style="display: none;">🚙</div>
-          </div>
-          <div class="car-info">
-            <h3 class="car-title">Mazda CX-5</h3>
-            <div class="car-price">1 800 000 ₽</div>
-            <div class="car-specs">
-              <span>2.0л</span>
-              <span>АКПП</span>
-              <span>2023г</span>
-            </div>
-            <button class="btn btn-primary calculate-car" data-price="1800000">
-              Рассчитать для этого авто
-            </button>
-          </div>
-        </div>
-        
-        <div class="car-card" data-category="hatchback">
-          <div class="car-image">
-            <!-- TODO: Замени на: src="images/skoda-rapid.jpg" -->
-            <img src="images/placeholder.jpg" alt="Skoda Rapid" loading="lazy" 
-                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-            <div class="placeholder" style="display: none;">🚗</div>
-          </div>
-          <div class="car-info">
-            <h3 class="car-title">Skoda Rapid</h3>
-            <div class="car-price">780 000 ₽</div>
-            <div class="car-specs">
-              <span>1.6л</span>
-              <span>АКПП</span>
-              <span>2023г</span>
-            </div>
-            <button class="btn btn-primary calculate-car" data-price="780000">
-              Рассчитать для этого авто
-            </button>
+            <div class="car-specs"><span>1.6л</span><span>АКПП</span><span>2023</span></div>
+            <button class="btn btn-primary calculate-car" data-price="850000">Рассчитать для этого авто</button>
           </div>
         </div>
 
-        <!-- 
-        🔧 ПРИМЕР ДОБАВЛЕНИЯ НОВОГО АВТОМОБИЛЯ:
-        
         <div class="car-card" data-category="suv">
-          <div class="car-image">
-            <img src="images/bmw-x3.jpg" alt="BMW X3" loading="lazy" 
-                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-            <div class="placeholder" style="display: none;">🚙</div>
-          </div>
+          <div class="car-image">🚙</div>
           <div class="car-info">
-            <h3 class="car-title">BMW X3</h3>
-            <div class="car-price">3 200 000 ₽</div>
-            <div class="car-specs">
-              <span>2.0л</span>
-              <span>АКПП</span>
-              <span>2023г</span>
-            </div>
-            <button class="btn btn-primary calculate-car" data-price="3200000">
-              Рассчитать для этого авто
-            </button>
+            <h3 class="car-title">Kia Sportage</h3>
+            <div class="car-price">1 650 000 ₽</div>
+            <div class="car-specs"><span>2.0л</span><span>АКПП</span><span>2023</span></div>
+            <button class="btn btn-primary calculate-car" data-price="1650000">Рассчитать для этого авто</button>
           </div>
         </div>
-        -->
+
+        <div class="car-card" data-category="hatchback">
+          <div class="car-image">🚗</div>
+          <div class="car-info">
+            <h3 class="car-title">Volkswagen Polo</h3>
+            <div class="car-price">950 000 ₽</div>
+            <div class="car-specs"><span>1.6л</span><span>МКПП</span><span>2023</span></div>
+            <button class="btn btn-primary calculate-car" data-price="950000">Рассчитать для этого авто</button>
+          </div>
+        </div>
+
+        <div class="car-card" data-category="sedan">
+          <div class="car-image">🚗</div>
+          <div class="car-info">
+            <h3 class="car-title">Toyota Camry</h3>
+            <div class="car-price">2 100 000 ₽</div>
+            <div class="car-specs"><span>2.5л</span><span>АКПП</span><span>2023</span></div>
+            <button class="btn btn-primary calculate-car" data-price="2100000">Рассчитать для этого авто</button>
+          </div>
+        </div>
+
+        <div class="car-card" data-category="suv">
+          <div class="car-image">🚙</div>
+          <div class="car-info">
+            <h3 class="car-title">Mazda CX-5</h3>
+            <div class="car-price">1 800 000 ₽</div>
+            <div class="car-specs"><span>2.0л</span><span>АКПП</span><span>2023</span></div>
+            <button class="btn btn-primary calculate-car" data-price="1800000">Рассчитать для этого авто</button>
+          </div>
+        </div>
+
+        <div class="car-card" data-category="hatchback">
+          <div class="car-image">🚗</div>
+          <div class="car-info">
+            <h3 class="car-title">Skoda Rapid</h3>
+            <div class="car-price">780 000 ₽</div>
+            <div class="car-specs"><span>1.6л</span><span>АКПП</span><span>2023</span></div>
+            <button class="btn btn-primary calculate-car" data-price="780000">Рассчитать для этого авто</button>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- How It Works -->
   <section class="how-it-works section">
     <div class="container">
       <h2 class="section-title">Как это работает</h2>
       <p class="section-subtitle">Простой процесс покупки автомобиля в рассрочку</p>
-      
       <div class="steps-grid">
-        <div class="step">
-          <div class="step-number">1</div>
-          <h3 class="step-title">Выбор автомобиля</h3>
-          <p class="step-text">Выберите понравившийся автомобиль из нашего каталога</p>
-        </div>
-        
-        <div class="step">
-          <div class="step-number">2</div>
-          <h3 class="step-title">Расчёт рассрочки</h3>
-          <p class="step-text">Рассчитайте удобные условия платежа с помощью калькулятора</p>
-        </div>
-        
-        <div class="step">
-          <div class="step-number">3</div>
-          <h3 class="step-title">Оформление</h3>
-          <p class="step-text">Приходите с документами, подписываем договор за 30 минут</p>
-        </div>
-        
-        <div class="step">
-          <div class="step-number">4</div>
-          <h3 class="step-title">Получение авто</h3>
-          <p class="step-text">Забираете автомобиль и платите по удобному графику</p>
-        </div>
+        <div class="step"><div class="step-number">1</div><h3 class="step-title">Выбор автомобиля</h3><p class="step-text">Выберите понравившийся автомобиль из нашего каталога</p></div>
+        <div class="step"><div class="step-number">2</div><h3 class="step-title">Расчёт рассрочки</h3><p class="step-text">Рассчитайте удобные условия платежа с помощью калькулятора</p></div>
+        <div class="step"><div class="step-number">3</div><h3 class="step-title">Оформление</h3><p class="step-text">Подписываем договор за 30 минут</p></div>
+        <div class="step"><div class="step-number">4</div><h3 class="step-title">Получение авто</h3><p class="step-text">Забираете автомобиль и платите по графику</p></div>
       </div>
     </div>
   </section>
 
-  <!-- Calculator Section -->
   <section id="calculator" class="calculator-section">
     <div class="container">
       <h2 class="section-title">Калькулятор рассрочки</h2>
       <p class="section-subtitle">Рассчитайте удобные условия покупки автомобиля</p>
-      
-      <!-- Integrated Calculator -->
+
       <div class="calculator">
         <div class="calc-header">
           <div class="calc-title">Рассрочка на авто</div>
@@ -350,15 +312,15 @@
           <div class="input-wrapper">
             <input type="number" id="price" placeholder="не менее 50 000 ₽" min="0" />
           </div>
-          <div class="error-message" id="errorMessage">⚠️ Стоимость автомобиля должна быть<br>не менее 50 000₽</div>
+          <div class="error-message" id="errorMessage">⚠️ Стоимость автомобиля должна быть не менее 50 000 ₽</div>
         </div>
 
         <div class="input-group">
           <label for="months" id="monthsLabel">Срок: 3 месяца</label>
           <div class="slider-container">
-            <input type="range" id="months" class="slider" min="3" max="12" value="3" />
+            <input type="range" id="months" class="slider" min="3" max="12" value="3" step="1" />
             <div class="months-display">
-              <span class="month-label active">3 мес</span>
+              <span class="month-label">3 мес</span>
               <span class="month-label">6 мес</span>
               <span class="month-label">9 мес</span>
               <span class="month-label">12 мес</span>
@@ -384,1541 +346,281 @@
           <p><strong>Наценка:</strong> <span class="output-value">0 ₽ (0%)</span></p>
         </div>
 
-        <div class="helper-text">
-          💡 Обязательные требования: Поручитель и паспорта обеих лиц
-        </div>
+        <div class="helper-text">💡 Обязательные требования: Поручитель и паспорта обеих лиц</div>
 
         <div class="calc-buttons">
-          <!-- TODO: Обнови номер WhatsApp -->
-          <a id="whatsapp" class="calc-btn calc-btn-whatsapp" href="#" target="_blank">
-            <span>✍️ Написать в WhatsApp</span>
-          </a>
-          <!-- TODO: Обнови номер телефона -->
-          <a class="calc-btn calc-btn-call" href="tel:+79280222114">
-            <span>📞 Позвонить</span>
-          </a>
+          <a id="whatsapp" class="calc-btn calc-btn-whatsapp" href="#" target="_blank"><span>✍️ Написать в WhatsApp</span></a>
+          <a class="calc-btn calc-btn-call" href="tel:+79280222114"><span>📞 Позвонить</span></a>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- FAQ Section -->
   <section class="faq section">
     <div class="container">
       <h2 class="section-title">Часто задаваемые вопросы</h2>
       <p class="section-subtitle">Ответы на популярные вопросы о рассрочке</p>
-      
+
       <div class="faq-list">
         <div class="faq-item">
-          <div class="faq-question">
-            Какие документы нужны для оформления рассрочки?
-            <span>+</span>
-          </div>
-          <div class="faq-answer">
-            Для оформления рассрочки вам потребуется только ваш паспорт и паспорт поручителя. Никаких справок о доходах и дополнительных документов не требуется.
-          </div>
+          <div class="faq-question">Какие документы нужны для оформления рассрочки? <span>+</span></div>
+          <div class="faq-answer">Паспорт и паспорт поручителя. Никаких справок о доходах.</div>
         </div>
-        
         <div class="faq-item">
-          <div class="faq-question">
-            Какой минимальный первый взнос?
-            <span>+</span>
-          </div>
-          <div class="faq-answer">
-            Минимальный первый взнос составляет 15% от стоимости автомобиля. Также доступна рассрочка полностью без первоначального взноса.
-          </div>
+          <div class="faq-question">Какой минимальный первый взнос? <span>+</span></div>
+          <div class="faq-answer">Минимальный первый взнос — 15% от стоимости. Доступна и рассрочка без взноса.</div>
         </div>
-        
         <div class="faq-item">
-          <div class="faq-question">
-            На какой срок можно оформить рассрочку?
-            <span>+</span>
-          </div>
-          <div class="faq-answer">
-            Рассрочку можно оформить на срок от 3 до 12 месяцев. Чем меньше срок, тем меньше переплата.
-          </div>
+          <div class="faq-question">На какой срок можно оформить рассрочку? <span>+</span></div>
+          <div class="faq-answer">От 3 до 12 месяцев. Чем меньше срок, тем меньше переплата.</div>
         </div>
-        
         <div class="faq-item">
-          <div class="faq-question">
-            Можно ли досрочно погасить рассрочку?
-            <span>+</span>
-          </div>
-          <div class="faq-answer">
-            Да, досрочное погашение возможно в любой момент без штрафов и комиссий. Переплата пересчитывается пропорционально.
-          </div>
-        </div>
-        
-        <div class="faq-item">
-          <div class="faq-question">
-            Что происходит при просрочке платежа?
-            <span>+</span>
-          </div>
-          <div class="faq-answer">
-            При просрочке платежа начисляется пеня согласно договору. Мы всегда идём навстречу клиентам и готовы обсудить реструктуризацию долга.
-          </div>
-        </div>
-        
-        <div class="faq-item">
-          <div class="faq-question">
-            Нужна ли страховка автомобиля?
-            <span>+</span>
-          </div>
-          <div class="faq-answer">
-            ОСАГО обязательно по закону. КАСКО не является обязательным требованием, но мы рекомендуем оформить его для защиты вашего автомобиля.
-          </div>
-        </div>
-        
-        <div class="faq-item">
-          <div class="faq-question">
-            Могу ли я продать автомобиль до полного погашения?
-            <span>+</span>
-          </div>
-          <div class="faq-answer">
-            Да, продажа возможна с согласия компании. Обычно требуется полное погашение задолженности из средств от продажи.
-          </div>
+          <div class="faq-question">Можно ли досрочно погасить рассрочку? <span>+</span></div>
+          <div class="faq-answer">Да, без штрафов и комиссий. Переплата перерассчитывается пропорционально.</div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Trust Section -->
   <section class="trust section">
     <div class="container">
       <h2 class="section-title">Нам доверяют</h2>
       <p class="section-subtitle">Отзывы клиентов и наши партнёры</p>
-      
+
       <div class="trust-grid">
         <div class="reviews">
           <h3>Отзывы клиентов</h3>
-          <!-- TODO: Замени на реальные отзывы -->
-          <div class="review">
-            <p class="review-text">"Быстро оформили рассрочку на Солярис. Никаких проблем с документами, всё честно и прозрачно."</p>
-            <p class="review-author">Алексей М.</p>
-          </div>
-          
-          <div class="review">
-            <p class="review-text">"Купила Polo в рассрочку. Очень удобно, платежи небольшие, никого не напрягают."</p>
-            <p class="review-author">Марина К.</p>
-          </div>
-          
-          <div class="review">
-            <p class="review-text">"Отличный сервис! Помогли выбрать авто и рассчитать оптимальные условия рассрочки."</p>
-            <p class="review-author">Дмитрий В.</p>
-          </div>
+          <div class="review"><p class="review-text">«Быстро оформили рассрочку на Солярис. Всё прозрачно.»</p><p class="review-author">Алексей М.</p></div>
+          <div class="review"><p class="review-text">«Купила Polo в рассрочку. Платежи небольшие.»</p><p class="review-author">Марина К.</p></div>
         </div>
-        
         <div class="partners">
           <h3>Наши партнёры</h3>
-          <!-- TODO: Замени на реальные логотипы партнёров -->
           <div class="partners-grid">
-            <div class="partner-logo">Hyundai</div>
-            <div class="partner-logo">Kia</div>
-            <div class="partner-logo">Toyota</div>
-            <div class="partner-logo">Mazda</div>
-            <div class="partner-logo">VW</div>
-            <div class="partner-logo">Skoda</div>
+            <div class="partner-logo">Hyundai</div><div class="partner-logo">Kia</div><div class="partner-logo">Toyota</div><div class="partner-logo">Mazda</div><div class="partner-logo">VW</div><div class="partner-logo">Skoda</div>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Contact Section -->
   <section class="contact section">
     <div class="container">
       <h2 class="section-title">Свяжитесь с нами</h2>
       <p class="section-subtitle">Готовы ответить на ваши вопросы и помочь с выбором</p>
-      
+
       <div class="contact-grid">
         <div class="contact-info">
-          <h3>Контактная информация</h3>
-          
-          <div class="contact-item">
-            <span>📞</span>
-            <!-- TODO: Обнови номер телефона -->
-            <div>
-              <strong>Телефон:</strong><br>
-              <a href="tel:+79280222114" style="color: white;">+7 (928) 022-21-14</a>
-            </div>
-          </div>
-          
-          <div class="contact-item">
-            <span>💬</span>
-            <div>
-              <strong>WhatsApp:</strong><br>
-              <!-- TODO: Обнови номер WhatsApp -->
-              <a href="https://wa.me/79280222114" style="color: white;">+7 (928) 022-21-14</a>
-            </div>
-          </div>
-          
-          <div class="contact-item">
-            <span>📍</span>
-            <div>
-              <strong>Адрес:</strong><br>
-              <!-- TODO: Обнови реальный адрес -->
-              г. Москва, ул. Примерная, 1
-            </div>
-          </div>
-          
-          <div class="contact-item">
-            <span>🕐</span>
-            <div>
-              <strong>Режим работы:</strong><br>
-              Пн-Пт: 9:00-20:00<br>
-              Сб-Вс: 10:00-18:00
-            </div>
-          </div>
+          <h3>Контакты</h3>
+          <div class="contact-item"><span>📞</span><div><strong>Телефон:</strong><br><a href="tel:+79280222114" style="color:#fff">+7 (928) 022-21-14</a></div></div>
+          <div class="contact-item"><span>💬</span><div><strong>WhatsApp:</strong><br><a href="https://wa.me/79280222114" style="color:#fff">+7 (928) 022-21-14</a></div></div>
+          <div class="contact-item"><span>📍</span><div><strong>Адрес:</strong><br>г. Москва, ул. Примерная, 1</div></div>
+          <div class="contact-item"><span>🕐</span><div><strong>Режим работы:</strong><br>Пн–Пт: 9:00–20:00<br>Сб–Вс: 10:00–18:00</div></div>
         </div>
-        
+
         <div class="contact-form">
           <h3>Оставьте заявку</h3>
-          <!-- TODO: Подключи реальную обработку формы -->
           <form>
-            <div class="form-group">
-              <label for="name">Ваше имя</label>
-              <input type="text" id="name" name="name" required>
-            </div>
-            
-            <div class="form-group">
-              <label for="phone">Телефон</label>
-              <input type="tel" id="phone" name="phone" required>
-            </div>
-            
-            <div class="form-group">
-              <label for="message">Сообщение</label>
-              <textarea id="message" name="message" rows="4" placeholder="Укажите интересующий автомобиль или вопрос"></textarea>
-            </div>
-            
-            <button type="submit" class="btn btn-secondary" style="width: 100%;">
-              Отправить заявку
-            </button>
+            <div class="form-group"><label for="name">Ваше имя</label><input type="text" id="name" required></div>
+            <div class="form-group"><label for="phone">Телефон</label><input type="tel" id="phone" required></div>
+            <div class="form-group"><label for="message">Сообщение</label><textarea id="message" rows="4" placeholder="Укажите авто или вопрос"></textarea></div>
+            <button type="submit" class="btn btn-secondary" style="width:100%">Отправить заявку</button>
           </form>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Footer -->
   <footer class="footer">
     <div class="container">
-      <!-- TODO: Обнови копирайт и ссылки -->
       <p>&copy; 2024 AutoCredit. Все права защищены.</p>
-      <p>
-        <a href="#" style="color: #94A3B8; margin: 0 10px;">Политика конфиденциальности</a>
-        <a href="#" style="color: #94A3B8; margin: 0 10px;">Условия использования</a>
-      </p>
+      <p><a href="#" style="color:#94A3B8;margin:0 10px">Политика конфиденциальности</a><a href="#" style="color:#94A3B8;margin:0 10px">Условия использования</a></p>
     </div>
   </footer>
 
   <script>
-    // Car filter functionality
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    // Фильтр авто
+    document.querySelectorAll('.filter-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
         btn.classList.add('active');
-        
-        const filter = btn.dataset.filter;
-        document.querySelectorAll('.car-card').forEach(card => {
-          if (filter === 'all' || card.dataset.category === filter) {
-            card.style.display = 'block';
-          } else {
-            card.style.display = 'none';
-          }
+        const f=btn.dataset.filter;
+        document.querySelectorAll('.car-card').forEach(card=>{
+          card.style.display=(f==='all'||card.dataset.category===f)?'block':'none';
         });
       });
     });
 
-    // Calculate for specific car functionality
-    document.querySelectorAll('.calculate-car').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const price = btn.dataset.price;
-        document.getElementById('calculator').scrollIntoView({ behavior: 'smooth' });
-        
-        // Set price in calculator after scroll
-        setTimeout(() => {
-          document.getElementById('price').value = price;
-          // Trigger calculator update
+    // Прокинуть цену авто в калькулятор
+    document.querySelectorAll('.calculate-car').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const price=btn.dataset.price;
+        document.getElementById('calculator').scrollIntoView({behavior:'smooth'});
+        setTimeout(()=>{
+          document.getElementById('price').value=price;
           updateCalculator(true);
-        }, 1000);
+        },400);
       });
     });
 
-    // FAQ accordion functionality
-    document.querySelectorAll('.faq-question').forEach(question => {
-      question.addEventListener('click', () => {
-        const answer = question.nextElementSibling;
-        const isActive = answer.classList.contains('active');
-        
-        // Close all other answers
-        document.querySelectorAll('.faq-answer').forEach(a => a.classList.remove('active'));
-        document.querySelectorAll('.faq-question span').forEach(s => s.textContent = '+');
-        
-        // Toggle current answer
-        if (!isActive) {
-          answer.classList.add('active');
-          question.querySelector('span').textContent = '−';
-        }
+    // FAQ
+    document.querySelectorAll('.faq-question').forEach(q=>{
+      q.addEventListener('click',()=>{
+        const a=q.nextElementSibling;
+        const open=a.classList.contains('active');
+        document.querySelectorAll('.faq-answer').forEach(x=>x.classList.remove('active'));
+        document.querySelectorAll('.faq-question span').forEach(s=>s.textContent='+');
+        if(!open){a.classList.add('active');q.querySelector('span').textContent='−'}
       });
     });
 
-    // Form submission (placeholder)
-    document.querySelector('.contact-form form').addEventListener('submit', (e) => {
+    // Форма-заглушка
+    document.querySelector('.contact-form form').addEventListener('submit',e=>{
       e.preventDefault();
       alert('Спасибо за заявку! Мы свяжемся с вами в ближайшее время.');
-      // TODO: Подключи реальную отправку формы
     });
 
-    // Smooth scroll for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-          target.scrollIntoView({ behavior: 'smooth' });
-        }
-      });
-    });
+    // Калькулятор
+    const priceInput=document.getElementById('price');
+    const monthsInput=document.getElementById('months');
+    const monthsLabel=document.getElementById('monthsLabel');
+    const prepaymentBlock=document.getElementById('prepaymentBlock');
+    const prepaymentSlider=document.getElementById('prepaymentSlider');
+    const prepaymentInput=document.getElementById('prepaymentInput');
+    const prepaymentError=document.getElementById('prepaymentError');
+    const resultsDiv=document.getElementById('results');
+    const whatsappBtn=document.getElementById('whatsapp');
+    const errorMessage=document.getElementById('errorMessage');
+    const tariffButtons=document.querySelectorAll('.tariff-button');
+    const monthLabels=document.querySelectorAll('.month-label');
 
-    // Calculator JavaScript (original logic preserved)
-    const priceInput = document.getElementById('price');
-    const monthsInput = document.getElementById('months');
-    const monthsLabel = document.getElementById('monthsLabel');
-    const prepaymentBlock = document.getElementById('prepaymentBlock');
-    const prepaymentSlider = document.getElementById('prepaymentSlider');
-    const prepaymentInput = document.getElementById('prepaymentInput');
-    const prepaymentError = document.getElementById('prepaymentError');
-    const resultsDiv = document.getElementById('results');
-    const whatsappBtn = document.getElementById('whatsapp');
-    const errorMessage = document.getElementById('errorMessage');
-    const tariffButtons = document.querySelectorAll('.tariff-button');
-    const monthLabels = document.querySelectorAll('.month-label');
+    let selectedTariff='with';
+    let conditionalPrepayment=0;
 
-    let selectedTariff = 'with';
-    let conditionalPrepayment = 0;
+    const markupWithDown={3:9,4:12,5:15,6:18,7:20,8:22,9:24,10:26,11:28,12:30};
+    const markupWithoutDown={3:13,4:17,5:21,6:25.5,7:28.5,8:32,9:35,10:38,11:41.5,12:45};
+    const markupNoDownPayment={3:14,4:18,5:23,6:28,7:31,8:34,9:37,10:40,11:43,12:46};
 
-    const markupWithDown = {3:9,4:12,5:15,6:18,7:20,8:22,9:24,10:26,11:28,12:30};
-    const markupWithoutDown = {3:13,4:17,5:21,6:25.5,7:28.5,8:32,9:35,10:38,11:41.5,12:45};
-    const markupNoDownPayment = {3:14,4:18,5:23,6:28,7:31,8:34,9:37,10:40,11:43,12:46};
+    const roundUpTo100=val=>Math.ceil(val/100)*100;
 
-    const roundUpTo100 = val => Math.ceil(val / 100) * 100;
-
-    function updateMonthLabels(selectedMonth) {
-      monthLabels.forEach((label, index) => {
-        const monthValue = [3, 6, 9, 12][index];
-        label.classList.toggle('active', monthValue === selectedMonth);
-      });
+    function updateMonthLabels(selected){
+      const points=[3,6,9,12];
+      monthLabels.forEach((label,i)=>label.classList.toggle('active',points[i]===selected|| (selected>points[i-1]&&selected<points[i]&&i>0)));
     }
 
-    function togglePrepaymentSlider() {
-      const isVisible = selectedTariff === 'with';
-      prepaymentBlock.style.display = isVisible ? 'block' : 'none';
-      if (isVisible) {
-        prepaymentBlock.style.animation = 'fadeInUp 0.4s ease-out';
-      }
+    function togglePrepayment(){
+      const show=selectedTariff==='with';
+      prepaymentBlock.style.display=show?'block':'none';
     }
 
-    function updateCalculator(resetPrepayment = false) {
-      const months = parseInt(monthsInput.value);
-      
-      const monthText = months === 1 ? 'месяц' : (months < 5 ? 'месяца' : 'месяцев');
-      monthsLabel.textContent = `Срок: ${months} ${monthText}`;
-      
+    function resetPrepaymentRange(baseFinal){
+      const min=roundUpTo100(baseFinal*0.15);
+      const max=roundUpTo100(baseFinal*0.65);
+      conditionalPrepayment=roundUpTo100(baseFinal*0.25);
+      prepaymentSlider.min=min;prepaymentSlider.max=max;
+    }
+
+    function updateCalculator(resetPrepayment=false){
+      const months=parseInt(monthsInput.value,10);
+      const monthText=months%10===1&&months!==11?'месяц':(months%10>=2&&months%10<=4 && (months<10||months>20)?'месяца':'месяцев');
+      monthsLabel.textContent=`Срок: ${months} ${monthText}`;
       updateMonthLabels(months);
 
-      const price = parseInt(priceInput.value);
-      if (isNaN(price) || price < 50000) {
-        errorMessage.style.display = 'block';
-        prepaymentInput.value = 0;
-        prepaymentError.style.display = 'none';
-        resultsDiv.innerHTML = `
+      const price=parseInt(priceInput.value,10);
+      if(isNaN(price)||price<50000){
+        errorMessage.style.display='block';
+        prepaymentInput.value=0;
+        prepaymentError.style.display='none';
+        resultsDiv.innerHTML=`
           <p><strong>Первый взнос:</strong> <span class="output-value">0 ₽</span></p>
           <p><strong>Ежемесячный платёж:</strong> <span class="output-value">0 ₽</span></p>
           <p><strong>Стоимость с наценкой:</strong> <span class="output-value">0 ₽</span></p>
-          <p><strong>Наценка:</strong> <span class="output-value">0 ₽ (0%)</span></p>
-        `;
-        whatsappBtn.href = "https://wa.me/79280222114?text=Здравствуйте, хочу оформить рассрочку на автомобиль.";
-        togglePrepaymentSlider();
+          <p><strong>Наценка:</strong> <span class="output-value">0 ₽ (0%)</span></p>`;
+        whatsappBtn.href="https://wa.me/79280222114?text="+encodeURIComponent("Здравствуйте! Хочу оформить рассрочку на автомобиль.");
+        togglePrepayment();
         return;
-      } else {
-        errorMessage.style.display = 'none';
+      }else{
+        errorMessage.style.display='none';
       }
 
-      const percent = selectedTariff === 'with' ? markupWithDown[months] : markupNoDownPayment[months];
-      const baseFinalCost = price * (1 + percent / 100);
+      const percent=(selectedTariff==='with')?markupWithDown[months]:markupNoDownPayment[months];
+      const baseFinalCost=price*(1+percent/100);
 
-      let prepayment = 0, monthly = 0, finalCost = 0, message = "";
+      let prepayment=0,monthly=0,finalCost=0;
 
-      if (selectedTariff === 'with') {
-        const minPrepayment = roundUpTo100(baseFinalCost * 0.15);
-        const maxPrepayment = roundUpTo100(baseFinalCost * 0.65);
-        conditionalPrepayment = roundUpTo100(baseFinalCost * 0.25);
+      if(selectedTariff==='with'){
+        resetPrepaymentRange(baseFinalCost);
+        if(resetPrepayment){prepaymentSlider.value=conditionalPrepayment;}
+        // магнит к условному взносу (±500 ₽)
+        const val=parseInt(prepaymentSlider.value,10);
+        prepayment=(Math.abs(val-conditionalPrepayment)<=500)?conditionalPrepayment:val;
+        prepaymentSlider.value=prepayment;
+        prepaymentInput.value=prepayment;
 
-        prepaymentSlider.min = minPrepayment;
-        prepaymentSlider.max = maxPrepayment;
-
-        if (resetPrepayment) {
-          prepaymentSlider.value = conditionalPrepayment;
+        if(prepayment===conditionalPrepayment){
+          const remaining=baseFinalCost-prepayment;
+          monthly=roundUpTo100(remaining/months);
+          finalCost=monthly*months+prepayment;
+        }else{
+          const remaining=price-prepayment;
+          const remainingWithMarkup=remaining*(1+markupWithoutDown[months]/100);
+          monthly=roundUpTo100(remainingWithMarkup/months);
+          finalCost=monthly*months+prepayment;
         }
-
-        prepayment = parseInt(prepaymentSlider.value);
-        prepaymentInput.value = prepayment;
-
-        if (prepayment === conditionalPrepayment) {
-          const remaining = baseFinalCost - prepayment;
-          monthly = roundUpTo100(remaining / months);
-          finalCost = monthly * months + prepayment;
-        } else {
-          const remaining = price - prepayment;
-          const remainingWithMarkup = remaining * (1 + markupWithoutDown[months] / 100);
-          monthly = roundUpTo100(remainingWithMarkup / months);
-          finalCost = monthly * months + prepayment;
-        }
-
-        message = `Здравствуйте, хочу оформить рассрочку на автомобиль. Стоимость: ${price.toLocaleString()} ₽, Тариф: С первым взносом, Первый взнос: ${prepayment.toLocaleString()} ₽, Срок: ${months} мес.`;
-
-      } else {
-        monthly = roundUpTo100(baseFinalCost / months);
-        finalCost = monthly * months;
-        prepaymentInput.value = "0";
-        prepayment = 0;
-        message = `Здравствуйте, хочу оформить рассрочку на автомобиль. Стоимость: ${price.toLocaleString()} ₽, Тариф: Без первого взноса, Срок: ${months} мес.`;
+      }else{
+        monthly=roundUpTo100(baseFinalCost/months);
+        finalCost=monthly*months;
+        prepayment=0;
+        prepaymentInput.value="0";
       }
 
-      const markup = finalCost - price;
-      const markupPercent = Math.round((markup / price) * 100);
+      const markup=finalCost-price;
+      const markupPercent=Math.round((markup/price)*100);
 
-      resultsDiv.innerHTML = `
+      resultsDiv.innerHTML=`
         <p><strong>Первый взнос:</strong> <span class="output-value">${prepayment.toLocaleString()} ₽</span></p>
         <p><strong>Ежемесячный платёж:</strong> <span class="output-value">${monthly.toLocaleString()} ₽</span></p>
         <p><strong>Стоимость с наценкой:</strong> <span class="output-value">${finalCost.toLocaleString()} ₽</span></p>
-        <p><strong>Наценка:</strong> <span class="output-value">${markup.toLocaleString()} ₽ (${markupPercent}%)</span></p>
-      `;
+        <p><strong>Наценка:</strong> <span class="output-value">${markup.toLocaleString()} ₽ (${markupPercent}%)</span></p>`;
 
-      // Trigger animation
-      resultsDiv.style.animation = 'none';
-      setTimeout(() => {
-        resultsDiv.style.animation = 'resultAppear 0.6s ease-out';
-      }, 10);
+      const msg=(selectedTariff==='with')
+        ? `Здравствуйте! Хочу оформить рассрочку. Стоимость: ${price.toLocaleString()} ₽; Тариф: С первым взносом; Первый взнос: ${prepayment.toLocaleString()} ₽; Срок: ${months} мес.`
+        : `Здравствуйте! Хочу оформить рассрочку. Стоимость: ${price.toLocaleString()} ₽; Тариф: Без первого взноса; Срок: ${months} мес.`;
+      whatsappBtn.href=`https://wa.me/79280222114?text=${encodeURIComponent(msg)}`;
 
-      whatsappBtn.href = `https://wa.me/79280222114?text=${encodeURIComponent(message)}`;
-      prepaymentError.style.display = 'none';
-      togglePrepaymentSlider();
+      prepaymentError.style.display='none';
+      togglePrepayment();
     }
 
-    tariffButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        tariffButtons.forEach(btn => {
-          btn.classList.remove('active');
-          btn.style.transform = 'scale(1)';
-        });
+    tariffButtons.forEach(button=>{
+      button.addEventListener('click',()=>{
+        tariffButtons.forEach(b=>b.classList.remove('active'));
         button.classList.add('active');
-        button.style.transform = 'scale(1.02)';
-        selectedTariff = button.dataset.tariff;
+        selectedTariff=button.dataset.tariff;
         updateCalculator(true);
       });
     });
 
-    // Add visual feedback for input interactions
-    priceInput.addEventListener('focus', () => {
-      priceInput.parentElement.style.transform = 'translateY(-2px)';
-    });
+    priceInput.addEventListener('input',()=>updateCalculator(true));
+    monthsInput.addEventListener('input',()=>updateCalculator(true));
+    prepaymentSlider.addEventListener('input',()=>updateCalculator(false));
 
-    priceInput.addEventListener('blur', () => {
-      priceInput.parentElement.style.transform = 'translateY(0)';
-    });
-
-    priceInput.addEventListener('input', () => updateCalculator(true));
-    monthsInput.addEventListener('input', () => updateCalculator(true));
-    prepaymentSlider.addEventListener('input', () => updateCalculator(false));
-
-    prepaymentInput.addEventListener('input', () => {
-      const val = roundUpTo100(parseInt(prepaymentInput.value || '0'));
-      const min = parseInt(prepaymentSlider.min);
-      const max = parseInt(prepaymentSlider.max);
-
-      if (val >= min && val <= max) {
-        prepaymentError.style.display = 'none';
-        prepaymentSlider.value = val;
+    prepaymentInput.addEventListener('input',()=>{
+      const val=roundUpTo100(parseInt(prepaymentInput.value||'0',10));
+      const min=parseInt(prepaymentSlider.min,10);
+      const max=parseInt(prepaymentSlider.max,10);
+      if(isNaN(val)){return;}
+      if(val>=min && val<=max){
+        prepaymentError.style.display='none';
+        prepaymentSlider.value=val;
         updateCalculator(false);
-      } else {
-        prepaymentError.textContent = `Первый взнос должен быть от ${min.toLocaleString()}₽ до ${max.toLocaleString()}₽`;
-        prepaymentError.style.display = 'block';
+      }else{
+        prepaymentError.textContent=`Первый взнос должен быть от ${min.toLocaleString()} ₽ до ${max.toLocaleString()} ₽`;
+        prepaymentError.style.display='block';
       }
     });
 
-    // Add ripple effect to buttons
-    document.querySelectorAll('.calc-btn').forEach(button => {
-      button.addEventListener('click', function(e) {
-        const ripple = document.createElement('div');
-        const rect = this.getBoundingClientRect();
-        const size = Math.max(rect.width, rect.height);
-        const x = e.clientX - rect.left - size / 2;
-        const y = e.clientY - rect.top - size / 2;
-        
-        ripple.style.cssText = `
-          position: absolute;
-          width: ${size}px;
-          height: ${size}px;
-          left: ${x}px;
-          top: ${y}px;
-          background: rgba(255, 255, 255, 0.3);
-          border-radius: 50%;
-          transform: scale(0);
-          animation: ripple 0.6s ease-out;
-          pointer-events: none;
-        `;
-        
-        this.appendChild(ripple);
-        
-        const style = document.createElement('style');
-        style.textContent = `
-          @keyframes ripple {
-            to {
-              transform: scale(4);
-              opacity: 0;
-            }
-          }
-        `;
-        document.head.appendChild(style);
-        
-        setTimeout(() => {
-          ripple.remove();
-          style.remove();
-        }, 600);
-      });
-    });
-
-    // Initialize calculator
+    // Инициализация
     updateCalculator(true);
-
-    // Lazy loading for images
-    const imageObserver = new IntersectionObserver((entries, observer) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const img = entry.target;
-          if (img.dataset.src) {
-            img.src = img.dataset.src;
-            img.classList.add('loaded');
-            img.removeAttribute('data-src');
-          }
-          observer.unobserve(img);
-        }
-      });
-    });
-
-    // Observe all images with data-src attribute
-    document.querySelectorAll('img[data-src]').forEach(img => {
-      imageObserver.observe(img);
-    });
   </script>
 </body>
-</html><!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <!-- TODO: Замени на реальные мета-теги -->
-  <title>Автомобили в рассрочку | AutoCredit - Простое оформление без банков</title>
-  <meta name="description" content="Покупай автомобили в рассрочку без банков и переплат. Простые условия, быстрое одобрение. Калькулятор рассрочки онлайн.">
-  
-  <!-- Open Graph -->
-  <meta property="og:title" content="Автомобили в рассрочку | AutoCredit">
-  <meta property="og:description" content="Покупай автомобили в рассрочку без банков и переплат">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://example.com">
-  <meta property="og:image" content="https://example.com/og-image.jpg">
-  
-  <!-- TODO: Замени на реальный favicon -->
-  <link rel="icon" type="image/x-icon" href="/favicon.ico">
-  
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
-  <!-- Structured Data - TODO: обнови на реальные данные -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "AutoDealer",
-    "name": "AutoCredit",
-    "description": "Автомобили в рассрочку без банков",
-    "url": "https://example.com",
-    "telephone": "+79280222114",
-    "address": {
-      "@type": "PostalAddress",
-      "addressCountry": "RU",
-      "addressLocality": "Москва"
-    }
-  }
-  </script>
-
-  <style>
-    /* CSS Variables - TODO: настрой фирменные цвета */
-    :root {
-      --primary-color: #1a365d;
-      --primary-light: #2d5a87;
-      --secondary-color: #e53e3e;
-      --accent-color: #fd7f28;
-      --text-dark: #1a202c;
-      --text-light: #718096;
-      --bg-light: #f7fafc;
-      --white: #ffffff;
-      --gradient-primary: linear-gradient(135deg, #1a365d 0%, #2d5a87 100%);
-      --gradient-secondary: linear-gradient(135deg, #e53e3e 0%, #fd7f28 100%);
-      --shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.1);
-      --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.15);
-      --border-radius: 12px;
-      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      line-height: 1.6;
-      color: var(--text-dark);
-      background: var(--white);
-    }
-
-    /* Utility Classes */
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 20px;
-    }
-
-    .section {
-      padding: 80px 0;
-    }
-
-    .section-title {
-      font-size: 2.5rem;
-      font-weight: 700;
-      text-align: center;
-      margin-bottom: 1rem;
-      color: var(--text-dark);
-    }
-
-    .section-subtitle {
-      font-size: 1.1rem;
-      text-align: center;
-      color: var(--text-light);
-      margin-bottom: 3rem;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px 32px;
-      font-size: 1rem;
-      font-weight: 600;
-      text-decoration: none;
-      border-radius: var(--border-radius);
-      transition: var(--transition);
-      cursor: pointer;
-      border: none;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .btn-primary {
-      background: var(--gradient-primary);
-      color: var(--white);
-    }
-
-    .btn-secondary {
-      background: var(--gradient-secondary);
-      color: var(--white);
-    }
-
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-medium);
-    }
-
-    /* Header */
-    .header {
-      position: fixed;
-      top: 0;
-      width: 100%;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      z-index: 1000;
-      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-    }
-
-    .header-content {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem 0;
-    }
-
-    .logo {
-      font-size: 1.5rem;
-      font-weight: 800;
-      background: var(--gradient-primary);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-    }
-
-    .header-phone {
-      font-weight: 600;
-      color: var(--text-dark);
-      text-decoration: none;
-    }
-
-    /* Hero Section */
-    .hero {
-      background: var(--gradient-primary);
-      color: var(--white);
-      padding: 120px 0 80px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><path d="M200,300 Q400,100 600,300 T1000,300 L1000,1000 L0,1000 Z" fill="rgba(255,255,255,0.05)"/></svg>') no-repeat center;
-      background-size: cover;
-      opacity: 0.3;
-    }
-
-    .hero-content {
-      position: relative;
-      text-align: center;
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
-    .hero-title {
-      font-size: 3.5rem;
-      font-weight: 800;
-      margin-bottom: 1.5rem;
-      line-height: 1.2;
-    }
-
-    .hero-subtitle {
-      font-size: 1.3rem;
-      margin-bottom: 2rem;
-      opacity: 0.9;
-    }
-
-    .hero-cta {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    /* Benefits Section */
-    .benefits {
-      background: var(--bg-light);
-    }
-
-    .benefits-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 2rem;
-    }
-
-    .benefit-card {
-      background: var(--white);
-      padding: 2rem;
-      border-radius: var(--border-radius);
-      text-align: center;
-      box-shadow: var(--shadow-soft);
-      transition: var(--transition);
-    }
-
-    .benefit-card:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-medium);
-    }
-
-    .benefit-icon {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-    }
-
-    .benefit-title {
-      font-size: 1.2rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      color: var(--text-dark);
-    }
-
-    .benefit-text {
-      color: var(--text-light);
-    }
-
-    /* Cars Showcase */
-    .cars-showcase {
-      padding: 80px 0;
-    }
-
-    .cars-filters {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      margin-bottom: 3rem;
-      flex-wrap: wrap;
-    }
-
-    .filter-btn {
-      padding: 0.5rem 1rem;
-      background: var(--white);
-      border: 2px solid var(--primary-color);
-      color: var(--primary-color);
-      border-radius: 25px;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .filter-btn.active,
-    .filter-btn:hover {
-      background: var(--primary-color);
-      color: var(--white);
-    }
-
-    .cars-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 2rem;
-    }
-
-    .car-card {
-      background: var(--white);
-      border-radius: var(--border-radius);
-      overflow: hidden;
-      box-shadow: var(--shadow-soft);
-      transition: var(--transition);
-    }
-
-    .car-card:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-medium);
-    }
-
-    .car-image {
-      width: 100%;
-      height: 200px;
-      background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 3rem;
-      color: var(--text-light);
-      overflow: hidden;
-      position: relative;
-    }
-
-    .car-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.3s ease;
-    }
-
-    .car-card:hover .car-image img {
-      transform: scale(1.05);
-    }
-
-    /* Lazy loading placeholder */
-    .car-image img[data-src] {
-      filter: blur(5px);
-      transition: filter 0.3s;
-    }
-
-    .car-image img[data-src].loaded {
-      filter: blur(0);
-    }
-
-    .car-image .placeholder {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 3rem;
-      color: var(--text-light);
-      background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
-    }
-
-    .car-info {
-      padding: 1.5rem;
-    }
-
-    .car-title {
-      font-size: 1.3rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-
-    .car-price {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--secondary-color);
-      margin-bottom: 1rem;
-    }
-
-    .car-specs {
-      display: flex;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-      font-size: 0.9rem;
-      color: var(--text-light);
-    }
-
-    /* How It Works */
-    .how-it-works {
-      background: var(--bg-light);
-    }
-
-    .steps-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 2rem;
-    }
-
-    .step {
-      text-align: center;
-      position: relative;
-    }
-
-    .step-number {
-      width: 60px;
-      height: 60px;
-      background: var(--gradient-primary);
-      color: var(--white);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin: 0 auto 1rem;
-    }
-
-    .step-title {
-      font-size: 1.2rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-
-    .step-text {
-      color: var(--text-light);
-    }
-
-    /* Calculator Section */
-    .calculator-section {
-      padding: 80px 0;
-      background: var(--white);
-    }
-
-    /* Calculator Styles - Original from your code but integrated */
-    .calculator {
-      width: 100%;
-      max-width: 500px;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 24px;
-      padding: 32px;
-      position: relative;
-      z-index: 1;
-      box-shadow: 
-        0 20px 40px rgba(0, 0, 0, 0.1),
-        0 0 80px rgba(26, 54, 93, 0.1);
-      animation: slideUp 0.8s ease-out;
-      transform-origin: center bottom;
-      margin: 0 auto;
-    }
-
-    @keyframes slideUp {
-      0% {
-        transform: translateY(60px);
-        opacity: 0;
-      }
-      100% {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-
-    .calculator .calc-header {
-      text-align: center;
-      margin-bottom: 32px;
-    }
-
-    .calculator .calc-header .calc-title {
-      font-size: 28px;
-      font-weight: 800;
-      background: var(--gradient-primary);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 8px;
-      letter-spacing: -0.5px;
-    }
-
-    .calculator .calc-header .calc-subtitle {
-      font-size: 14px;
-      color: #64748B;
-      font-weight: 500;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-    }
-
-    .tariff-buttons {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 32px;
-    }
-
-    .tariff-button {
-      padding: 16px;
-      background: rgba(248, 250, 252, 0.8);
-      border: 2px solid transparent;
-      border-radius: 16px;
-      cursor: pointer;
-      text-align: center;
-      font-weight: 600;
-      font-size: 14px;
-      color: #64748B;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    }
-
-    .tariff-button::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(26, 54, 93, 0.1), transparent);
-      transition: left 0.5s ease;
-    }
-
-    .tariff-button:hover::before {
-      left: 100%;
-    }
-
-    .tariff-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(26, 54, 93, 0.15);
-    }
-
-    .tariff-button.active {
-      background: var(--gradient-primary);
-      color: white;
-      border-color: rgba(255, 255, 255, 0.3);
-      transform: scale(1.02);
-      box-shadow: 0 12px 30px rgba(26, 54, 93, 0.3);
-    }
-
-    .input-group {
-      margin-bottom: 24px;
-      animation: fadeInUp 0.6s ease-out;
-      animation-fill-mode: both;
-    }
-
-    .input-group:nth-child(3) { animation-delay: 0.1s; }
-    .input-group:nth-child(4) { animation-delay: 0.2s; }
-    .input-group:nth-child(5) { animation-delay: 0.3s; }
-
-    @keyframes fadeInUp {
-      0% {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .calculator label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      font-size: 14px;
-      color: #1E293B;
-    }
-
-    .input-wrapper {
-      position: relative;
-    }
-
-    .calculator input[type="number"] {
-      width: 100%;
-      padding: 16px 20px;
-      font-size: 16px;
-      font-weight: 500;
-      border: 2px solid #E2E8F0;
-      border-radius: 12px;
-      background: rgba(248, 250, 252, 0.8);
-      transition: all 0.3s ease;
-      color: #1E293B;
-    }
-
-    .calculator input[type="number"]:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      background: rgba(255, 255, 255, 0.95);
-      box-shadow: 0 0 0 4px rgba(26, 54, 93, 0.1);
-      transform: translateY(-1px);
-    }
-
-    .calculator input[type="number"]::placeholder {
-      color: #94A3B8;
-    }
-
-    .slider-container {
-      margin-top: 12px;
-    }
-
-    .slider {
-      width: 100%;
-      height: 8px;
-      border-radius: 4px;
-      background: #E2E8F0;
-      outline: none;
-      appearance: none;
-      cursor: pointer;
-      position: relative;
-    }
-
-    .slider::-webkit-slider-thumb {
-      appearance: none;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: var(--gradient-primary);
-      cursor: pointer;
-      border: 3px solid white;
-      box-shadow: 0 4px 12px rgba(26, 54, 93, 0.3);
-      transition: all 0.2s ease;
-    }
-
-    .slider::-webkit-slider-thumb:hover {
-      transform: scale(1.1);
-      box-shadow: 0 6px 20px rgba(26, 54, 93, 0.4);
-    }
-
-    .slider::-moz-range-thumb {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: var(--gradient-primary);
-      cursor: pointer;
-      border: 3px solid white;
-      box-shadow: 0 4px 12px rgba(26, 54, 93, 0.3);
-    }
-
-    .months-display {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 8px;
-      font-size: 12px;
-      color: #64748B;
-    }
-
-    .month-label {
-      position: relative;
-    }
-
-    .month-label.active {
-      color: var(--primary-color);
-      font-weight: 600;
-    }
-
-    .prepayment-input-group {
-      margin-top: 8px;
-    }
-
-    .prepayment-input-group input[type="number"] {
-      width: 200px;
-      padding: 12px 16px;
-      font-size: 14px;
-    }
-
-    .error-message {
-      background: linear-gradient(135deg, #FEF7ED, #FED7AA);
-      color: #EA580C;
-      padding: 12px 16px;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 500;
-      margin-top: 8px;
-      border-left: 4px solid #EA580C;
-      display: none;
-      animation: pulseGlow 2s ease-in-out infinite;
-      line-height: 1.4;
-    }
-
-    .helper-text {
-      background: linear-gradient(135deg, #FEF7ED, #FED7AA);
-      color: #EA580C;
-      padding: 12px 16px;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 500;
-      margin: 24px 0;
-      border-left: 4px solid #EA580C;
-      animation: pulseGlow 2s ease-in-out infinite;
-    }
-
-    @keyframes pulseGlow {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(234, 88, 12, 0.1); }
-      50% { box-shadow: 0 0 0 8px rgba(234, 88, 12, 0.05); }
-    }
-
-    .output {
-      background: linear-gradient(135deg, #F0FDF4, #DCFCE7);
-      border: 2px solid #BBF7D0;
-      padding: 24px;
-      border-radius: 16px;
-      margin: 24px 0;
-      animation: resultAppear 0.6s ease-out;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .output::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(26, 54, 93, 0.1), transparent);
-      animation: shimmer 2s ease-in-out infinite;
-    }
-
-    @keyframes shimmer {
-      0% { left: -100%; }
-      100% { left: 100%; }
-    }
-
-    @keyframes resultAppear {
-      0% {
-        opacity: 0;
-        transform: scale(0.95) translateY(10px);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-      }
-    }
-
-    .output p {
-      margin: 12px 0;
-      font-size: 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .output strong {
-      color: #166534;
-      font-weight: 600;
-      flex-shrink: 0;
-      min-width: 0;
-      flex: 1;
-    }
-
-    .output-value {
-      font-weight: 700;
-      font-size: 16px;
-      color: #15803D;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    .calc-buttons {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 32px;
-    }
-
-    .calc-btn {
-      padding: 16px 24px;
-      border-radius: 12px;
-      text-decoration: none;
-      text-align: center;
-      font-weight: 600;
-      font-size: 15px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .calc-btn::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      transition: width 0.6s ease, height 0.6s ease;
-    }
-
-    .calc-btn:hover::before {
-      width: 300px;
-      height: 300px;
-    }
-
-    .calc-btn-whatsapp {
-      background: linear-gradient(135deg, #25D366, #128C7E);
-      color: white;
-    }
-
-    .calc-btn-whatsapp:hover {
-      transform: translateY(-3px) scale(1.02);
-      box-shadow: 0 12px 30px rgba(37, 211, 102, 0.4);
-    }
-
-    .calc-btn-call {
-      background: var(--gradient-primary);
-      color: white;
-    }
-
-    .calc-btn-call:hover {
-      transform: translateY(-3px) scale(1.02);
-      box-shadow: 0 12px 30px rgba(26, 54, 93, 0.4);
-    }
-
-    .calc-btn span {
-      position: relative;
-      z-index: 1;
-    }
-
-    /* FAQ Section */
-    .faq {
-      background: var(--bg-light);
-    }
-
-    .faq-list {
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
-    .faq-item {
-      background: var(--white);
-      border-radius: var(--border-radius);
-      margin-bottom: 1rem;
-      overflow: hidden;
-      box-shadow: var(--shadow-soft);
-    }
-
-    .faq-question {
-      padding: 1.5rem;
-      cursor: pointer;
-      font-weight: 600;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: var(--transition);
-    }
-
-    .faq-question:hover {
-      background: var(--bg-light);
-    }
-
-    .faq-answer {
-      padding: 0 1.5rem 1.5rem;
-      color: var(--text-light);
-      display: none;
-    }
-
-    .faq-answer.active {
-      display: block;
-    }
-
-    /* Trust Section */
-    .trust {
-      padding: 80px 0;
-    }
-
-    .trust-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 3rem;
-    }
-
-    .reviews {
-      text-align: center;
-    }
-
-    .review {
-      background: var(--white);
-      padding: 2rem;
-      border-radius: var(--border-radius);
-      box-shadow: var(--shadow-soft);
-      margin-bottom: 1rem;
-    }
-
-    .review-text {
-      font-style: italic;
-      margin-bottom: 1rem;
-    }
-
-    .review-author {
-      font-weight: 600;
-      color: var(--primary-color);
-    }
-
-    .partners {
-      text-align: center;
-    }
-
-    .partners-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-      gap: 2rem;
-      margin-top: 2rem;
-    }
-
-    .partner-logo {
-      height: 60px;
-      background: var(--bg-light);
-      border-radius: var(--border-radius);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-light);
-      font-weight: 600;
-    }
-
-    /* Contact Section */
-    .contact {
-      background: var(--gradient-primary);
-      color: var(--white);
-    }
-
-    .contact-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 3rem;
-    }
-
-    .contact-info h3 {
-      margin-bottom: 1rem;
-    }
-
-    .contact-item {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
-
-    .contact-form {
-      background: rgba(255, 255, 255, 0.1);
-      padding: 2rem;
-      border-radius: var(--border-radius);
-    }
-
-    .form-group {
-      margin-bottom: 1rem;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-    }
-
-    .form-group input,
-    .form-group textarea {
-      width: 100%;
-      padding: 0.75rem;
-      border: none;
-      border-radius: var(--border-radius);
-      background: rgba(255, 255, 255, 0.9);
-      color: var(--text-dark);
-    }
-
-    /* Footer */
-    .footer {
-      background: var(--text-dark);
-      color: var(--white);
-      text-align: center;
-      padding: 2rem 0;
-    }
-
-    /* Mobile Responsiveness */
-    @media (max-width: 768px) {
-      .section {
-        padding: 60px 0;
-      }
-
-      .section-title {
-        font-size: 2rem;
-      }
-
-      .hero-title {
-        font-size: 2.5rem;
-      }
-
-      .hero-subtitle {
-        font-size: 1.1rem;
-      }
-
-      .hero-cta {
-        flex-direction: column;
-        align-items: center;
-      }
-
-      .header-actions {
-        display: none;
-      }
-
-      .contact-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .calculator {
-        padding: 24px;
-        border-radius: 20px;
-      }
+</html>
