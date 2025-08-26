@@ -1,826 +1,11 @@
-.btn-whatsapp {
-      background: #25d366;
-      color: var(--white);
-    }
-
-    .btn-whatsapp:hover {
-      background: #128c7e;
-      transform: translateY(-1px);
-    }
-
-    /* Requirements */
-    .requirements {
-      background: #fef3c7;
-      border: 2px solid #fbbf24;
-      border-radius: var(--border-radius);
-      padding: 1rem;
-      margin: 1.5rem 0;
-      font-size: 0.875rem;
-    }
-
-    .requirements-title {
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      color: #92400e;
-    }
-
-    .requirements-text {
-      color: #a16207;
-    }
-
-    /* Loading and Error states */
-    .loading, .error {
-      text-align: center;
-      padding: 2rem;
-      color: var(--text-light);
-    }
-
-    .error {
-      background: #fef2f2;
-      border: 2px solid #fca5a5;
-      border-radius: var(--border-radius);
-      color: #dc2626;
-    }
-
-    .error a {
-      color: var(--primary-color);
-      text-decoration: none;
-    }
-
-    .error a:hover {
-      text-decoration: underline;
-    }
-
-    /* Mobile Responsive */
-    @media (max-width: 1024px) {
-      .main-content {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-      }
-
-      .calculator-sidebar {
-        position: static;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .header-content {
-        flex-wrap: wrap;
-        gap: 1rem;
-      }
-
-      .header-contact {
-        display: none;
-      }
-
-      .car-details {
-        padding: 1rem;
-      }
-
-      .car-title {
-        font-size: 1.5rem;
-      }
-
-      .main-image {
-        height: 250px;
-      }
-
-      .specs {
-        grid-template-columns: 1fr 1fr;
-        gap: 0.5rem;
-      }
-
-      .features-list {
-        grid-template-columns: 1fr;
-      }
-
-      .calc-actions {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
-</head>
-<body>
-  <!-- Header -->
-  <header class="header">
-    <div class="container">
-      <div class="header-content">
-        <a href="index.html" class="back-btn">
-          ← Назад к каталогу
-        </a>
-        <a href="index.html" class="logo">AutoCredit</a>
-        <div class="header-contact">
-          <!-- TODO: Замени номер телефона -->
-          <a href="tel:+79280222114" class="phone">+7 (928) 022-21-14</a>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <!-- Main Content -->
-  <div class="container">
-    <div class="main-content">
-      <!-- Car Details -->
-      <div class="car-details">
-        <div id="carContent">
-          <div class="loading">Загружаем информацию об автомобиле...</div>
-        </div>
-      </div>
-
-      <!-- Calculator Sidebar -->
-      <div class="calculator-sidebar">
-        <div class="calculator">
-          <div class="calc-header">
-            <h2 class="calc-title">Калькулятор рассрочки</h2>
-            <p class="calc-subtitle">Рассчитайте удобные условия</p>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="months">Срок рассрочки: <span id="monthsValue">6</span> мес.</label>
-            <div class="slider-container">
-              <input type="range" id="months" class="slider" min="3" max="12" value="6">
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="downPayment">Первый взнос: <span id="downPaymentValue">0</span> ₽</label>
-            <input type="number" id="downPaymentInput" class="input-field" placeholder="Введите сумму" min="0" step="1000">
-            <div class="slider-container" style="margin-top: 0.5rem;">
-              <input type="range" id="downPayment" class="slider" min="0" max="100000" value="0" step="1000">
-            </div>
-          </div>
-
-          <div class="results" id="results">
-            <div class="result-item">
-              <span class="result-label">Первый взнос:</span>
-              <span class="result-value" id="resultDownPayment">0 ₽</span>
-            </div>
-            <div class="result-item">
-              <span class="result-label">Ежемесячный платёж:</span>
-              <span class="result-value" id="resultMonthly">0 ₽</span>
-            </div>
-            <div class="result-item">
-              <span class="result-label">Общая сумма:</span>
-              <span class="result-value" id="resultTotal">0 ₽</span>
-            </div>
-            <div class="result-item">
-              <span class="result-label">Переплата:</span>
-              <span class="result-value" id="resultOverpay">0 ₽</span>
-            </div>
-          </div>
-
-          <div class="requirements">
-            <div class="requirements-title">💡 Требования:</div>
-            <div class="requirements-text">
-              Поручитель и паспорта обеих лиц
-            </div>
-          </div>
-
-          <div class="calc-actions">
-            <a href="#" id="whatsappBtn" class="btn btn-whatsapp">WhatsApp</a>
-            <a href="tel:+79280222114" class="btn btn-primary">Позвонить</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Подключаем базу данных автомобилей -->
-  <script src="data/cars.js"></script>
-
-  <script>
-    // Переменные для калькулятора
-    let currentCar = null;
-    let currentMonths = 6;
-    let currentDownPayment = 0;
-
-    // Логика расчета рассрочки (оригинальная логика)
-    const markupWithDown = {3:9,4:12,5:15,6:18,7:20,8:22,9:24,10:26,11:28,12:30};
-    const markupNoDownPayment = {3:14,4:18,5:23,6:28,7:31,8:34,9:37,10:40,11:43,12:46};
-
-    const roundUpTo100 = val => Math.ceil(val / 100) * 100;
-
-    // Функция расчета рассрочки
-    function calculateInstallment() {
-      if (!currentCar) return;
-
-      const costPrice = currentCar.costPrice;
-      const months = currentMonths;
-      const downPayment = currentDownPayment;
-
-      let percent, monthly, total, overpay;
-
-      if (downPayment > 0) {
-        // С первым взносом
-        percent = markupWithDown[months];
-        const baseFinalCost = costPrice * (1 + percent / 100);
-        const remaining = baseFinalCost - downPayment;
-        monthly = roundUpTo100(remaining / months);
-        total = monthly * months + downPayment;
-      } else {
-        // Без первого взноса
-        percent = markupNoDownPayment[months];
-        const finalCostWithoutDown = costPrice * (1 + percent / 100);
-        monthly = roundUpTo100(finalCostWithoutDown / months);
-        total = monthly * months;
-      }
-
-      overpay = total - costPrice;
-
-      // Обновляем результаты
-      document.getElementById('resultDownPayment').textContent = downPayment.toLocaleString() + ' ₽';
-      document.getElementById('resultMonthly').textContent = monthly.toLocaleString() + ' ₽';
-      document.getElementById('resultTotal').textContent = total.toLocaleString() + ' ₽';
-      document.getElementById('resultOverpay').textContent = overpay.toLocaleString() + ' ₽';
-
-      // Обновляем WhatsApp ссылку
-      const message = `Здравствуйте! Хочу оформить рассрочку на ${currentCar.brand} ${currentCar.model}. Срок: ${months} мес., первый взнос: ${downPayment.toLocaleString()} ₽, ежемесячный платёж: ${monthly.toLocaleString()} ₽`;
-      document.getElementById('whatsappBtn').href = `https://wa.me/79280222114?text=${encodeURIComponent(message)}`;
-    }
-
-    // Функция создания контента автомобиля
-    function createCarContent(car) {
-      return `
-        <div class="car-header">
-          <h1 class="car-title">${car.brand} ${car.model}</h1>
-          <p class="car-subtitle">${car.description}</p>
-        </div>
-
-        <div class="gallery">
-          <div class="main-image" id="mainImage">
-            <img src="${car.mainImage}" alt="${car.brand} ${car.model}" 
-                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-            <div class="placeholder" style="display: none;">🚗</div>
-          </div>
-          <div class="thumbnails">
-            ${car.images.map((img, index) => `
-              <div class="thumbnail ${index === 0 ? 'active' : ''}" onclick="changeMainImage('${img}', this)">
-                <img src="${img}" alt="${car.brand} ${car.model}" 
-                     onerror="this.parentElement.style.display='none';">
-              </div>
-            `).join('')}
-          </div>
-        </div>
-
-        <div class="specs">
-          <div class="spec-card">
-            <div class="spec-icon">📅</div>
-            <div class="spec-label">Год выпуска</div>
-            <div class="spec-value">${car.year}</div>
-          </div>
-          <div class="spec-card">
-            <div class="spec-icon">🛣️</div>
-            <div class="spec-label">Пробег</div>
-            <div class="spec-value">${car.mileage.toLocaleString()} км</div>
-          </div>
-          <div class="spec-card">
-            <div class="spec-icon">⚙️</div>
-            <div class="spec-label">Коробка передач</div>
-            <div class="spec-value">${car.transmission}</div>
-          </div>
-          <div class="spec-card">
-            <div class="spec-icon">⛽</div>
-            <div class="spec-label">Топливо</div>
-            <div class="spec-value">${car.fuelType}</div>
-          </div>
-        </div>
-
-        <div class="features">
-          <h3>Комплектация и особенности</h3>
-          <div class="features-list">
-            ${car.features.map(feature => `
-              <div class="feature-item">
-                <span class="feature-icon">✓</span>
-                <span>${feature}</span>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      `;
-    }
-
-    // Функция смены главного изображения
-    function changeMainImage(newImage, thumbnail) {
-      const mainImage = document.querySelector('#mainImage img');
-      if (mainImage) {
-        mainImage.src = newImage;
-      }
-      
-      // Обновляем активную миниатюру
-      document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
-      thumbnail.classList.add('active');
-    }
-
-    // Функция загрузки автомобиля
-    function loadCar() {
-      const carId = localStorage.getItem('selectedCarId');
-      
-      if (!carId) {
-        document.getElementById('carContent').innerHTML = `
-          <div class="error">
-            Автомобиль не найден. <a href="index.html">Вернуться к каталогу</a>
-          </div>
-        `;
-        return;
-      }
-
-      // Проверяем, загружена ли база данных
-      if (!window.carsDatabase) {
-        document.getElementById('carContent').innerHTML = `
-          <div class="error">
-            База данных не загружена. <a href="index.html">Вернуться к каталогу</a>
-          </div>
-        `;
-        return;
-      }
-
-      currentCar = window.carsDatabase.find(car => car.id == carId);
-      
-      if (!currentCar) {
-        document.getElementById('carContent').innerHTML = `
-          <div class="error">
-            Автомобиль не найден. <a href="index.html">Вернуться к каталогу</a>
-          </div>
-        `;
-        return;
-      }
-
-      // Отображаем контент автомобиля
-      document.getElementById('carContent').innerHTML = createCarContent(currentCar);
-      
-      // Обновляем заголовок страницы
-      document.title = `${currentCar.brand} ${currentCar.model} в рассрочку | AutoCredit`;
-      
-      // Настраиваем максимальное значение для первого взноса (50% от себестоимости)
-      const maxDownPayment = Math.floor(currentCar.costPrice * 0.5);
-      document.getElementById('downPayment').max = maxDownPayment;
-      document.getElementById('downPaymentInput').max = maxDownPayment;
-      
-      // Рассчитываем начальные значения
-      calculateInstallment();
-    }
-
-    // Обработчики событий
-    document.addEventListener('DOMContentLoaded', function() {
-      loadCar();
-
-      // Обработчик изменения срока рассрочки
-      const monthsSlider = document.getElementById('months');
-      const monthsValue = document.getElementById('monthsValue');
-      
-      monthsSlider.addEventListener('input', function() {
-        currentMonths = parseInt(this.value);
-        monthsValue.textContent = currentMonths;
-        calculateInstallment();
-      });
-
-      // Обработчик изменения первого взноса (слайдер)
-      const downPaymentSlider = document.getElementById('downPayment');
-      const downPaymentValue = document.getElementById('downPaymentValue');
-      const downPaymentInput = document.getElementById('downPaymentInput');
-      
-      downPaymentSlider.addEventListener('input', function() {
-        currentDownPayment = parseInt(this.value);
-        downPaymentValue.textContent = currentDownPayment.toLocaleString();
-        downPaymentInput.value = currentDownPayment;
-        calculateInstallment();
-      });
-
-      // Обработчик изменения первого взноса (поле ввода)
-      downPaymentInput.addEventListener('input', function() {
-        let value = parseInt(this.value) || 0;
-        const maxValue = parseInt(downPaymentSlider.max);
-        
-        if (value > maxValue) {
-          value = maxValue;
-          this.value = value;
-        }
-        
-        currentDownPayment = value;
-        downPaymentValue.textContent = value.toLocaleString();
-        downPaymentSlider.value = value;
-        calculateInstallment();
-      });
-    });
-
-    // Добавляем глобальную функцию для смены изображения
-    window.changeMainImage = changeMainImage;
-  </script>
-</body>
-</html>
-
-=== 📄 data/cars.js ===
-// База данных автомобилей для AutoCredit
-// 
-// ИНСТРУКЦИЯ ПО ДОБАВЛЕНИЮ АВТОМОБИЛЕЙ:
-// 1. Добавьте фотографии в папку images/cars/
-// 2. Добавьте новый объект в массив carsDatabase
-// 3. Укажите costPrice - себестоимость для расчета рассрочки (цена клиенту НЕ показывается)
-// 4. Обновите пути к изображениям
-
-const carsDatabase = [
-  {
-    id: 1,
-    brand: "Hyundai",
-    model: "Solaris",
-    year: 2023,
-    mileage: 15000,
-    transmission: "АКПП",
-    fuelType: "Бензин",
-    category: "sedan", // sedan, suv, hatchback, wagon
-    costPrice: 750000, // 👈 СЕБЕСТОИМОСТЬ - не показывается клиенту!
-    images: [
-      "images/cars/hyundai-solaris-1.jpg",
-      "images/cars/hyundai-solaris-2.jpg",
-      "images/cars/hyundai-solaris-3.jpg"
-    ],
-    mainImage: "images/cars/hyundai-solaris-1.jpg",
-    description: "Надежный и экономичный седан для города и трассы",
-    features: [
-      "Климат-контроль",
-      "Мультимедиа система", 
-      "Камера заднего вида",
-      "Подогрев сидений",
-      "Bluetooth",
-      "USB разъемы"
-    ]
-  },
-  {
-    id: 2,
-    brand: "Kia",
-    model: "Sportage",
-    year: 2022,
-    mileage: 28000,
-    transmission: "АКПП",
-    fuelType: "Бензин",
-    category: "suv",
-    costPrice: 1450000,
-    images: [
-      "images/cars/kia-sportage-1.jpg",
-      "images/cars/kia-sportage-2.jpg", 
-      "images/cars/kia-sportage-3.jpg"
-    ],
-    mainImage: "images/cars/kia-sportage-1.jpg",
-    description: "Стильный кроссовер с отличной проходимостью",
-    features: [
-      "Полный привод",
-      "Панорамная крыша",
-      "Система безопасности",
-      "Кожаный салон",
-      "Навигация",
-      "Камера 360°"
-    ]
-  },
-  {
-    id: 3,
-    brand: "Volkswagen", 
-    model: "Polo",
-    year: 2023,
-    mileage: 8000,
-    transmission: "МКПП",
-    fuelType: "Бензин",
-    category: "hatchback",
-    costPrice: 850000,
-    images: [
-      "images/cars/vw-polo-1.jpg",
-      "images/cars/vw-polo-2.jpg"
-    ],
-    mainImage: "images/cars/vw-polo-1.jpg",
-    description: "Компактный и маневренный хэтчбек для города",
-    features: [
-      "Экономичный расход",
-      "Просторный салон",
-      "Система ESP",
-      "Кондиционер",
-      "Центральный замок",
-      "Электростеклоподъемники"
-    ]
-  },
-  {
-    id: 4,
-    brand: "Toyota",
-    model: "Camry", 
-    year: 2022,
-    mileage: 22000,
-    transmission: "АКПП",
-    fuelType: "Бензин",
-    category: "sedan",
-    costPrice: 1950000,
-    images: [
-      "images/cars/toyota-camry-1.jpg",
-      "images/cars/toyota-camry-2.jpg",
-      "images/cars/toyota-camry-3.jpg"
-    ],
-    mainImage: "images/cars/toyota-camry-1.jpg",
-    description: "Премиальный седан бизнес-класса с японским качеством",
-    features: [
-      "Кожаный салон",
-      "Навигация",
-      "Система помощи водителю",
-      "Беспроводная зарядка",
-      "Климат-контроль",
-      "Premium аудио"
-    ]
-  },
-  {
-    id: 5,
-    brand: "Mazda",
-    model: "CX-5",
-    year: 2023,
-    mileage: 12000,
-    transmission: "АКПП", 
-    fuelType: "Бензин",
-    category: "suv",
-    costPrice: 1650000,
-    images: [
-      "images/cars/mazda-cx5-1.jpg",
-      "images/cars/mazda-cx5-2.jpg"
-    ],
-    mainImage: "images/cars/mazda-cx5-1.jpg",
-    description: "Динамичный кроссовер с японским качеством и стилем",
-    features: [
-      "Полный привод",
-      "Спортивная подвеска", 
-      "Premium аудио",
-      "Адаптивный круиз-контроль",
-      "Система контроля слепых зон",
-      "LED фары"
-    ]
-  },
-  {
-    id: 6,
-    brand: "Skoda",
-    model: "Octavia",
-    year: 2023,
-    mileage: 5000,
-    transmission: "АКПП",
-    fuelType: "Бензин", 
-    category: "wagon",
-    costPrice: 1100000,
-    images: [
-      "images/cars/skoda-octavia-1.jpg",
-      "images/cars/skoda-octavia-2.jpg"
-    ],
-    mainImage: "images/cars/skoda-octavia-1.jpg",
-    description: "Практичный универсал для семьи с большим багажником",
-    features: [
-      "Большой багажник",
-      "Экономичность",
-      "Надежность",
-      "Комфортная подвеска",
-      "Просторный салон",
-      "Множество карманов"
-    ]
-  }
-
-  // 🔧 ПРИМЕР ДОБАВЛЕНИЯ НОВОГО АВТОМОБИЛЯ:
-  /*
-  {
-    id: 7, // следующий уникальный ID
-    brand: "BMW",
-    model: "X3",
-    year: 2023,
-    mileage: 3000,
-    transmission: "АКПП",
-    fuelType: "Бензин",
-    category: "suv", // sedan, suv, hatchback, wagon
-    costPrice: 2800000, // 👈 СЕБЕСТОИМОСТЬ для расчета рассрочки
-    images: [
-      "images/cars/bmw-x3-1.jpg",
-      "images/cars/bmw-x3-2.jpg",
-      "images/cars/bmw-x3-3.jpg"
-    ],
-    mainImage: "images/cars/bmw-x3-1.jpg", 
-    description: "Премиальный немецкий кроссовер с роскошным салоном",
-    features: [
-      "Кожаный салон",
-      "Панорамная крыша",
-      "Система безопасности",
-      "Полный привод xDrive",
-      "Навигация Professional", 
-      "Парковочный ассистент",
-      "Подогрев сидений",
-      "Harman Kardon аудио"
-    ]
-  }
-  */
-];
-
-// Экспортируем базу данных для использования на сайте
-if (typeof window !== 'undefined') {
-  window.carsDatabase = carsDatabase;
-}
-
-// Для Node.js (если потребуется)
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = carsDatabase;
-}
-
-=== 📄 README.md ===
-# 🚗 AutoCredit - Автомобили в рассрочку
-
-Современный сайт автосалона с каталогом автомобилей и калькулятором рассрочки.
-
-## 🌐 Демо
-
-**GitHub Pages:** `https://ваш-username.github.io/auto-credit`
-
-## 📋 Описание
-
-Сайт позволяет:
-- Просматривать каталог автомобилей без указания цен
-- Рассчитывать рассрочку для выбранного автомобиля
-- Связываться с продавцами через WhatsApp или телефон
-
-## 🚀 Быстрый запуск
-
-### Вариант 1: GitHub Pages (рекомендуется)
-1. Форкните или скачайте репозиторий
-2. Загрузите в свой GitHub репозиторий
-3. Включите GitHub Pages в настройках
-4. Сайт будет доступен по адресу: `https://username.github.io/repository-name`
-
-### Вариант 2: Локально
-1. Скачайте ZIP архив
-2. Разархивируйте в папку
-3. Откройте `index.html` в браузере
-
-## 📁 Структура проекта
-
-```
-auto-credit/
-├── index.html          # Главная страница (каталог)
-├── car.html           # Страница автомобиля с калькулятором  
-├── README.md          # Документация
-├── package.json       # Информация о проекте
-├── data/
-│   └── cars.js        # База данных автомобилей
-└── images/
-    └── cars/          # Папка для фотографий автомобилей
-```
-
-## 🛠️ Настройка
-
-### 📞 Изменение контактов
-
-В файлах `index.html` и `car.html` найдите и замените:
-
-```html
-<!-- Телефон -->
-+79280222114
-
-<!-- WhatsApp -->
-https://wa.me/79280222114
-
-<!-- Адрес -->
-г. Москва, ул. Примерная, 1
-```
-
-### 🚗 Добавление автомобилей
-
-Отредактируйте файл `data/cars.js`:
-
-```javascript
-{
-  id: 7,                    // Уникальный ID
-  brand: "BMW",            // Марка
-  model: "X3",             // Модель
-  year: 2023,              // Год
-  mileage: 5000,           // Пробег
-  transmission: "АКПП",    // КПП
-  fuelType: "Бензин",      // Топливо
-  category: "suv",         // Категория: sedan, suv, hatchback, wagon
-  costPrice: 2500000,      // 👈 СЕБЕСТОИМОСТЬ (не показывается клиенту!)
-  images: [                // Массив фотографий
-    "images/cars/bmw-x3-1.jpg",
-    "images/cars/bmw-x3-2.jpg"
-  ],
-  mainImage: "images/cars/bmw-x3-1.jpg", // Главное фото
-  description: "Описание автомобиля",     // Описание
-  features: [              // Особенности
-    "Кожаный салон",
-    "Панорамная крыша"
-  ]
-}
-```
-
-### 📷 Добавление фотографий
-
-1. Добавьте фотографии в папку `images/cars/`
-2. Обновите пути в `data/cars.js`
-3. **Рекомендуемый размер:** 800x600px, формат JPG
-
-### 🎨 Кастомизация
-
-Измените цвета в CSS (в начале файлов):
-
-```css
-:root {
-  --primary-color: #2563eb;     /* Основной цвет */
-  --secondary-color: #f59e0b;   /* Вторичный цвет */
-  --text-dark: #1f2937;         /* Темный текст */
-}
-```
-
-## 💰 Логика расчета рассрочки
-
-- **С первым взносом:** наценка 9-30% (в зависимости от срока)
-- **Без первого взноса:** наценка 14-46%
-- **Срок:** от 3 до 12 месяцев
-- **Округление:** до сотен рублей
-- **Максимальный первый взнос:** 50% от себестоимости
-
-## 📱 Особенности
-
-- ✅ **Полностью адаптивный дизайн** (mobile-first)
-- ✅ **Современный минимализм**
-- ✅ **Без указания цен** автомобилей
-- ✅ **Калькулятор работает** без перезагрузки
-- ✅ **Интеграция с WhatsApp**
-- ✅ **SEO-оптимизация**
-- ✅ **Быстрая загрузка**
-
-## 🔧 Технические детали
-
-- **HTML5** - семантическая разметка
-- **CSS3** - современные стили, Grid, Flexbox
-- **Vanilla JavaScript** - без зависимостей
-- **Адаптивность** - Mobile-first подход
-- **Производительность** - lazy loading изображений
-
-## 📞 Поддержка
-
-Если нужна помощь:
-1. Проверьте консоль браузера (F12)
-2. Создайте Issue в GitHub репозитории
-3. Приложите скриншоты ошибок
-
-## 📄 Лицензия
-
-MIT License - используйте свободно для коммерческих проектов.
-
----
-
-**AutoCredit** - продажа автомобилей в рассрочку без банков 🚗
-
-=== 📄 package.json ===
-{
-  "name": "auto-credit",
-  "version": "1.0.0",
-  "description": "Сайт автосалона с каталогом автомобилей и калькулятором рассрочки",
-  "main": "index.html",
-  "scripts": {
-    "start": "live-server --port=3000",
-    "build": "echo 'Статический сайт готов к деплою'",
-    "test": "echo 'Откройте index.html в браузере для тестирования'"
-  📁 auto-credit-project/
-├── 📄 index.html
-├── 📄 car.html
-├── 📄 README.md
-├── 📄 package.json
-├── 📄 .gitignore
-├── 📁 data/
-│   └── 📄 cars.js
-└── 📁 images/
-    ├── 📄 .gitkeep
-    └── 📁 cars/
-        └── 📄 .gitkeep
-
-=== 📄 index.html ===
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Автомобили в рассрочку | AutoCredit</title>
-  <meta name="description" content="Купите автомобиль в рассрочку без банков. Большой выбор проверенных автомобилей с гарантией. Простое оформление за 30 минут.">
-  <meta name="keywords" content="автомобили в рассрочку, авто без банков, рассрочка на машину, купить авто">
-  
-  <!-- Open Graph -->
-  <meta property="og:title" content="Автомобили в рассрочку | AutoCredit">
-  <meta property="og:description" content="Купите автомобиль в рассрочку без банков и переплат">
-  <meta property="og:type" content="website">
-  <meta property="og:image" content="images/og-image.jpg">
-  
-  <!-- Favicon -->
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-  
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Amana Finance — Калькулятор рассрочки</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --primary-color: #2563eb;
-      --primary-dark: #1d4ed8;
-      --secondary-color: #f59e0b;
-      --text-dark: #1f2937;
-      --text-light: #6b7280;
-      --bg-light: #f9fafb;
-      --white: #ffffff;
-      --border: #e5e7eb;
-      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-      --border-radius: 12px;
-      --transition: all 0.3s ease;
-    }
-
     * {
       margin: 0;
       padding: 0;
@@ -828,930 +13,875 @@ MIT License - используйте свободно для коммерчес�
     }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      line-height: 1.6;
-      color: var(--text-dark);
-      background: var(--bg-light);
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 1rem;
-    }
-
-    /* Header */
-    .header {
-      background: var(--white);
-      box-shadow: var(--shadow);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .header-content {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem 0;
-    }
-
-    .logo {
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: var(--primary-color);
-    }
-
-    .header-contact {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .phone {
-      color: var(--text-dark);
-      text-decoration: none;
-      font-weight: 600;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.75rem 1.5rem;
-      font-weight: 600;
-      text-decoration: none;
-      border-radius: var(--border-radius);
-      transition: var(--transition);
-      border: none;
-      cursor: pointer;
-      font-size: 0.875rem;
-    }
-
-    .btn-primary {
-      background: var(--primary-color);
-      color: var(--white);
-    }
-
-    .btn-primary:hover {
-      background: var(--primary-dark);
-      transform: translateY(-1px);
-    }
-
-    .btn-secondary {
-      background: var(--secondary-color);
-      color: var(--white);
-    }
-
-    /* Hero Section */
-    .hero {
-      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-      color: var(--white);
-      padding: 4rem 0;
-      text-align: center;
-    }
-
-    .hero h1 {
-      font-size: 2.5rem;
-      font-weight: 800;
-      margin-bottom: 1rem;
-    }
-
-    .hero p {
-      font-size: 1.2rem;
-      opacity: 0.9;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    /* Filters */
-    .filters {
-      background: var(--white);
-      padding: 2rem 0;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .filter-group {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .filter-label {
-      font-weight: 600;
-      color: var(--text-dark);
-    }
-
-    .filter-btn {
-      padding: 0.5rem 1rem;
-      background: var(--bg-light);
-      border: 2px solid var(--border);
-      border-radius: 25px;
-      color: var(--text-light);
-      font-size: 0.875rem;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .filter-btn.active,
-    .filter-btn:hover {
-      background: var(--primary-color);
-      color: var(--white);
-      border-color: var(--primary-color);
-    }
-
-    /* Catalog */
-    .catalog {
-      padding: 3rem 0;
-    }
-
-    .catalog-header {
-      text-align: center;
-      margin-bottom: 3rem;
-    }
-
-    .catalog-header h2 {
-      font-size: 2rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-    }
-
-    .catalog-header p {
-      color: var(--text-light);
-      font-size: 1.1rem;
-    }
-
-    .cars-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 2rem;
-    }
-
-    .car-card {
-      background: var(--white);
-      border-radius: var(--border-radius);
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      transition: var(--transition);
-      cursor: pointer;
-    }
-
-    .car-card:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .car-image {
-      width: 100%;
-      height: 240px;
-      background: linear-gradient(45deg, #f3f4f6, #e5e7eb);
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
+      padding: 20px;
       position: relative;
+      overflow-x: hidden;
     }
 
-    .car-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: var(--transition);
-    }
-
-    .car-card:hover .car-image img {
-      transform: scale(1.05);
-    }
-
-    .car-image .placeholder {
-      font-size: 4rem;
-      color: var(--text-light);
-    }
-
-    .car-info {
-      padding: 1.5rem;
-    }
-
-    .car-title {
-      font-size: 1.25rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-      color: var(--text-dark);
-    }
-
-    .car-specs {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .spec-item {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.875rem;
-      color: var(--text-light);
-    }
-
-    .car-actions {
-      display: flex;
-      gap: 0.75rem;
-    }
-
-    .btn-calculate {
-      flex: 1;
-      background: var(--primary-color);
-      color: var(--white);
-      padding: 0.75rem;
-      border: none;
-      border-radius: var(--border-radius);
-      font-weight: 600;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .btn-calculate:hover {
-      background: var(--primary-dark);
-    }
-
-    /* Footer */
-    .footer {
-      background: var(--text-dark);
-      color: var(--white);
-      padding: 3rem 0 2rem;
-      margin-top: 4rem;
-    }
-
-    .footer-content {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 2rem;
-    }
-
-    .footer-section h3 {
-      margin-bottom: 1rem;
-      font-size: 1.1rem;
-    }
-
-    .footer-section p,
-    .footer-section a {
-      color: #9ca3af;
-      text-decoration: none;
-      margin-bottom: 0.5rem;
-      display: block;
-    }
-
-    .footer-section a:hover {
-      color: var(--white);
-    }
-
-    .footer-bottom {
-      border-top: 1px solid #374151;
-      margin-top: 2rem;
-      padding-top: 2rem;
-      text-align: center;
-      color: #9ca3af;
-    }
-
-    /* Loading animation */
-    .loading {
-      display: none;
-      text-align: center;
-      padding: 2rem;
-    }
-
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 4px solid var(--border);
-      border-top: 4px solid var(--primary-color);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 1rem;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* Mobile Responsive */
-    @media (max-width: 768px) {
-      .header-contact {
-        display: none;
-      }
-
-      .hero h1 {
-        font-size: 2rem;
-      }
-
-      .hero p {
-        font-size: 1rem;
-      }
-
-      .cars-grid {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-      }
-
-      .car-specs {
-        grid-template-columns: 1fr;
-      }
-
-      .footer-content {
-        grid-template-columns: 1fr;
-        text-align: center;
-      }
-    }
-  </style>
-</head>
-<body>
-  <!-- Header -->
-  <header class="header">
-    <div class="container">
-      <div class="header-content">
-        <div class="logo">AutoCredit</div>
-        <div class="header-contact">
-          <!-- TODO: Замени номер телефона -->
-          <a href="tel:+79280222114" class="phone">+7 (928) 022-21-14</a>
-          <a href="https://wa.me/79280222114" class="btn btn-secondary">WhatsApp</a>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="container">
-      <h1>Автомобили в рассрочку</h1>
-      <p>Купите автомобиль мечты уже сегодня. Простое оформление, гибкие условия, без банков и лишних документов.</p>
-    </div>
-  </section>
-
-  <!-- Filters -->
-  <section class="filters">
-    <div class="container">
-      <div class="filter-group">
-        <span class="filter-label">Категория:</span>
-        <button class="filter-btn active" data-filter="all">Все</button>
-        <button class="filter-btn" data-filter="sedan">Седаны</button>
-        <button class="filter-btn" data-filter="suv">Кроссоверы</button>
-        <button class="filter-btn" data-filter="hatchback">Хэтчбеки</button>
-        <button class="filter-btn" data-filter="wagon">Универсалы</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Catalog -->
-  <section class="catalog">
-    <div class="container">
-      <div class="catalog-header">
-        <h2>Автомобили в наличии</h2>
-        <p>Все автомобили проверены и готовы к продаже</p>
-      </div>
-
-      <div class="loading" id="loading">
-        <div class="spinner"></div>
-        <p>Загружаем автомобили...</p>
-      </div>
-
-      <div class="cars-grid" id="carsGrid">
-        <!-- Карточки автомобилей будут добавлены через JavaScript -->
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-content">
-        <div class="footer-section">
-          <h3>Контакты</h3>
-          <!-- TODO: Обнови контакты -->
-          <a href="tel:+79280222114">+7 (928) 022-21-14</a>
-          <a href="https://wa.me/79280222114">WhatsApp</a>
-          <p>г. Москва, ул. Примерная, 1</p>
-        </div>
-        <div class="footer-section">
-          <h3>Режим работы</h3>
-          <p>Пн-Пт: 9:00-20:00</p>
-          <p>Сб-Вс: 10:00-18:00</p>
-        </div>
-        <div class="footer-section">
-          <h3>Услуги</h3>
-          <a href="#">Рассрочка без банков</a>
-          <a href="#">Помощь в выборе</a>
-          <a href="#">Гарантия на автомобили</a>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <p>&copy; 2024 AutoCredit. Все права защищены.</p>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Подключаем базу данных автомобилей -->
-  <script src="data/cars.js"></script>
-
-  <script>
-    // Функция создания карточки автомобиля
-    function createCarCard(car) {
-      return `
-        <div class="car-card" data-category="${car.category}" onclick="openCarPage(${car.id})">
-          <div class="car-image">
-            <img src="${car.mainImage}" alt="${car.brand} ${car.model}" 
-                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                 loading="lazy">
-            <div class="placeholder" style="display: none;">🚗</div>
-          </div>
-          <div class="car-info">
-            <h3 class="car-title">${car.brand} ${car.model}</h3>
-            <div class="car-specs">
-              <div class="spec-item">
-                <span>📅</span>
-                <span>${car.year} год</span>
-              </div>
-              <div class="spec-item">
-                <span>🛣️</span>
-                <span>${car.mileage.toLocaleString()} км</span>
-              </div>
-              <div class="spec-item">
-                <span>⚙️</span>
-                <span>${car.transmission}</span>
-              </div>
-              <div class="spec-item">
-                <span>⛽</span>
-                <span>${car.fuelType}</span>
-              </div>
-            </div>
-            <div class="car-actions">
-              <button class="btn-calculate" onclick="event.stopPropagation(); openCarPage(${car.id})">
-                Рассчитать рассрочку
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    // Функция отображения автомобилей
-    function displayCars(cars = window.carsDatabase || []) {
-      const grid = document.getElementById('carsGrid');
-      const loading = document.getElementById('loading');
-      
-      loading.style.display = 'block';
-      grid.innerHTML = '';
-      
-      setTimeout(() => {
-        if (cars.length === 0) {
-          grid.innerHTML = '<p style="text-align: center; color: var(--text-light); grid-column: 1/-1;">Автомобили не найдены</p>';
-        } else {
-          grid.innerHTML = cars.map(car => createCarCard(car)).join('');
-        }
-        loading.style.display = 'none';
-      }, 500);
-    }
-
-    // Функция фильтрации
-    function filterCars(category) {
-      const allCars = window.carsDatabase || [];
-      const filteredCars = category === 'all' ? 
-        allCars : 
-        allCars.filter(car => car.category === category);
-      
-      displayCars(filteredCars);
-    }
-
-    // Функция открытия страницы автомобиля
-    function openCarPage(carId) {
-      localStorage.setItem('selectedCarId', carId);
-      window.location.href = 'car.html';
-    }
-
-    // Инициализация при загрузке страницы
-    document.addEventListener('DOMContentLoaded', function() {
-      if (!window.carsDatabase) {
-        console.error('База данных автомобилей не загружена');
-        document.getElementById('carsGrid').innerHTML = 
-          '<p style="text-align: center; color: red; grid-column: 1/-1;">Ошибка загрузки автомобилей</p>';
-        return;
-      }
-
-      displayCars();
-
-      const filterButtons = document.querySelectorAll('.filter-btn');
-      filterButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-          filterButtons.forEach(b => b.classList.remove('active'));
-          this.classList.add('active');
-          filterCars(this.dataset.filter);
-        });
-      });
-    });
-  </script>
-</body>
-</html>
-
-=== 📄 car.html ===
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Автомобиль в рассрочку | Калькулятор | AutoCredit</title>
-  <meta name="description" content="Рассчитайте рассрочку на выбранный автомобиль. Гибкие условия, без банков. Срок от 3 до 12 месяцев.">
-  
-  <style>
-    :root {
-      --primary-color: #2563eb;
-      --primary-dark: #1d4ed8;
-      --secondary-color: #f59e0b;
-      --success-color: #10b981;
-      --text-dark: #1f2937;
-      --text-light: #6b7280;
-      --bg-light: #f9fafb;
-      --white: #ffffff;
-      --border: #e5e7eb;
-      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-      --border-radius: 12px;
-      --transition: all 0.3s ease;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      line-height: 1.6;
-      color: var(--text-dark);
-      background: var(--bg-light);
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 1rem;
-    }
-
-    /* Header */
-    .header {
-      background: var(--white);
-      box-shadow: var(--shadow);
-      position: sticky;
+    body::before {
+      content: '';
+      position: absolute;
       top: 0;
-      z-index: 100;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(120, 255, 214, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 120, 198, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(149, 193, 31, 0.1) 0%, transparent 50%);
+      animation: backgroundShift 15s ease-in-out infinite alternate;
     }
 
-    .header-content {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem 0;
-    }
-
-    .logo {
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: var(--primary-color);
-      text-decoration: none;
-    }
-
-    .back-btn {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: var(--text-light);
-      text-decoration: none;
-      transition: var(--transition);
-    }
-
-    .back-btn:hover {
-      color: var(--primary-color);
-    }
-
-    .header-contact {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .phone {
-      color: var(--text-dark);
-      text-decoration: none;
-      font-weight: 600;
-    }
-
-    /* Main Content */
-    .main-content {
-      display: grid;
-      grid-template-columns: 1fr 400px;
-      gap: 2rem;
-      padding: 2rem 0;
-    }
-
-    /* Car Details */
-    .car-details {
-      background: var(--white);
-      border-radius: var(--border-radius);
-      padding: 2rem;
-      box-shadow: var(--shadow);
-    }
-
-    .car-header {
-      margin-bottom: 2rem;
-    }
-
-    .car-title {
-      font-size: 2rem;
-      font-weight: 800;
-      margin-bottom: 0.5rem;
-    }
-
-    .car-subtitle {
-      color: var(--text-light);
-      font-size: 1.1rem;
-    }
-
-    /* Image Gallery */
-    .gallery {
-      margin-bottom: 2rem;
-    }
-
-    .main-image {
-      width: 100%;
-      height: 400px;
-      border-radius: var(--border-radius);
-      overflow: hidden;
-      margin-bottom: 1rem;
-      background: linear-gradient(45deg, #f3f4f6, #e5e7eb);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .main-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .main-image .placeholder {
-      font-size: 6rem;
-      color: var(--text-light);
-    }
-
-    .thumbnails {
-      display: flex;
-      gap: 0.5rem;
-      overflow-x: auto;
-      padding-bottom: 0.5rem;
-    }
-
-    .thumbnail {
-      width: 80px;
-      height: 60px;
-      border-radius: 8px;
-      overflow: hidden;
-      cursor: pointer;
-      opacity: 0.7;
-      transition: var(--transition);
-      flex-shrink: 0;
-      border: 2px solid transparent;
-    }
-
-    .thumbnail.active,
-    .thumbnail:hover {
-      opacity: 1;
-      border-color: var(--primary-color);
-    }
-
-    .thumbnail img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    /* Specifications */
-    .specs {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-      margin-bottom: 2rem;
-    }
-
-    .spec-card {
-      background: var(--bg-light);
-      padding: 1rem;
-      border-radius: var(--border-radius);
-      text-align: center;
-    }
-
-    .spec-icon {
-      font-size: 2rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .spec-label {
-      font-size: 0.875rem;
-      color: var(--text-light);
-      margin-bottom: 0.25rem;
-    }
-
-    .spec-value {
-      font-weight: 600;
-      color: var(--text-dark);
-    }
-
-    /* Features */
-    .features {
-      margin-bottom: 2rem;
-    }
-
-    .features h3 {
-      margin-bottom: 1rem;
-      font-size: 1.2rem;
-    }
-
-    .features-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 0.5rem;
-    }
-
-    .feature-item {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem;
-      background: var(--bg-light);
-      border-radius: 8px;
-    }
-
-    .feature-icon {
-      color: var(--success-color);
-    }
-
-    /* Calculator Sidebar */
-    .calculator-sidebar {
-      position: sticky;
-      top: 100px;
-      height: fit-content;
+    @keyframes backgroundShift {
+      0% { transform: translateX(-20px) translateY(-10px); }
+      100% { transform: translateX(20px) translateY(10px); }
     }
 
     .calculator {
-      background: var(--white);
-      border-radius: var(--border-radius);
-      padding: 2rem;
-      box-shadow: var(--shadow);
+      width: 100%;
+      max-width: 500px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 24px;
+      padding: 32px;
+      position: relative;
+      z-index: 1;
+      box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.1),
+        0 0 80px rgba(149, 193, 31, 0.1);
+      animation: slideUp 0.8s ease-out;
+      transform-origin: center bottom;
     }
 
-    .calc-header {
+    @keyframes slideUp {
+      0% {
+        transform: translateY(60px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .header {
       text-align: center;
-      margin-bottom: 2rem;
+      margin-bottom: 32px;
     }
 
-    .calc-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-      color: var(--primary-color);
+    .header .title {
+      font-size: 28px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #116234, #95C11F);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
     }
 
-    .calc-subtitle {
-      color: var(--text-light);
-      font-size: 0.9rem;
+    .header .subtitle {
+      font-size: 14px;
+      color: #64748B;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
     }
 
-    /* Form Groups */
-    .form-group {
-      margin-bottom: 1.5rem;
+    .tariff-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 32px;
     }
 
-    .form-label {
-      display: block;
-      margin-bottom: 0.5rem;
+    .tariff-button {
+      padding: 16px;
+      background: rgba(248, 250, 252, 0.8);
+      border: 2px solid transparent;
+      border-radius: 16px;
+      cursor: pointer;
+      text-align: center;
       font-weight: 600;
-      color: var(--text-dark);
+      font-size: 14px;
+      color: #64748B;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .tariff-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(149, 193, 31, 0.1), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .tariff-button:hover::before {
+      left: 100%;
+    }
+
+    .tariff-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(149, 193, 31, 0.15);
+    }
+
+    .tariff-button.active {
+      background: linear-gradient(135deg, #95C11F, #116234);
+      color: white;
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: scale(1.02);
+      box-shadow: 0 12px 30px rgba(149, 193, 31, 0.3);
+    }
+
+    .input-group {
+      margin-bottom: 24px;
+      animation: fadeInUp 0.6s ease-out;
+      animation-fill-mode: both;
+    }
+
+    .input-group:nth-child(3) { animation-delay: 0.1s; }
+    .input-group:nth-child(4) { animation-delay: 0.2s; }
+    .input-group:nth-child(5) { animation-delay: 0.3s; }
+
+    @keyframes fadeInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      color: #1E293B;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 16px 20px;
+      font-size: 16px;
+      font-weight: 500;
+      border: 2px solid #E2E8F0;
+      border-radius: 12px;
+      background: rgba(248, 250, 252, 0.8);
+      transition: all 0.3s ease;
+      color: #1E293B;
+    }
+
+    input[type="number"]:focus {
+      outline: none;
+      border-color: #95C11F;
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 0 0 4px rgba(149, 193, 31, 0.1);
+      transform: translateY(-1px);
+    }
+
+    input[type="number"]::placeholder {
+      color: #94A3B8;
+    }
+
+    .slider-container {
+      margin-top: 12px;
     }
 
     .slider {
       width: 100%;
       height: 8px;
       border-radius: 4px;
-      background: var(--border);
+      background: #E2E8F0;
       outline: none;
       appearance: none;
       cursor: pointer;
+      position: relative;
     }
 
     .slider::-webkit-slider-thumb {
       appearance: none;
-      width: 20px;
-      height: 20px;
+      width: 24px;
+      height: 24px;
       border-radius: 50%;
-      background: var(--primary-color);
+      background: linear-gradient(135deg, #95C11F, #116234);
       cursor: pointer;
-      border: 3px solid var(--white);
-      box-shadow: var(--shadow);
+      border: 3px solid white;
+      box-shadow: 0 4px 12px rgba(149, 193, 31, 0.3);
+      transition: all 0.2s ease;
+    }
+
+    .slider::-webkit-slider-thumb:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(149, 193, 31, 0.4);
     }
 
     .slider::-moz-range-thumb {
-      width: 20px;
-      height: 20px;
+      width: 24px;
+      height: 24px;
       border-radius: 50%;
-      background: var(--primary-color);
+      background: linear-gradient(135deg, #95C11F, #116234);
       cursor: pointer;
-      border: 3px solid var(--white);
-      box-shadow: var(--shadow);
+      border: 3px solid white;
+      box-shadow: 0 4px 12px rgba(149, 193, 31, 0.3);
     }
 
-    .input-field {
+    .months-display {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #64748B;
+    }
+
+    .month-label {
+      position: relative;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      font-size: 12px;
+    }
+
+    .month-label.active {
+      color: #95C11F;
+      font-weight: 600;
+    }
+
+    .month-label.disabled {
+      opacity: 0.3;
+      color: #CBD5E1;
+    }
+
+    .prepayment-input-group {
+      margin-top: 8px;
+    }
+
+    .prepayment-input-group input[type="number"] {
+      width: 200px;
+      padding: 12px 16px;
+      font-size: 14px;
+    }
+
+    .error-message {
+      background: linear-gradient(135deg, #FEF7ED, #FED7AA);
+      color: #EA580C;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      margin-top: 8px;
+      border-left: 4px solid #EA580C;
+      display: none;
+      animation: pulseGlow 2s ease-in-out infinite;
+      line-height: 1.4;
+    }
+
+    @keyframes shake {
+      0%, 20%, 40%, 60%, 80%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    }
+
+    .helper-text {
+      background: linear-gradient(135deg, #FEF7ED, #FED7AA);
+      color: #EA580C;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      margin: 24px 0;
+      border-left: 4px solid #EA580C;
+      animation: pulseGlow 2s ease-in-out infinite;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(234, 88, 12, 0.1); }
+      50% { box-shadow: 0 0 0 8px rgba(234, 88, 12, 0.05); }
+    }
+
+    .output {
+      background: linear-gradient(135deg, #F0FDF4, #DCFCE7);
+      border: 2px solid #BBF7D0;
+      padding: 24px;
+      border-radius: 16px;
+      margin: 24px 0;
+      animation: resultAppear 0.6s ease-out;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .output::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
       width: 100%;
-      padding: 0.75rem;
-      border: 2px solid var(--border);
-      border-radius: var(--border-radius);
-      font-size: 1rem;
-      transition: var(--transition);
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(149, 193, 31, 0.1), transparent);
+      animation: shimmer 2s ease-in-out infinite;
     }
 
-    .input-field:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    @keyframes shimmer {
+      0% { left: -100%; }
+      100% { left: 100%; }
     }
 
-    /* Results */
-    .results {
-      background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
-      border: 2px solid #7dd3fc;
-      border-radius: var(--border-radius);
-      padding: 1.5rem;
-      margin: 1.5rem 0;
+    @keyframes resultAppear {
+      0% {
+        opacity: 0;
+        transform: scale(0.95) translateY(10px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
     }
 
-    .result-item {
+    .output p {
+      margin: 12px 0;
+      font-size: 15px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0.5rem 0;
-      border-bottom: 1px solid rgba(125, 211, 252, 0.3);
+      gap: 12px;
     }
 
-    .result-item:last-child {
-      border-bottom: none;
-      font-weight: 700;
-      font-size: 1.1rem;
-    }
-
-    .result-label {
-      color: var(--text-dark);
-    }
-
-    .result-value {
+    .output strong {
+      color: #166534;
       font-weight: 600;
-      color: var(--primary-color);
+      flex-shrink: 0;
+      min-width: 0;
+      flex: 1;
     }
 
-    /* Action Buttons */
-    .calc-actions {
+    .output-value {
+      font-weight: 700;
+      font-size: 16px;
+      color: #15803D;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .buttons {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      margin-top: 1.5rem;
+      gap: 12px;
+      margin-top: 32px;
     }
 
     .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.75rem 1.5rem;
-      font-weight: 600;
+      padding: 16px 24px;
+      border-radius: 12px;
       text-decoration: none;
-      border-radius: var(--border-radius);
-      transition: var(--transition);
+      text-align: center;
+      font-weight: 600;
+      font-size: 15px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
       border: none;
       cursor: pointer;
-      font-size: 0.875rem;
-      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .btn-primary {
-      background: var(--primary-color);
-      color: var(--white);
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.6s ease, height 0.6s ease;
     }
 
-    .btn-primary:hover {
-      background: var(--primary-dark);
-      transform: translateY(-1px);
+    .btn:hover::before {
+      width: 300px;
+      height: 300px;
     }
 
     .btn-whatsapp {
-      background: #25d366;
-      color
+      background: linear-gradient(135deg, #25D366, #128C7E);
+      color: white;
+    }
+
+    .btn-whatsapp:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 12px 30px rgba(37, 211, 102, 0.4);
+    }
+
+    .btn-call {
+      background: linear-gradient(135deg, #116234, #95C11F);
+      color: white;
+    }
+
+    .btn-call:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 12px 30px rgba(17, 98, 52, 0.4);
+    }
+
+    .btn span {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      body {
+        padding: 16px;
+      }
+
+      .calculator {
+        padding: 24px;
+        border-radius: 20px;
+      }
+
+      .header .title {
+        font-size: 24px;
+      }
+
+      .buttons {
+        grid-template-columns: 1fr;
+      }
+
+      .tariff-buttons {
+        grid-template-columns: 1fr;
+      }
+
+      .prepayment-input-group {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+
+      .prepayment-input-group input[type="number"] {
+        width: 100%;
+      }
+    }
+
+    /* Accessibility improvements */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* Focus styles for better accessibility */
+    .tariff-button:focus-visible,
+    .btn:focus-visible {
+      outline: 2px solid #95C11F;
+      outline-offset: 2px;
+    }
+
+    .slider:focus-visible {
+      box-shadow: 0 0 0 3px rgba(149, 193, 31, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <div class="header">
+      <div class="title">AMANA FINANCE</div>
+      <div class="subtitle">Калькулятор рассрочки</div>
+    </div>
+
+    <div class="tariff-buttons">
+      <div class="tariff-button active" data-tariff="with">С первым взносом</div>
+      <div class="tariff-button" data-tariff="without">Без первого взноса</div>
+    </div>
+
+    <div class="input-group">
+      <label for="price">Стоимость товара</label>
+      <div class="input-wrapper">
+        <input type="number" id="price" placeholder="не менее 30 000 ₽" min="0" />
+      </div>
+      <div class="error-message" id="errorMessage">⚠️ Стоимость товара должна быть<br>не менее 30 000₽</div>
+    </div>
+
+    <div class="input-group">
+      <label for="months" id="monthsLabel">Срок: 3 месяца</label>
+      <div class="slider-container">
+        <input type="range" id="months" class="slider" min="3" max="12" value="3" />
+        <div class="months-display" id="monthsDisplay">
+          <span class="month-label active" data-month="3">3 мес</span>
+          <span class="month-label" data-month="6">6 мес</span>
+          <span class="month-label" data-month="9">9 мес</span>
+          <span class="month-label" data-month="12">12 мес</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="prepaymentBlock" class="input-group">
+      <label for="prepaymentSlider">Первый взнос</label>
+      <div class="prepayment-input-group">
+        <input type="number" id="prepaymentInput" step="100" placeholder="0" />
+      </div>
+      <div class="error-message" id="prepaymentError"></div>
+      <div class="slider-container">
+        <input type="range" id="prepaymentSlider" class="slider" min="0" max="0" step="100" value="0" />
+      </div>
+    </div>
+
+    <div class="output" id="results">
+      <p><strong>Первый взнос:</strong> <span class="output-value">0 ₽</span></p>
+      <p><strong>Ежемесячный платёж:</strong> <span class="output-value">0 ₽</span></p>
+      <p><strong>Стоимость с наценкой:</strong> <span class="output-value">0 ₽</span></p>
+      <p><strong>Наценка:</strong> <span class="output-value">0 ₽ (0%)</span></p>
+    </div>
+
+    <div class="helper-text">
+      💡 Обязательные требования: Поручитель и паспорта обеих лиц
+    </div>
+
+    <div class="buttons">
+      <a id="whatsapp" class="btn btn-whatsapp" href="#" target="_blank">
+        <span>✍️ Написать в WhatsApp</span>
+      </a>
+      <a class="btn btn-call" href="tel:+79280222114">
+        <span>📞 Позвонить</span>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const priceInput = document.getElementById('price');
+    const monthsInput = document.getElementById('months');
+    const monthsLabel = document.getElementById('monthsLabel');
+    const prepaymentBlock = document.getElementById('prepaymentBlock');
+    const prepaymentSlider = document.getElementById('prepaymentSlider');
+    const prepaymentInput = document.getElementById('prepaymentInput');
+    const prepaymentError = document.getElementById('prepaymentError');
+    const resultsDiv = document.getElementById('results');
+    const whatsappBtn = document.getElementById('whatsapp');
+    const errorMessage = document.getElementById('errorMessage');
+    const tariffButtons = document.querySelectorAll('.tariff-button');
+    const monthLabels = document.querySelectorAll('.month-label');
+
+    const monthsDisplay = document.getElementById('monthsDisplay');
+
+    let selectedTariff = 'with';
+    let conditionalPrepayment = 0;
+
+    const markupWithDown = {3:9,4:12,5:15,6:18,7:20,8:22,9:24,10:26,11:28,12:30};
+    const markupWithoutDown = {3:13,4:17,5:21,6:25.5,7:28.5,8:32,9:35,10:38,11:41.5,12:45};
+    const markupNoDownPayment = {3:14,4:18,5:23,6:28,7:31,8:34,9:37,10:40,11:43,12:46};
+
+    const roundUpTo100 = val => Math.ceil(val / 100) * 100;
+
+    function getMaxMonthsForPrice(price) {
+      if (price < 30000) return 3;
+      if (price < 50000) return 6;
+      if (price < 100000) return 9;
+      return 12;
+    }
+
+    function getAvailableMonthsForPrice(price) {
+      const maxMonths = getMaxMonthsForPrice(price);
+      const baseMonths = [3, 6, 9, 12];
+      return baseMonths.filter(month => month <= maxMonths);
+    }
+
+    function updateMonthsDisplay(price, selectedMonth) {
+      const maxMonths = getMaxMonthsForPrice(price);
+      
+      // Очищаем текущие отметки
+      monthsDisplay.innerHTML = '';
+      
+      // Создаем отметки в зависимости от максимального срока
+      let displayMonths = [];
+      
+      if (maxMonths <= 6) {
+        // До 49,999₽: показываем все месяцы от 3 до 6
+        displayMonths = [3, 4, 5, 6];
+      } else if (maxMonths <= 9) {
+        // 50,000-99,999₽: показываем 3, 6, 9
+        displayMonths = [3, 6, 9];
+      } else {
+        // 100,000₽ и выше: показываем 3, 6, 9, 12
+        displayMonths = [3, 6, 9, 12];
+      }
+      
+      // Создаем отметки
+      displayMonths.forEach((month, index) => {
+        const label = document.createElement('span');
+        label.className = 'month-label';
+        label.dataset.month = month;
+        label.textContent = `${month} мес`;
+        
+        // Подсвечиваем только точно совпадающую отметку
+        if (selectedMonth === month) {
+          label.classList.add('active');
+        }
+        
+        monthsDisplay.appendChild(label);
+      });
+      
+      // Обновляем позиционирование для равномерного распределения
+      const labels = monthsDisplay.querySelectorAll('.month-label');
+      labels.forEach((label, index) => {
+        if (displayMonths.length === 1) {
+          label.style.position = 'absolute';
+          label.style.left = '50%';
+          label.style.transform = 'translateX(-50%)';
+        } else {
+          let position;
+          if (index === 0) {
+            // Первая отметка: выравниваем по левому краю
+            position = 0;
+            label.style.left = `${position}%`;
+            label.style.transform = 'translateX(0)';
+          } else if (index === displayMonths.length - 1) {
+            // Последняя отметка: выравниваем по правому краю
+            position = 100;
+            label.style.left = `${position}%`;
+            label.style.transform = 'translateX(-100%)';
+          } else {
+            // Средние отметки: центрируем
+            position = (index / (displayMonths.length - 1)) * 100;
+            label.style.left = `${position}%`;
+            label.style.transform = 'translateX(-50%)';
+          }
+          label.style.position = 'absolute';
+        }
+      });
+      
+      // Устанавливаем позиционирование для контейнера
+      monthsDisplay.style.position = 'relative';
+      monthsDisplay.style.height = '20px';
+    }
+
+    function updateMonthsSlider(price) {
+      const maxMonths = getMaxMonthsForPrice(price);
+      const currentMonths = parseInt(monthsInput.value);
+      
+      // Обновляем параметры ползунка - теперь можно выбирать любое значение от 3 до максимума
+      monthsInput.min = 3;
+      monthsInput.max = maxMonths;
+      monthsInput.step = 1; // Шаг в 1 месяц для плавного выбора
+      
+      // Если текущее значение больше максимального, устанавливаем максимальное
+      let newValue = currentMonths;
+      if (currentMonths > maxMonths) {
+        newValue = maxMonths;
+      } else if (currentMonths < 3) {
+        newValue = 3;
+      }
+      
+      monthsInput.value = newValue;
+      return newValue;
+    }
+
+    function togglePrepaymentSlider() {
+      const isVisible = selectedTariff === 'with';
+      prepaymentBlock.style.display = isVisible ? 'block' : 'none';
+      if (isVisible) {
+        prepaymentBlock.style.animation = 'fadeInUp 0.4s ease-out';
+      }
+    }
+
+    function updateCalculator(resetPrepayment = false) {
+      const price = parseInt(priceInput.value);
+      
+      // Проверяем минимальную стоимость
+      if (isNaN(price) || price < 30000) {
+        errorMessage.style.display = 'block';
+        prepaymentInput.value = 0;
+        prepaymentError.style.display = 'none';
+        resultsDiv.innerHTML = `
+          <p><strong>Первый взнос:</strong> <span class="output-value">0 ₽</span></p>
+          <p><strong>Ежемесячный платёж:</strong> <span class="output-value">0 ₽</span></p>
+          <p><strong>Стоимость с наценкой:</strong> <span class="output-value">0 ₽</span></p>
+          <p><strong>Наценка:</strong> <span class="output-value">0 ₽ (0%)</span></p>
+        `;
+        whatsappBtn.href = "https://wa.me/79280222114?text=Здравствуйте, хочу оформить рассрочку.";
+        togglePrepaymentSlider();
+        
+        // Обновляем отображение даже при неверной цене
+        updateMonthsDisplay(30000, 3); // Показываем минимальные настройки
+        return;
+      } else {
+        errorMessage.style.display = 'none';
+      }
+
+      // Обновляем ползунок месяцев на основе цены
+      const months = updateMonthsSlider(price);
+      
+      // Обновляем отображение отметок месяцев
+      updateMonthsDisplay(price, months);
+      
+      // Обновляем текст лейбла в зависимости от количества месяцев
+      const monthText = months === 1 ? 'месяц' : (months < 5 ? 'месяца' : 'месяцев');
+      monthsLabel.textContent = `Срок: ${months} ${monthText}`;
+
+      const percent = selectedTariff === 'with' ? markupWithDown[months] : markupNoDownPayment[months];
+      const baseFinalCost = price * (1 + percent / 100);
+
+      let prepayment = 0, monthly = 0, finalCost = 0, message = "";
+
+      if (selectedTariff === 'with') {
+        const minPrepayment = roundUpTo100(baseFinalCost * 0.15);
+        const maxPrepayment = roundUpTo100(baseFinalCost * 0.65);
+        conditionalPrepayment = roundUpTo100(baseFinalCost * 0.25);
+
+        prepaymentSlider.min = minPrepayment;
+        prepaymentSlider.max = maxPrepayment;
+
+        if (resetPrepayment) {
+          prepaymentSlider.value = conditionalPrepayment;
+        }
+
+        prepayment = parseInt(prepaymentSlider.value);
+        prepaymentInput.value = prepayment;
+
+        if (prepayment === conditionalPrepayment) {
+          const remaining = baseFinalCost - prepayment;
+          monthly = roundUpTo100(remaining / months);
+          finalCost = monthly * months + prepayment;
+        } else {
+          const remaining = price - prepayment;
+          const remainingWithMarkup = remaining * (1 + markupWithoutDown[months] / 100);
+          monthly = roundUpTo100(remainingWithMarkup / months);
+          finalCost = monthly * months + prepayment;
+        }
+
+        message = `Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${price.toLocaleString()} ₽, Тариф: С первым взносом, Первый взнос: ${prepayment.toLocaleString()} ₽, Срок: ${months} мес.`;
+
+      } else {
+        monthly = roundUpTo100(baseFinalCost / months);
+        finalCost = monthly * months;
+        prepaymentInput.value = "0";
+        prepayment = 0;
+        message = `Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${price.toLocaleString()} ₽, Тариф: Без первого взноса, Срок: ${months} мес.`;
+      }
+
+      const markup = finalCost - price;
+      const markupPercent = Math.round((markup / price) * 100);
+
+      resultsDiv.innerHTML = `
+        <p><strong>Первый взнос:</strong> <span class="output-value">${prepayment.toLocaleString()} ₽</span></p>
+        <p><strong>Ежемесячный платёж:</strong> <span class="output-value">${monthly.toLocaleString()} ₽</span></p>
+        <p><strong>Стоимость с наценкой:</strong> <span class="output-value">${finalCost.toLocaleString()} ₽</span></p>
+        <p><strong>Наценка:</strong> <span class="output-value">${markup.toLocaleString()} ₽ (${markupPercent}%)</span></p>
+      `;
+
+      // Trigger animation
+      resultsDiv.style.animation = 'none';
+      setTimeout(() => {
+        resultsDiv.style.animation = 'resultAppear 0.6s ease-out';
+      }, 10);
+
+      whatsappBtn.href = `https://wa.me/79280222114?text=${encodeURIComponent(message)}`;
+      prepaymentError.style.display = 'none';
+      togglePrepaymentSlider();
+    }
+
+    tariffButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        tariffButtons.forEach(btn => {
+          btn.classList.remove('active');
+          btn.style.transform = 'scale(1)';
+        });
+        button.classList.add('active');
+        button.style.transform = 'scale(1.02)';
+        selectedTariff = button.dataset.tariff;
+        updateCalculator(true);
+      });
+    });
+
+    // Add visual feedback for input interactions
+    priceInput.addEventListener('focus', () => {
+      priceInput.parentElement.style.transform = 'translateY(-2px)';
+    });
+
+    priceInput.addEventListener('blur', () => {
+      priceInput.parentElement.style.transform = 'translateY(0)';
+    });
+
+    priceInput.addEventListener('input', () => updateCalculator(true));
+    monthsInput.addEventListener('input', () => updateCalculator(true));
+    prepaymentSlider.addEventListener('input', () => updateCalculator(false));
+
+    prepaymentInput.addEventListener('input', () => {
+      const val = roundUpTo100(parseInt(prepaymentInput.value || '0'));
+      const min = parseInt(prepaymentSlider.min);
+      const max = parseInt(prepaymentSlider.max);
+
+      if (val >= min && val <= max) {
+        prepaymentError.style.display = 'none';
+        prepaymentSlider.value = val;
+        updateCalculator(false);
+      } else {
+        prepaymentError.textContent = `Первый взнос должен быть от ${min.toLocaleString()}₽ до ${max.toLocaleString()}₽`;
+        prepaymentError.style.display = 'block';
+      }
+    });
+
+    // Add ripple effect to buttons
+    document.querySelectorAll('.btn').forEach(button => {
+      button.addEventListener('click', function(e) {
+        const ripple = document.createElement('div');
+        const rect = this.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+        
+        ripple.style.cssText = `
+          position: absolute;
+          width: ${size}px;
+          height: ${size}px;
+          left: ${x}px;
+          top: ${y}px;
+          background: rgba(255, 255, 255, 0.3);
+          border-radius: 50%;
+          transform: scale(0);
+          animation: ripple 0.6s ease-out;
+          pointer-events: none;
+        `;
+        
+        this.appendChild(ripple);
+        
+        const style = document.createElement('style');
+        style.textContent = `
+          @keyframes ripple {
+            to {
+              transform: scale(4);
+              opacity: 0;
+            }
+          }
+        `;
+        document.head.appendChild(style);
+        
+        setTimeout(() => {
+          ripple.remove();
+          style.remove();
+        }, 600);
+      });
+    });
+
+    updateCalculator(true);
+  </script>
+</body>
+</html>
