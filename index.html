@@ -1,258 +1,283 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Amana Finance — Калькулятор рассрочки</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-  * {margin:0; padding:0; box-sizing:border-box;}
-  body {
-    font-family:'Inter',sans-serif;
-    background: linear-gradient(135deg,#95c11f,#116234);
-    min-height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-    overflow-x:hidden;
-    position:relative;
-  }
-  body::before{
-    content:'';
-    position:absolute;
-    top:0; left:0; right:0; bottom:0;
-    background:
-      radial-gradient(circle at 20% 80%, rgba(255,255,255,0.08), transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(255,255,255,0.06), transparent 50%),
-      radial-gradient(circle at 50% 50%, rgba(0,0,0,0.02), transparent 50%);
-    animation: bgShift 20s ease-in-out infinite alternate;
-  }
-  @keyframes bgShift {
-    0% {transform: translateX(-20px) translateY(-10px);}
-    100% {transform: translateX(20px) translateY(10px);}
-  }
+import React, { useState, useEffect } from 'react';
 
-  .calculator {
-    width:100%; max-width:480px;
-    background: rgba(255,255,255,0.15);
-    backdrop-filter: blur(20px);
-    border-radius: 24px;
-    padding:32px;
-    position:relative;
-    z-index:1;
-    box-shadow:0 20px 40px rgba(0,0,0,0.08);
-  }
+const SheyKeyCalculator = () => {
+  const [category, setCategory] = useState('Потребительские товары');
+  const [productCost, setProductCost] = useState(50000);
+  const [tariff, setTariff] = useState('Без поручителя');
+  const [downPayment, setDownPayment] = useState(20);
+  const [installmentPeriod, setInstallmentPeriod] = useState('6 мес.');
 
-  .header{
-    text-align:center;
-    margin-bottom:32px;
-  }
-  .header .title{
-    font-size:28px;
-    font-weight:800;
-    background:linear-gradient(135deg,#116234,#95C11F);
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-  }
-  .header .subtitle{
-    font-size:14px;
-    color:rgba(255,255,255,0.85);
-    text-transform:uppercase;
-    letter-spacing:1px;
-  }
+  // Calculate results
+  const [results, setResults] = useState({
+    productCost: 50000,
+    tradingMargin: 12000,
+    totalCost: 62000,
+    initialPayment: 12400,
+    monthlyPayment: 8267
+  });
 
-  .tariff-buttons{
-    display:flex;
-    gap:12px;
-    margin-bottom:32px;
-  }
-  .tariff-button{
-    flex:1;
-    padding:14px;
-    border-radius:16px;
-    text-align:center;
-    font-weight:600;
-    font-size:14px;
-    color:white;
-    cursor:pointer;
-    transition:all 0.3s ease;
-    background:rgba(255,255,255,0.1);
-  }
-  .tariff-button.active{
-    background:linear-gradient(135deg,#95C11F,#116234);
-    box-shadow:0 6px 20px rgba(0,0,0,0.1);
-  }
-  .tariff-button:hover{
-    transform:translateY(-2px);
-  }
+  useEffect(() => {
+    const tradingMargin = productCost * 0.24; // 24% margin
+    const totalCost = productCost + tradingMargin;
+    const initialPayment = (totalCost * downPayment) / 100;
+    const remainingAmount = totalCost - initialPayment;
+    const months = parseInt(installmentPeriod);
+    const monthlyPayment = Math.round(remainingAmount / months);
 
-  .input-group{
-    margin-bottom:24px;
-  }
-  label{
-    display:block;
-    margin-bottom:8px;
-    font-weight:600;
-    font-size:14px;
-    color:white;
-  }
-  .input-wrapper{
-    position:relative;
-  }
-  input[type="number"]{
-    width:100%;
-    padding:14px 18px;
-    font-size:16px;
-    border-radius:12px;
-    border:none;
-    outline:none;
-    background:rgba(255,255,255,0.25);
-    color:white;
-    font-weight:500;
-  }
-  input[type="number"]::placeholder{
-    color:rgba(255,255,255,0.6);
-  }
+    setResults({
+      productCost,
+      tradingMargin: Math.round(tradingMargin),
+      totalCost: Math.round(totalCost),
+      initialPayment: Math.round(initialPayment),
+      monthlyPayment
+    });
+  }, [productCost, downPayment, installmentPeriod]);
 
-  .slider{
-    width:100%;
-    height:8px;
-    border-radius:4px;
-    background:rgba(255,255,255,0.3);
-    outline:none;
-    cursor:pointer;
-  }
-  .slider::-webkit-slider-thumb{
-    width:22px;
-    height:22px;
-    border-radius:50%;
-    background:linear-gradient(135deg,#95C11F,#116234);
-    border:2px solid white;
-    cursor:pointer;
-  }
+  const tariffOptions = [
+    { id: 'no-guarantor', label: 'Без поручителя', limit: '10 000 ₽ – 80 000 ₽' },
+    { id: 'no-collateral', label: 'Без взноса', limit: '10 000 ₽ – 60 000 ₽' },
+    { id: 'with-guarantor', label: 'С 1 поручителем', limit: '10 000 ₽ – 300 000 ₽' },
+    { id: 'with-two-guarantors', label: 'С 2 поручителями', limit: '100 000 ₽ – 1 000 000 ₽' }
+  ];
 
-  .months-display{
-    display:flex;
-    justify-content:space-between;
-    margin-top:6px;
-    font-size:12px;
-    color:white;
-  }
-  .month-label.active{
-    font-weight:600;
-    color:#fff;
-  }
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-black text-white py-4 px-6">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="bg-yellow-400 text-black px-2 py-1 font-bold text-xl">S</div>
+            <div>
+              <div className="font-bold">SHEYKEY</div>
+            </div>
+            <div className="text-sm text-gray-300 ml-8">
+              Исламская компания, которая работает<br />
+              на принципах и нормах шариата
+            </div>
+          </div>
+          <div className="flex items-center space-x-4">
+            <div className="bg-yellow-400 text-black px-4 py-2 rounded-full text-sm font-medium">
+              📞 8 965-953-56-33
+            </div>
+            <div className="border border-yellow-400 text-yellow-400 px-4 py-2 rounded-full text-sm">
+              WhatsApp
+            </div>
+          </div>
+        </div>
+      </header>
 
-  .output{
-    background:rgba(255,255,255,0.15);
-    border-radius:16px;
-    padding:24px;
-    margin:24px 0;
-    color:white;
-  }
-  .output p{
-    display:flex;
-    justify-content:space-between;
-    margin:10px 0;
-    font-weight:500;
-  }
-  .output-value{
-    font-weight:700;
-  }
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            SheyKey Finance. Купите сейчас — платите потом.
+          </h1>
+          <p className="text-gray-600">
+            Рассрочка по нормам Ислама. Без банка, без скрытых платежей, без штрафов и пеней.
+          </p>
+        </div>
 
-  .helper-text{
-    font-size:13px;
-    color:rgba(255,100,80,0.85);
-    margin-bottom:24px;
-  }
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Left Panel - Form */}
+          <div className="bg-white rounded-lg p-6 shadow-sm">
+            {/* Category */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Категория
+              </label>
+              <select 
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+              >
+                <option>Потребительские товары</option>
+                <option>Электроника</option>
+                <option>Мебель</option>
+                <option>Автомобили</option>
+              </select>
+            </div>
 
-  .buttons{
-    display:flex;
-    gap:12px;
-  }
-  .btn{
-    flex:1;
-    padding:14px;
-    border-radius:12px;
-    font-weight:600;
-    font-size:14px;
-    color:white;
-    text-align:center;
-    cursor:pointer;
-    border:none;
-    transition:all 0.3s ease;
-    text-decoration:none;
-  }
-  .btn-whatsapp{
-    background:linear-gradient(135deg,#25D366,#128C7E);
-  }
-  .btn-call{
-    background:linear-gradient(135deg,#116234,#95C11F);
-  }
+            {/* Product Cost */}
+            <div className="mb-6">
+              <div className="flex justify-between items-center mb-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Стоимость товара
+                </label>
+                <span className="text-xs text-gray-500">
+                  Мин: 10 000 ₽ • Макс: 1 000 000 ₽
+                </span>
+              </div>
+              <div className="mb-3">
+                <input
+                  type="number"
+                  value={productCost}
+                  onChange={(e) => setProductCost(parseInt(e.target.value) || 0)}
+                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+                />
+              </div>
+              <div className="relative">
+                <input
+                  type="range"
+                  min="10000"
+                  max="1000000"
+                  step="1000"
+                  value={productCost}
+                  onChange={(e) => setProductCost(parseInt(e.target.value))}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                />
+              </div>
+            </div>
 
-  @media(max-width:768px){
-    .calculator{padding:24px;}
-    .tariff-buttons{flex-direction:column;}
-    .buttons{flex-direction:column;}
-  }
-</style>
-</head>
-<body>
-<div class="calculator">
-  <div class="header">
-    <div class="title">AMANA FINANCE</div>
-    <div class="subtitle">Калькулятор рассрочки</div>
-  </div>
+            {/* Tariff Options */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-4">
+                Тариф условий
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                {tariffOptions.map((option) => (
+                  <button
+                    key={option.id}
+                    onClick={() => setTariff(option.label)}
+                    className={`p-3 border rounded-lg text-left text-sm transition-colors ${
+                      tariff === option.label
+                        ? 'border-yellow-500 bg-yellow-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="font-medium">{option.label}</div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      Лимит: {option.limit}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
 
-  <div class="tariff-buttons">
-    <div class="tariff-button active" data-tariff="with">С первым взносом</div>
-    <div class="tariff-button" data-tariff="without">Без первого взноса</div>
-  </div>
+            {/* Down Payment */}
+            <div className="mb-6">
+              <div className="flex justify-between items-center mb-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Первоначальный взнос
+                </label>
+                <span className="text-xs text-gray-500">
+                  Мин: 20% • Макс: 90%
+                </span>
+              </div>
+              <div className="mb-3">
+                <input
+                  type="number"
+                  value={downPayment}
+                  onChange={(e) => setDownPayment(parseInt(e.target.value) || 0)}
+                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+                />
+              </div>
+              <div className="relative">
+                <input
+                  type="range"
+                  min="20"
+                  max="90"
+                  value={downPayment}
+                  onChange={(e) => setDownPayment(parseInt(e.target.value))}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                />
+              </div>
+              <div className="text-sm text-gray-500 mt-2">
+                ({results.initialPayment.toLocaleString()} ₽)
+              </div>
+            </div>
 
-  <div class="input-group">
-    <label for="price">Стоимость товара</label>
-    <div class="input-wrapper">
-      <input type="number" id="price" placeholder="не менее 30 000 ₽" min="0" />
+            {/* Installment Period */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Срок рассрочки
+              </label>
+              <select 
+                value={installmentPeriod}
+                onChange={(e) => setInstallmentPeriod(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+              >
+                <option>6 мес.</option>
+                <option>12 мес.</option>
+                <option>18 мес.</option>
+                <option>24 мес.</option>
+              </select>
+              <div className="text-xs text-gray-500 mt-2">
+                Наценка: 4% за месяц (со взносом)
+              </div>
+            </div>
+          </div>
+
+          {/* Right Panel - Results */}
+          <div className="bg-white rounded-lg p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-gray-900">Результат расчёта</h2>
+              <span className="bg-yellow-400 text-black px-3 py-1 rounded-full text-sm font-medium">
+                6 мес.
+              </span>
+            </div>
+
+            <div className="space-y-4 mb-6">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Стоимость товара</span>
+                <span className="font-medium">{results.productCost.toLocaleString()} ₽</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Торговая наценка</span>
+                <span className="font-medium">{results.tradingMargin.toLocaleString()} ₽</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Итоговая стоимость</span>
+                <span className="font-medium">{results.totalCost.toLocaleString()} ₽</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Первоначальный взнос</span>
+                <span className="font-medium">{results.initialPayment.toLocaleString()} ₽</span>
+              </div>
+            </div>
+
+            <div className="bg-gray-50 p-4 rounded-lg mb-6">
+              <div className="flex justify-between items-center">
+                <span className="text-lg font-bold text-gray-900">Ежемесячный платёж</span>
+                <span className="text-2xl font-bold text-gray-900">{results.monthlyPayment.toLocaleString()} ₽</span>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-bold text-gray-900 mb-3">Требования</h3>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>• Возраст от 20 лет</li>
+                <li>• Постоянная регистрация в ЧР</li>
+                <li>• Паспорт РФ</li>
+                <li>• Поручитель 22-60 лет (если требуется по тарифу)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <style jsx>{`
+        .slider::-webkit-slider-thumb {
+          appearance: none;
+          height: 20px;
+          width: 20px;
+          border-radius: 50%;
+          background: #fbbf24;
+          cursor: pointer;
+          box-shadow: 0 0 2px 0 #555;
+        }
+        
+        .slider::-moz-range-thumb {
+          height: 20px;
+          width: 20px;
+          border-radius: 50%;
+          background: #fbbf24;
+          cursor: pointer;
+          border: none;
+          box-shadow: 0 0 2px 0 #555;
+        }
+      `}</style>
     </div>
-  </div>
+  );
+};
 
-  <div class="input-group">
-    <label for="months" id="monthsLabel">Срок: 3 месяца</label>
-    <input type="range" id="months" class="slider" min="3" max="12" value="3" />
-    <div class="months-display" id="monthsDisplay">
-      <span class="month-label active" data-month="3">3 мес</span>
-      <span class="month-label" data-month="6">6 мес</span>
-      <span class="month-label" data-month="9">9 мес</span>
-      <span class="month-label" data-month="12">12 мес</span>
-    </div>
-  </div>
-
-  <div id="prepaymentBlock" class="input-group">
-    <label for="prepaymentInput">Первый взнос</label>
-    <input type="number" id="prepaymentInput" placeholder="0" />
-    <input type="range" id="prepaymentSlider" class="slider" min="0" max="0" step="100" value="0" />
-  </div>
-
-  <div class="output" id="results">
-    <p><strong>Первый взнос:</strong> <span class="output-value">0 ₽</span></p>
-    <p><strong>Ежемесячный платёж:</strong> <span class="output-value">0 ₽</span></p>
-    <p><strong>Стоимость с наценкой:</strong> <span class="output-value">0 ₽</span></p>
-    <p><strong>Наценка:</strong> <span class="output-value">0 ₽ (0%)</span></p>
-  </div>
-
-  <div class="helper-text">
-    💡 Обязательные требования: Поручитель и паспорта обеих лиц
-  </div>
-
-  <div class="buttons">
-    <a id="whatsapp" class="btn btn-whatsapp" href="#" target="_blank">✍️ Написать в WhatsApp</a>
-    <a class="btn btn-call" href="tel:+79280222114">📞 Позвонить</a>
-  </div>
-</div>
-
-<script>
-  // Здесь оставляем весь твой JS код без изменений
-</script>
-</body>
-</html>
+export default SheyKeyCalculator;
