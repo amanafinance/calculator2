@@ -226,8 +226,8 @@
     </div>
     <div class="input-group">
       <label for="price">Стоимость товара</label>
-      <input type="number" id="price" placeholder="не менее 40 000 ₽" min="0" />
-      <div class="error-message" id="errorMessage">⚠️ Стоимость товара должна быть не менее 40 000₽</div>
+      <input type="number" id="price" placeholder="не менее 30 000 ₽" min="0" />
+      <div class="error-message" id="errorMessage">⚠️ Стоимость товара должна быть не менее 30 000₽</div>
     </div>
     <div class="input-group">
       <label for="months" id="monthsLabel">Срок: 3 месяца</label>
@@ -333,7 +333,7 @@
       const monthText = months === 1 ? 'месяц' : (months < 5 ? 'месяца' : 'месяцев');
       monthsLabel.textContent = `Срок: ${months} ${monthText}`;
       updateMonthLabels(months, maxMonths);
-      if (isNaN(price) || price < 40000) {
+      if (isNaN(price) || price < 30000) {
         errorMessage.style.display = 'block';
         resultsDiv.innerHTML = '<p><strong>Первый взнос:</strong> <span class="output-value">0 ₽</span></p><p><strong>Ежемесячный платёж:</strong> <span class="output-value">0 ₽</span></p><p><strong>Стоимость с наценкой:</strong> <span class="output-value">0 ₽</span></p><p><strong>Наценка:</strong> <span class="output-value">0 ₽ (0%)</span></p>';
         whatsappBtn.href = "https://wa.me/79280222114?text=Здравствуйте, хочу оформить рассрочку.";
