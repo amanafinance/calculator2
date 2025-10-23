@@ -1,688 +1,219 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SheyKey Finance - Калькулятор рассрочки</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #f5f5f5;
-            color: #333;
-        }
-
-        /* Фиксированная шапка */
-        .header {
-            position: sticky;
-            top: 0;
-            background-color: #1a1a1a;
-            color: white;
-            padding: 15px 0;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #ffd700, #ffed4e);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: #1a1a1a;
-            font-size: 20px;
-        }
-
-        .company-info {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
-        .contacts {
-            display: flex;
-            gap: 15px;
-        }
-
-        .contact-btn {
-            padding: 8px 20px;
-            border-radius: 25px;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .phone {
-            background-color: #ffd700;
-            color: #1a1a1a;
-        }
-
-        .whatsapp {
-            background-color: transparent;
-            color: #ffd700;
-            border: 1px solid #ffd700;
-        }
-
-        .contact-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
-        }
-
-        /* Основной контент */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-
-        .main-title {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            color: #1a1a1a;
-        }
-
-        .subtitle {
-            font-size: 16px;
-            color: #666;
-            margin-bottom: 40px;
-        }
-
-        .calculator-wrapper {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-
-        .calculator-form {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-
-        .form-group {
-            margin-bottom: 30px;
-        }
-
-        .form-label {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: #1a1a1a;
-        }
-
-        .slider-container {
-            position: relative;
-            margin: 20px 0;
-        }
-
-        .slider {
-            width: 100%;
-            height: 6px;
-            border-radius: 3px;
-            background: #e0e0e0;
-            outline: none;
-            -webkit-appearance: none;
-            appearance: none;
-        }
-
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #ffd700;
-            cursor: pointer;
-            box-shadow: 0 2px 10px rgba(255, 215, 0, 0.5);
-        }
-
-        .slider::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #ffd700;
-            cursor: pointer;
-            border: none;
-            box-shadow: 0 2px 10px rgba(255, 215, 0, 0.5);
-        }
-
-        .slider-value {
-            font-size: 18px;
-            font-weight: 700;
-            color: #1a1a1a;
-            margin-top: 10px;
-        }
-
-        .slider-limits {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: #999;
-            margin-top: 5px;
-        }
-
-        .tariff-options {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .tariff-option {
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: white;
-        }
-
-        .tariff-option.active {
-            border-color: #ffd700;
-            background: #fffdf0;
-        }
-
-        .tariff-title {
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .tariff-limit {
-            font-size: 12px;
-            color: #666;
-        }
-
-        .term-selector {
-            margin-bottom: 20px;
-        }
-
-        .term-select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 16px;
-            background: white;
-        }
-
-        .results-panel {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 120px;
-        }
-
-        .results-title {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: #1a1a1a;
-        }
-
-        .term-badge {
-            background: #ffd700;
-            color: #1a1a1a;
-            padding: 4px 12px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: 600;
-            float: right;
-        }
-
-        .result-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .result-row:last-child {
-            border-bottom: none;
-        }
-
-        .result-label {
-            font-size: 14px;
-            color: #666;
-        }
-
-        .result-value {
-            font-size: 16px;
-            font-weight: 600;
-            color: #1a1a1a;
-        }
-
-        .monthly-payment {
-            background: #f8f8f8;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .monthly-payment-label {
-            font-size: 16px;
-            color: #666;
-            margin-bottom: 10px;
-        }
-
-        .monthly-payment-value {
-            font-size: 28px;
-            font-weight: 700;
-            color: #1a1a1a;
-        }
-
-        .requirements {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-
-        .requirements-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 15px;
-            color: #1a1a1a;
-        }
-
-        .requirements-list {
-            list-style: none;
-        }
-
-        .requirements-list li {
-            padding: 8px 0;
-            padding-left: 20px;
-            position: relative;
-            color: #666;
-        }
-
-        .requirements-list li:before {
-            content: "•";
-            color: #ffd700;
-            font-weight: bold;
-            position: absolute;
-            left: 0;
-        }
-
-        .promo-banner {
-            background: linear-gradient(135deg, #ffd700, #ffed4e);
-            padding: 20px;
-            border-radius: 15px;
-            margin: 40px 0;
-            text-align: center;
-        }
-
-        .promo-text {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1a1a1a;
-            margin-bottom: 5px;
-        }
-
-        .promo-subtext {
-            font-size: 14px;
-            color: #666;
-        }
-
-        .promo-btn {
-            background: #1a1a1a;
-            color: white;
-            padding: 12px 30px;
-            border: none;
-            border-radius: 25px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 15px;
-            transition: all 0.3s ease;
-        }
-
-        .promo-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(26, 26, 26, 0.3);
-        }
-
-        .footer {
-            background-color: #1a1a1a;
-            color: white;
-            padding: 30px 0;
-            text-align: center;
-        }
-
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        .footer-logo {
-            margin-bottom: 15px;
-        }
-
-        .footer-text {
-            font-size: 14px;
-            opacity: 0.7;
-        }
-
-        .footer-contacts {
-            margin-top: 15px;
-        }
-
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .contacts {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .calculator-wrapper {
-                grid-template-columns: 1fr;
-                gap: 30px;
-            }
-
-            .tariff-options {
-                grid-template-columns: 1fr;
-            }
-
-            .main-title {
-                font-size: 24px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Amana Finance — Калькулятор рассрочки</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {margin:0;padding:0;box-sizing:border-box;}
+    body {
+      font-family:'Inter',sans-serif;
+      background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      min-height:100vh;display:flex;align-items:center;justify-content:center;
+      padding:20px;position:relative;overflow-x:hidden;
+    }
+    body::before {
+      content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+      background:
+        radial-gradient(circle at 20% 80%,rgba(120,255,214,0.1)0%,transparent 50%),
+        radial-gradient(circle at 80% 20%,rgba(255,120,198,0.1)0%,transparent 50%),
+        radial-gradient(circle at 40% 40%,rgba(149,193,31,0.1)0%,transparent 50%);
+      animation:backgroundShift 15s ease-in-out infinite alternate;
+    }
+    @keyframes backgroundShift {0%{transform:translateX(-20px)translateY(-10px);}100%{transform:translateX(20px)translateY(10px);}}
+    .calculator {
+      width:100%;max-width:500px;background:rgba(255,255,255,0.95);
+      backdrop-filter:blur(20px);border-radius:24px;padding:32px;
+      box-shadow:0 20px 40px rgba(0,0,0,0.1),0 0 80px rgba(149,193,31,0.1);
+      animation:slideUp 0.8s ease-out;
+    }
+    @keyframes slideUp {0%{transform:translateY(60px);opacity:0;}100%{transform:translateY(0);opacity:1;}}
+    .header{text-align:center;margin-bottom:32px;}
+    .header .title{font-size:28px;font-weight:800;background:linear-gradient(135deg,#116234,#95C11F);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px;}
+    .header .subtitle{font-size:14px;color:#64748B;font-weight:500;letter-spacing:2px;text-transform:uppercase;}
+    .tariff-buttons{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:32px;}
+    .tariff-button{padding:16px;background:rgba(248,250,252,0.8);border:2px solid transparent;border-radius:16px;
+      cursor:pointer;text-align:center;font-weight:600;font-size:14px;color:#64748B;transition:all 0.3s;}
+    .tariff-button.active{background:linear-gradient(135deg,#95C11F,#116234);color:#fff;transform:scale(1.02);}
+    label{display:block;margin-bottom:8px;font-weight:600;font-size:14px;color:#1E293B;}
+    input[type="number"]{width:100%;padding:16px 20px;font-size:16px;font-weight:500;
+      border:2px solid #E2E8F0;border-radius:12px;background:rgba(248,250,252,0.8);}
+    .slider{width:100%;height:8px;border-radius:4px;background:#E2E8F0;outline:none;cursor:pointer;}
+    .slider::-webkit-slider-thumb{appearance:none;width:24px;height:24px;border-radius:50%;
+      background:linear-gradient(135deg,#95C11F,#116234);border:3px solid #fff;}
+    .output{background:linear-gradient(135deg,#F0FDF4,#DCFCE7);border:2px solid #BBF7D0;
+      padding:24px;border-radius:16px;margin:24px 0;}
+    .output p{margin:12px 0;font-size:15px;display:flex;justify-content:space-between;}
+    .output-value{font-weight:700;font-size:16px;color:#15803D;}
+    .buttons{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:32px;}
+    .btn{padding:16px 24px;border-radius:12px;text-align:center;font-weight:600;font-size:15px;border:none;cursor:pointer;}
+    .btn-whatsapp{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;}
+    .btn-call{background:linear-gradient(135deg,#116234,#95C11F);color:#fff;}
+    .error-message{background:#FED7AA;color:#EA580C;padding:12px 16px;border-radius:10px;
+      font-size:13px;font-weight:500;margin-top:8px;display:none;}
+    .helper-text{background:#FEF7ED;color:#EA580C;padding:12px 16px;border-radius:10px;font-size:13px;font-weight:500;margin-top:16px;}
+    @media(max-width:768px){.buttons{grid-template-columns:1fr;}.tariff-buttons{grid-template-columns:1fr;}}
+  </style>
 </head>
 <body>
-    <!-- Фиксированная шапка -->
-    <header class="header">
-        <div class="header-content">
-            <div class="logo">
-                <div class="logo-icon">S</div>
-                <div>
-                    <div style="font-weight: 700; font-size: 18px;">SHEYKEY</div>
-                    <div class="company-info">Исламская компания, которая работает<br>на принципах и нормах шариата</div>
-                </div>
-            </div>
-            <div class="contacts">
-                <a href="tel:89659535633" class="contact-btn phone">📞 8 965-953-56-33</a>
-                <a href="#" class="contact-btn whatsapp">💬 WhatsApp</a>
-            </div>
-        </div>
-    </header>
-
-    <!-- Основной контент -->
-    <div class="container">
-        <h1 class="main-title">SheyKey Finance. Купите сейчас — платите потом.</h1>
-        <p class="subtitle">Рассрочка по нормам Ислама. Без банка, без скрытых платежей, без штрафов и пеней.</p>
-
-        <div class="calculator-wrapper">
-            <!-- Форма калькулятора -->
-            <div class="calculator-form">
-                <div class="form-group">
-                    <div class="form-label">Категория</div>
-                    <select class="term-select" id="category">
-                        <option value="consumer">Потребительские товары</option>
-                        <option value="electronics">Электроника</option>
-                        <option value="furniture">Мебель</option>
-                        <option value="appliances">Бытовая техника</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <div class="form-label">Стоимость товара</div>
-                    <div class="slider-container">
-                        <input type="range" min="10000" max="1000000" value="50000" class="slider" id="productPrice">
-                        <div class="slider-value" id="productPriceValue">50 000 ₽</div>
-                        <div class="slider-limits">
-                            <span>Мин: 10 000 ₽</span>
-                            <span>Макс: 1 000 000 ₽</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="form-label">Тариф условий</div>
-                    <div class="tariff-options">
-                        <div class="tariff-option" data-tariff="no-deposit">
-                            <div class="tariff-title">Без взноса</div>
-                            <div class="tariff-limit">Лимит: 10 000 ₽ — 60 000 ₽</div>
-                        </div>
-                        <div class="tariff-option active" data-tariff="no-guarantor">
-                            <div class="tariff-title">Без поручителя</div>
-                            <div class="tariff-limit">Лимит: 10 000 ₽ — 80 000 ₽</div>
-                        </div>
-                        <div class="tariff-option" data-tariff="one-guarantor">
-                            <div class="tariff-title">С 1 поручителем</div>
-                            <div class="tariff-limit">Лимит: 10 000 ₽ — 300 000 ₽</div>
-                        </div>
-                        <div class="tariff-option" data-tariff="two-guarantors">
-                            <div class="tariff-title">С 2 поручителями</div>
-                            <div class="tariff-limit">Лимит: 50 000 ₽ — 1 000 000 ₽</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="form-label">Первоначальный взнос</div>
-                    <div class="slider-container">
-                        <input type="range" min="20" max="90" value="20" class="slider" id="initialPayment">
-                        <div class="slider-value" id="initialPaymentValue">20%</div>
-                        <div class="slider-limits">
-                            <span>Мин: 20%</span>
-                            <span>Макс: 90%</span>
-                        </div>
-                        <div style="margin-top: 10px; font-size: 14px; color: #666;" id="initialPaymentAmount">(12 400 ₽)</div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="form-label">Срок рассрочки</div>
-                    <select class="term-select" id="term">
-                        <option value="6">6 мес.</option>
-                        <option value="12">12 мес.</option>
-                        <option value="18">18 мес.</option>
-                        <option value="24">24 мес.</option>
-                    </select>
-                    <div style="margin-top: 10px; font-size: 12px; color: #999;">Наценка: 4% за месяц (со взносом)</div>
-                </div>
-            </div>
-
-            <!-- Панель результатов -->
-            <div class="results-panel">
-                <div class="results-title">
-                    Результат расчёта
-                    <span class="term-badge" id="termBadge">6 мес</span>
-                </div>
-
-                <div class="result-row">
-                    <span class="result-label">Стоимость товара</span>
-                    <span class="result-value" id="resultProductPrice">50 000 ₽</span>
-                </div>
-
-                <div class="result-row">
-                    <span class="result-label">Торговая наценка</span>
-                    <span class="result-value" id="resultMarkup">12 000 ₽</span>
-                </div>
-
-                <div class="result-row">
-                    <span class="result-label">Итоговая стоимость</span>
-                    <span class="result-value" id="resultTotalCost">62 000 ₽</span>
-                </div>
-
-                <div class="result-row">
-                    <span class="result-label">Первоначальный взнос</span>
-                    <span class="result-value" id="resultInitialPayment">12 400 ₽</span>
-                </div>
-
-                <div class="monthly-payment">
-                    <div class="monthly-payment-label">Ежемесячный платёж</div>
-                    <div class="monthly-payment-value" id="monthlyPaymentValue">8 267 ₽</div>
-                </div>
-
-                <div style="margin-top: 30px;">
-                    <div class="requirements-title">Требования</div>
-                    <ul class="requirements-list">
-                        <li>Возраст от 20 лет</li>
-                        <li>Постоянная регистрация в ЧР</li>
-                        <li>Паспорт РФ</li>
-                        <li>Поручитель 22-60 лет (если требуется по тарифу)</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- Промо-баннер -->
-        <div class="promo-banner">
-            <div class="promo-text">Рассрочка на всё — без банка</div>
-            <div class="promo-subtext">Купите сейчас — платите потом. Срок до 12 месяцев.</div>
-            <button class="promo-btn" onclick="alert('Перейти к оформлению заявки')">Позвонить</button>
-        </div>
+  <div class="calculator">
+    <div class="header">
+      <div class="title">AMANA FINANCE</div>
+      <div class="subtitle">Калькулятор рассрочки</div>
     </div>
 
-    <!-- Подвал -->
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-logo">
-                <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px;">
-                    <div class="logo-icon">S</div>
-                    <div style="font-weight: 700; font-size: 18px;">SHEYKEY</div>
-                </div>
-            </div>
-            <div class="footer-text">© 2025 SheyKey Finance. Все права защищены.</div>
-            <div class="footer-contacts">
-                <div>Тел: 8 965-953-56-33</div>
-                <div>WhatsApp</div>
-            </div>
-        </div>
-    </footer>
+    <div class="tariff-buttons">
+      <div class="tariff-button active" data-tariff="with">С первым взносом</div>
+      <div class="tariff-button" data-tariff="without">Без первого взноса</div>
+    </div>
 
-    <script>
-        // Элементы управления
-        const productPriceSlider = document.getElementById('productPrice');
-        const productPriceValue = document.getElementById('productPriceValue');
-        const initialPaymentSlider = document.getElementById('initialPayment');
-        const initialPaymentValue = document.getElementById('initialPaymentValue');
-        const initialPaymentAmount = document.getElementById('initialPaymentAmount');
-        const termSelect = document.getElementById('term');
-        const termBadge = document.getElementById('termBadge');
+    <div class="input-group">
+      <label for="price">Стоимость товара</label>
+      <input type="number" id="price" placeholder="не менее 50 000 ₽" min="0"/>
+      <div class="error-message" id="errorMessage">⚠️ Стоимость товара должна быть не менее 50 000₽</div>
+    </div>
 
-        // Элементы результатов
-        const resultProductPrice = document.getElementById('resultProductPrice');
-        const resultMarkup = document.getElementById('resultMarkup');
-        const resultTotalCost = document.getElementById('resultTotalCost');
-        const resultInitialPayment = document.getElementById('resultInitialPayment');
-        const monthlyPaymentValue = document.getElementById('monthlyPaymentValue');
+    <div class="input-group">
+      <label for="months" id="monthsLabel">Срок: 3 месяца</label>
+      <input type="range" id="months" class="slider" min="3" max="12" value="3"/>
+      <div class="months-display">
+        <span class="month-label active">3 мес</span>
+        <span class="month-label">6 мес</span>
+        <span class="month-label">9 мес</span>
+        <span class="month-label">12 мес</span>
+      </div>
+    </div>
 
-        // Обработчики тарифных опций
-        const tariffOptions = document.querySelectorAll('.tariff-option');
-        let selectedTariff = 'no-guarantor';
+    <div id="prepaymentBlock" class="input-group">
+      <label for="prepaymentSlider">Первый взнос</label>
+      <input type="number" id="prepaymentInput" step="100" placeholder="0"/>
+      <div class="error-message" id="prepaymentError"></div>
+      <input type="range" id="prepaymentSlider" class="slider" min="0" max="0" step="100" value="0"/>
+    </div>
 
-        tariffOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                tariffOptions.forEach(opt => opt.classList.remove('active'));
-                option.classList.add('active');
-                selectedTariff = option.dataset.tariff;
-                calculateResults();
-            });
-        });
+    <div class="output" id="results">
+      <p><strong>Первый взнос:</strong><span class="output-value">0 ₽</span></p>
+      <p><strong>Ежемесячный платёж:</strong><span class="output-value">0 ₽</span></p>
+      <p><strong>Стоимость с наценкой:</strong><span class="output-value">0 ₽</span></p>
+      <p><strong>Наценка:</strong><span class="output-value">0 ₽ (0%)</span></p>
+    </div>
 
-        // Функция форматирования чисел
-        function formatNumber(num) {
-            return new Intl.NumberFormat('ru-RU').format(Math.round(num));
+    <div class="helper-text">💡 Обязательные требования: Поручитель и паспорта обеих лиц</div>
+
+    <div class="buttons">
+      <a id="whatsapp" class="btn btn-whatsapp" href="#" target="_blank">✍️ WhatsApp</a>
+      <a class="btn btn-call" href="tel:+79280222114">📞 Позвонить</a>
+    </div>
+  </div>
+
+  <script>
+    const priceInput=document.getElementById('price');
+    const monthsInput=document.getElementById('months');
+    const monthsLabel=document.getElementById('monthsLabel');
+    const prepaymentBlock=document.getElementById('prepaymentBlock');
+    const prepaymentSlider=document.getElementById('prepaymentSlider');
+    const prepaymentInput=document.getElementById('prepaymentInput');
+    const prepaymentError=document.getElementById('prepaymentError');
+    const resultsDiv=document.getElementById('results');
+    const whatsappBtn=document.getElementById('whatsapp');
+    const errorMessage=document.getElementById('errorMessage');
+    const tariffButtons=document.querySelectorAll('.tariff-button');
+
+    let selectedTariff='with';
+    let conditionalPrepayment=0;
+
+    const markupWithDown={3:9,4:12,5:15,6:18,7:20,8:22,9:24,10:26,11:28,12:30};
+    const markupWithoutDown={3:13,4:17,5:21,6:25.5,7:28.5,8:32,9:35,10:38,11:41.5,12:45};
+    const markupNoDownPayment={3:14,4:18,5:23,6:28,7:31,8:34,9:37,10:40,11:43,12:46};
+    const roundUpTo100=val=>Math.ceil(val/100)*100;
+
+    function updateCalculator(resetPrepayment=false){
+      let months=parseInt(monthsInput.value);
+      const price=parseInt(priceInput.value)||0;
+
+      // Ограничения по сумме
+      let maxMonths=12;
+      if(price<50000) maxMonths=6;
+      else if(price>=50000 && price<100000) maxMonths=9;
+      else maxMonths=12;
+
+      monthsInput.max=maxMonths;
+      if(months>maxMonths){months=maxMonths;monthsInput.value=maxMonths;}
+
+      const monthText=months===1?'месяц':(months<5?'месяца':'месяцев');
+      monthsLabel.textContent=`Срок: ${months} ${monthText}`;
+
+      if(isNaN(price)||price<50000){
+        errorMessage.style.display='block';
+        resultsDiv.innerHTML='<p><strong>Первый взнос:</strong><span class="output-value">0 ₽</span></p><p><strong>Ежемесячный платёж:</strong><span class="output-value">0 ₽</span></p><p><strong>Стоимость с наценкой:</strong><span class="output-value">0 ₽</span></p><p><strong>Наценка:</strong><span class="output-value">0 ₽ (0%)</span></p>';
+        whatsappBtn.href="https://wa.me/79280222114?text=Здравствуйте, хочу оформить рассрочку.";
+        return;
+      } else errorMessage.style.display='none';
+
+      const percent=selectedTariff==='with'?markupWithDown[months]:markupNoDownPayment[months];
+      const baseFinalCost=price*(1+percent/100);
+      let prepayment=0,monthly=0,finalCost=0,message="";
+
+      if(selectedTariff==='with'){
+        const minPrepayment=roundUpTo100(baseFinalCost*0.15);
+        const maxPrepayment=roundUpTo100(baseFinalCost*0.65);
+        conditionalPrepayment=roundUpTo100(baseFinalCost*0.25);
+        prepaymentSlider.min=minPrepayment;
+        prepaymentSlider.max=maxPrepayment;
+        if(resetPrepayment) prepaymentSlider.value=conditionalPrepayment;
+        prepayment=parseInt(prepaymentSlider.value);
+        prepaymentInput.value=prepayment;
+        if(prepayment===conditionalPrepayment){
+          const remaining=baseFinalCost-prepayment;
+          monthly=roundUpTo100(remaining/months);
+          finalCost=monthly*months+prepayment;
+        }else{
+          const remaining=price-prepayment;
+          const remainingWithMarkup=remaining*(1+markupWithoutDown[months]/100);
+          monthly=roundUpTo100(remainingWithMarkup/months);
+          finalCost=monthly*months+prepayment;
         }
+        message=`Здравствуйте, хочу оформить рассрочку. Стоимость: ${price.toLocaleString()} ₽, С первым взносом ${prepayment.toLocaleString()} ₽, срок ${months} мес.`;
+      }else{
+        monthly=roundUpTo100(baseFinalCost/months);
+        finalCost=monthly*months;
+        prepayment=0;prepaymentInput.value="0";
+        message=`Здравствуйте, хочу оформить рассрочку без первого взноса. Стоимость: ${price.toLocaleString()} ₽, срок ${months} мес.`;
+      }
 
-        // Функция расчета результатов
-        function calculateResults() {
-            const productPrice = parseFloat(productPriceSlider.value);
-            const initialPaymentPercent = parseFloat(initialPaymentSlider.value);
-            const termMonths = parseFloat(termSelect.value);
+      const markup=finalCost-price;
+      const markupPercent=Math.round((markup/price)*100);
 
-            // Торговая наценка (4% за месяц)
-            const markupPercent = 4;
-            const totalMarkup = (productPrice * markupPercent * termMonths) / 100;
-            
-            // Итоговая стоимость
-            const totalCost = productPrice + totalMarkup;
-            
-            // Первоначальный взнос
-            const initialPaymentAmount = (productPrice * initialPaymentPercent) / 100;
-            
-            // Остаток к рассрочке
-            const remainingAmount = totalCost - initialPaymentAmount;
-            
-            // Ежемесячный платеж
-            const monthlyPayment = remainingAmount / termMonths;
+      resultsDiv.innerHTML=`
+        <p><strong>Первый взнос:</strong><span class="output-value">${prepayment.toLocaleString()} ₽</span></p>
+        <p><strong>Ежемесячный платёж:</strong><span class="output-value">${monthly.toLocaleString()} ₽</span></p>
+        <p><strong>Стоимость с наценкой:</strong><span class="output-value">${finalCost.toLocaleString()} ₽</span></p>
+        <p><strong>Наценка:</strong><span class="output-value">${markup.toLocaleString()} ₽ (${markupPercent}%)</span></p>`;
+      whatsappBtn.href=`https://wa.me/79280222114?text=${encodeURIComponent(message)}`;
+    }
 
-            // Обновление значений в интерфейсе
-            productPriceValue.textContent = `${formatNumber(productPrice)} ₽`;
-            initialPaymentValue.textContent = `${initialPaymentPercent}%`;
-            initialPaymentAmount.textContent = `(${formatNumber(initialPaymentAmount)} ₽)`;
-            
-            resultProductPrice.textContent = `${formatNumber(productPrice)} ₽`;
-            resultMarkup.textContent = `${formatNumber(totalMarkup)} ₽`;
-            resultTotalCost.textContent = `${formatNumber(totalCost)} ₽`;
-            resultInitialPayment.textContent = `${formatNumber(initialPaymentAmount)} ₽`;
-            monthlyPaymentValue.textContent = `${formatNumber(monthlyPayment)} ₽`;
-            
-            termBadge.textContent = `${termMonths} мес`;
-        }
+    tariffButtons.forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        tariffButtons.forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedTariff=btn.dataset.tariff;
+        updateCalculator(true);
+      });
+    });
 
-        // Обработчики событий
-        productPriceSlider.addEventListener('input', calculateResults);
-        initialPaymentSlider.addEventListener('input', calculateResults);
-        termSelect.addEventListener('change', calculateResults);
+    priceInput.addEventListener('input',()=>updateCalculator(true));
+    monthsInput.addEventListener('input',()=>updateCalculator(true));
+    prepaymentSlider.addEventListener('input',()=>updateCalculator(false));
+    prepaymentInput.addEventListener('input',()=>{
+      const val=roundUpTo100(parseInt(prepaymentInput.value||'0'));
+      const min=parseInt(prepaymentSlider.min);const max=parseInt(prepaymentSlider.max);
+      if(val>=min&&val<=max){prepaymentError.style.display='none';prepaymentSlider.value=val;updateCalculator(false);}
+      else{prepaymentError.textContent=`Первый взнос должен быть от ${min.toLocaleString()}₽ до ${max.toLocaleString()}₽`;prepaymentError.style.display='block';}
+    });
 
-        // Инициализация
-        calculateResults();
-
-        // Обработка скролла для эффекта зафиксированной шапки
-        let lastScrollTop = 0;
-        const header = document.querySelector('.header');
-
-        window.addEventListener('scroll', () => {
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            
-            if (scrollTop > lastScrollTop) {
-                // Скролл вниз - шапка остается видимой
-                header.style.transform = 'translateY(0)';
-            } else {
-                // Скролл вверх - шапка остается видимой
-                header.style.transform = 'translateY(0)';
-            }
-            
-            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
-        });
-    </script>
+    updateCalculator(true);
+  </script>
 </body>
 </html>
