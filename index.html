@@ -6,12 +6,7 @@
   <title>Amana Finance — Калькулятор рассрочки</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Inter', sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -23,26 +18,19 @@
       position: relative;
       overflow-x: hidden;
     }
-
     body::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: 
-        radial-gradient(circle at 20% 80%, rgba(120, 255, 214, 0.1) 0%, transparent 50%),
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle at 20% 80%, rgba(120, 255, 214, 0.1) 0%, transparent 50%),
         radial-gradient(circle at 80% 20%, rgba(255, 120, 198, 0.1) 0%, transparent 50%),
         radial-gradient(circle at 40% 40%, rgba(149, 193, 31, 0.1) 0%, transparent 50%);
       animation: backgroundShift 15s ease-in-out infinite alternate;
     }
-
     @keyframes backgroundShift {
       0% { transform: translateX(-20px) translateY(-10px); }
       100% { transform: translateX(20px) translateY(10px); }
     }
-
     .calculator {
       width: 100%;
       max-width: 500px;
@@ -53,29 +41,14 @@
       padding: 32px;
       position: relative;
       z-index: 1;
-      box-shadow: 
-        0 20px 40px rgba(0, 0, 0, 0.1),
-        0 0 80px rgba(149, 193, 31, 0.1);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 0 0 80px rgba(149, 193, 31, 0.1);
       animation: slideUp 0.8s ease-out;
-      transform-origin: center bottom;
     }
-
     @keyframes slideUp {
-      0% {
-        transform: translateY(60px);
-        opacity: 0;
-      }
-      100% {
-        transform: translateY(0);
-        opacity: 1;
-      }
+      0% { transform: translateY(60px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
     }
-
-    .header {
-      text-align: center;
-      margin-bottom: 32px;
-    }
-
+    .header { text-align: center; margin-bottom: 32px; }
     .header .title {
       font-size: 28px;
       font-weight: 800;
@@ -86,7 +59,6 @@
       margin-bottom: 8px;
       letter-spacing: -0.5px;
     }
-
     .header .subtitle {
       font-size: 14px;
       color: #64748B;
@@ -94,14 +66,7 @@
       letter-spacing: 2px;
       text-transform: uppercase;
     }
-
-    .tariff-buttons {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 32px;
-    }
-
+    .tariff-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 32px; }
     .tariff-button {
       padding: 16px;
       background: rgba(248, 250, 252, 0.8);
@@ -117,27 +82,7 @@
       overflow: hidden;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
-
-    .tariff-button::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(149, 193, 31, 0.1), transparent);
-      transition: left 0.5s ease;
-    }
-
-    .tariff-button:hover::before {
-      left: 100%;
-    }
-
-    .tariff-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(149, 193, 31, 0.15);
-    }
-
+    .tariff-button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(149, 193, 31, 0.15); }
     .tariff-button.active {
       background: linear-gradient(135deg, #95C11F, #116234);
       color: white;
@@ -145,40 +90,12 @@
       transform: scale(1.02);
       box-shadow: 0 12px 30px rgba(149, 193, 31, 0.3);
     }
-
-    .input-group {
-      margin-bottom: 24px;
-      animation: fadeInUp 0.6s ease-out;
-      animation-fill-mode: both;
-    }
-
-    .input-group:nth-child(3) { animation-delay: 0.1s; }
-    .input-group:nth-child(4) { animation-delay: 0.2s; }
-    .input-group:nth-child(5) { animation-delay: 0.3s; }
-
+    .input-group { margin-bottom: 24px; animation: fadeInUp 0.6s ease-out; }
     @keyframes fadeInUp {
-      0% {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
     }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      font-size: 14px;
-      color: #1E293B;
-    }
-
-    .input-wrapper {
-      position: relative;
-    }
-
+    label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: #1E293B; }
     input[type="number"] {
       width: 100%;
       padding: 16px 20px;
@@ -190,23 +107,13 @@
       transition: all 0.3s ease;
       color: #1E293B;
     }
-
     input[type="number"]:focus {
       outline: none;
       border-color: #95C11F;
       background: rgba(255, 255, 255, 0.95);
       box-shadow: 0 0 0 4px rgba(149, 193, 31, 0.1);
-      transform: translateY(-1px);
     }
-
-    input[type="number"]::placeholder {
-      color: #94A3B8;
-    }
-
-    .slider-container {
-      margin-top: 12px;
-    }
-
+    .slider-container { margin-top: 12px; }
     .slider {
       width: 100%;
       height: 8px;
@@ -215,9 +122,7 @@
       outline: none;
       appearance: none;
       cursor: pointer;
-      position: relative;
     }
-
     .slider::-webkit-slider-thumb {
       appearance: none;
       width: 24px;
@@ -227,14 +132,7 @@
       cursor: pointer;
       border: 3px solid white;
       box-shadow: 0 4px 12px rgba(149, 193, 31, 0.3);
-      transition: all 0.2s ease;
     }
-
-    .slider::-webkit-slider-thumb:hover {
-      transform: scale(1.1);
-      box-shadow: 0 6px 20px rgba(149, 193, 31, 0.4);
-    }
-
     .slider::-moz-range-thumb {
       width: 24px;
       height: 24px;
@@ -244,35 +142,11 @@
       border: 3px solid white;
       box-shadow: 0 4px 12px rgba(149, 193, 31, 0.3);
     }
-
-    .months-display {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 8px;
-      font-size: 12px;
-      color: #64748B;
-    }
-
-    .month-label {
-      position: relative;
-      transition: all 0.3s ease;
-    }
-
-    .month-label.active {
-      color: #95C11F;
-      font-weight: 600;
-    }
-
-    .prepayment-input-group {
-      margin-top: 8px;
-    }
-
-    .prepayment-input-group input[type="number"] {
-      width: 200px;
-      padding: 12px 16px;
-      font-size: 14px;
-    }
-
+    .months-display { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: #64748B; }
+    .month-label { transition: all 0.3s ease; }
+    .month-label.active { color: #95C11F; font-weight: 600; }
+    .prepayment-input-group { margin-top: 8px; }
+    .prepayment-input-group input[type="number"] { width: 200px; padding: 12px 16px; font-size: 14px; }
     .error-message {
       background: linear-gradient(135deg, #FEF7ED, #FED7AA);
       color: #EA580C;
@@ -283,10 +157,8 @@
       margin-top: 8px;
       border-left: 4px solid #EA580C;
       display: none;
-      animation: pulseGlow 2s ease-in-out infinite;
       line-height: 1.4;
     }
-
     .helper-text {
       background: linear-gradient(135deg, #FEF7ED, #FED7AA);
       color: #EA580C;
@@ -296,52 +168,14 @@
       font-weight: 500;
       margin: 24px 0;
       border-left: 4px solid #EA580C;
-      animation: pulseGlow 2s ease-in-out infinite;
     }
-
-    @keyframes pulseGlow {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(234, 88, 12, 0.1); }
-      50% { box-shadow: 0 0 0 8px rgba(234, 88, 12, 0.05); }
-    }
-
     .output {
       background: linear-gradient(135deg, #F0FDF4, #DCFCE7);
       border: 2px solid #BBF7D0;
       padding: 24px;
       border-radius: 16px;
       margin: 24px 0;
-      animation: resultAppear 0.6s ease-out;
-      position: relative;
-      overflow: hidden;
     }
-
-    .output::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(149, 193, 31, 0.1), transparent);
-      animation: shimmer 2s ease-in-out infinite;
-    }
-
-    @keyframes shimmer {
-      0% { left: -100%; }
-      100% { left: 100%; }
-    }
-
-    @keyframes resultAppear {
-      0% {
-        opacity: 0;
-        transform: scale(0.95) translateY(10px);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-      }
-    }
-
     .output p {
       margin: 12px 0;
       font-size: 15px;
@@ -350,30 +184,9 @@
       align-items: center;
       gap: 12px;
     }
-
-    .output strong {
-      color: #166534;
-      font-weight: 600;
-      flex-shrink: 0;
-      min-width: 0;
-      flex: 1;
-    }
-
-    .output-value {
-      font-weight: 700;
-      font-size: 16px;
-      color: #15803D;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    .buttons {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 32px;
-    }
-
+    .output strong { color: #166534; font-weight: 600; flex: 1; }
+    .output-value { font-weight: 700; font-size: 16px; color: #15803D; white-space: nowrap; }
+    .buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 32px; }
     .btn {
       padding: 16px 24px;
       border-radius: 12px;
@@ -381,102 +194,23 @@
       text-align: center;
       font-weight: 600;
       font-size: 15px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
+      transition: all 0.3s;
       border: none;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-    }
-
-    .btn::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      transition: width 0.6s ease, height 0.6s ease;
-    }
-
-    .btn:hover::before {
-      width: 300px;
-      height: 300px;
-    }
-
-    .btn-whatsapp {
-      background: linear-gradient(135deg, #25D366, #128C7E);
       color: white;
     }
-
-    .btn-whatsapp:hover {
-      transform: translateY(-3px) scale(1.02);
-      box-shadow: 0 12px 30px rgba(37, 211, 102, 0.4);
-    }
-
-    .btn-call {
-      background: linear-gradient(135deg, #116234, #95C11F);
-      color: white;
-    }
-
-    .btn-call:hover {
-      transform: translateY(-3px) scale(1.02);
-      box-shadow: 0 12px 30px rgba(17, 98, 52, 0.4);
-    }
-
-    .btn span {
-      position: relative;
-      z-index: 1;
-    }
-
+    .btn-whatsapp { background: linear-gradient(135deg, #25D366, #128C7E); }
+    .btn-whatsapp:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(37, 211, 102, 0.4); }
+    .btn-call { background: linear-gradient(135deg, #116234, #95C11F); }
+    .btn-call:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(17, 98, 52, 0.4); }
     @media (max-width: 768px) {
-      body {
-        padding: 16px;
-      }
-
-      .calculator {
-        padding: 24px;
-        border-radius: 20px;
-      }
-
-      .header .title {
-        font-size: 24px;
-      }
-
-      .buttons {
-        grid-template-columns: 1fr;
-      }
-
-      .tariff-buttons {
-        grid-template-columns: 1fr;
-      }
-
-      .prepayment-input-group input[type="number"] {
-        width: 100%;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-      }
-    }
-
-    .tariff-button:focus-visible,
-    .btn:focus-visible {
-      outline: 2px solid #95C11F;
-      outline-offset: 2px;
-    }
-
-    .slider:focus-visible {
-      box-shadow: 0 0 0 3px rgba(149, 193, 31, 0.3);
+      .calculator { padding: 24px; }
+      .buttons { grid-template-columns: 1fr; }
+      .tariff-buttons { grid-template-columns: 1fr; }
+      .prepayment-input-group input[type="number"] { width: 100%; }
     }
   </style>
 </head>
@@ -486,25 +220,20 @@
       <div class="title">AMANA FINANCE</div>
       <div class="subtitle">Калькулятор рассрочки</div>
     </div>
-
     <div class="tariff-buttons">
       <div class="tariff-button active" data-tariff="with">С первым взносом</div>
       <div class="tariff-button" data-tariff="without">Без первого взноса</div>
     </div>
-
     <div class="input-group">
       <label for="price">Стоимость товара</label>
-      <div class="input-wrapper">
-        <input type="number" id="price" placeholder="не менее 40 000 ₽" min="0" />
-      </div>
-      <div class="error-message" id="errorMessage">⚠️ Стоимость товара должна быть<br>не менее 40 000₽</div>
+      <input type="number" id="price" placeholder="не менее 40 000 ₽" min="0" />
+      <div class="error-message" id="errorMessage">⚠️ Стоимость товара должна быть не менее 40 000₽</div>
     </div>
-
     <div class="input-group">
       <label for="months" id="monthsLabel">Срок: 3 месяца</label>
       <div class="slider-container">
         <input type="range" id="months" class="slider" min="3" max="12" value="3" />
-        <div class="months-display">
+        <div class="months-display" id="monthsDisplay">
           <span class="month-label active">3 мес</span>
           <span class="month-label">6 мес</span>
           <span class="month-label">9 мес</span>
@@ -512,7 +241,6 @@
         </div>
       </div>
     </div>
-
     <div id="prepaymentBlock" class="input-group">
       <label for="prepaymentSlider">Первый взнос</label>
       <div class="prepayment-input-group">
@@ -523,15 +251,13 @@
         <input type="range" id="prepaymentSlider" class="slider" min="0" max="0" step="100" value="0" />
       </div>
     </div>
-
     <div class="output" id="results">
       <p><strong>Первый взнос:</strong> <span class="output-value">0 ₽</span></p>
       <p><strong>Ежемесячный платёж:</strong> <span class="output-value">0 ₽</span></p>
       <p><strong>Стоимость с наценкой:</strong> <span class="output-value">0 ₽</span></p>
       <p><strong>Наценка:</strong> <span class="output-value">0 ₽ (0%)</span></p>
     </div>
-
-    <div class="helper-text" id="requirements">
+    <div class="helper-text">
       <div style="font-weight: 600; margin-bottom: 8px;">💡 Обязательные требования:</div>
       <div style="line-height: 1.8;">
         • Покупатель 22-60 лет<br>
@@ -540,17 +266,11 @@
         • Фактический адрес проживания
       </div>
     </div>
-
     <div class="buttons">
-      <a id="whatsapp" class="btn btn-whatsapp" href="#" target="_blank">
-        <span>✍️ Написать в WhatsApp</span>
-      </a>
-      <a class="btn btn-call" href="tel:+79280222114">
-        <span>📞 Позвонить</span>
-      </a>
+      <a id="whatsapp" class="btn btn-whatsapp" href="#" target="_blank">✍️ Написать в WhatsApp</a>
+      <a class="btn btn-call" href="tel:+79280222114">📞 Позвонить</a>
     </div>
   </div>
-
   <script>
     const priceInput = document.getElementById('price');
     const monthsInput = document.getElementById('months');
@@ -563,111 +283,76 @@
     const whatsappBtn = document.getElementById('whatsapp');
     const errorMessage = document.getElementById('errorMessage');
     const tariffButtons = document.querySelectorAll('.tariff-button');
-    const monthLabels = document.querySelectorAll('.month-label');
-    const requirementsDiv = document.getElementById('requirements');
-
+    const monthsDisplay = document.getElementById('monthsDisplay');
     let selectedTariff = 'with';
     let conditionalPrepayment = 0;
-
     const markupWithDown = {3:9,4:12,5:15,6:18,7:20,8:22,9:24,10:26,11:28,12:30};
     const markupWithoutDown = {3:13,4:17,5:21,6:25.5,7:28.5,8:32,9:35,10:38,11:41.5,12:45};
     const markupNoDownPayment = {3:14,4:18,5:23,6:28,7:31,8:34,9:37,10:40,11:43,12:46};
-
     const roundUpTo100 = val => Math.ceil(val / 100) * 100;
 
     function updateMonthLabels(selectedMonth, maxMonths) {
-      monthLabels.forEach((label, index) => {
-        const monthValue = [3, 6, 9, 12][index];
-        
-        if (monthValue > maxMonths) {
-          label.style.display = 'none';
-        } else {
-          label.style.display = 'block';
-        }
-        
-        label.classList.toggle('active', monthValue === selectedMonth);
-      });
+      if (maxMonths === 6) {
+        monthsDisplay.innerHTML = `
+          <span class="month-label ${selectedMonth === 3 ? 'active' : ''}">3 мес</span>
+          <span class="month-label ${selectedMonth === 4 ? 'active' : ''}">4 мес</span>
+          <span class="month-label ${selectedMonth === 5 ? 'active' : ''}">5 мес</span>
+          <span class="month-label ${selectedMonth === 6 ? 'active' : ''}">6 мес</span>
+        `;
+      } else if (maxMonths === 9) {
+        monthsDisplay.innerHTML = `
+          <span class="month-label ${selectedMonth === 3 ? 'active' : ''}">3 мес</span>
+          <span class="month-label ${selectedMonth === 6 ? 'active' : ''}">6 мес</span>
+          <span class="month-label ${selectedMonth === 9 ? 'active' : ''}">9 мес</span>
+        `;
+      } else {
+        monthsDisplay.innerHTML = `
+          <span class="month-label ${selectedMonth === 3 ? 'active' : ''}">3 мес</span>
+          <span class="month-label ${selectedMonth === 6 ? 'active' : ''}">6 мес</span>
+          <span class="month-label ${selectedMonth === 9 ? 'active' : ''}">9 мес</span>
+          <span class="month-label ${selectedMonth === 12 ? 'active' : ''}">12 мес</span>
+        `;
+      }
     }
 
     function togglePrepaymentSlider() {
-      const isVisible = selectedTariff === 'with';
-      prepaymentBlock.style.display = isVisible ? 'block' : 'none';
-      if (isVisible) {
-        prepaymentBlock.style.animation = 'fadeInUp 0.4s ease-out';
-      }
-      
-      requirementsDiv.innerHTML = `
-        <div style="font-weight: 600; margin-bottom: 8px;">💡 Обязательные требования:</div>
-        <div style="line-height: 1.8;">
-          • Покупатель 22-60 лет<br>
-          • Поручитель муж. пола 25-60 лет<br>
-          • Паспорт обоих лиц (Лицевая и страница с пропиской)<br>
-          • Фактический адрес проживания
-        </div>
-      `;
+      prepaymentBlock.style.display = selectedTariff === 'with' ? 'block' : 'none';
     }
 
     function updateCalculator(resetPrepayment = false) {
       const price = parseInt(priceInput.value);
-      
       let maxMonths = 12;
-      if (price >= 1 && price <= 49999) {
-        maxMonths = 6;
-      } else if (price >= 50000 && price <= 99999) {
-        maxMonths = 9;
-      } else if (price >= 100000) {
-        maxMonths = 12;
-      }
-      
+      if (price >= 1 && price <= 49999) maxMonths = 6;
+      else if (price >= 50000 && price <= 99999) maxMonths = 9;
       monthsInput.max = maxMonths;
-      
       let months = parseInt(monthsInput.value);
       if (months > maxMonths) {
         months = maxMonths;
         monthsInput.value = maxMonths;
       }
-      
       const monthText = months === 1 ? 'месяц' : (months < 5 ? 'месяца' : 'месяцев');
       monthsLabel.textContent = `Срок: ${months} ${monthText}`;
       updateMonthLabels(months, maxMonths);
-
       if (isNaN(price) || price < 40000) {
         errorMessage.style.display = 'block';
-        prepaymentInput.value = 0;
-        prepaymentError.style.display = 'none';
-        resultsDiv.innerHTML = `
-          <p><strong>Первый взнос:</strong> <span class="output-value">0 ₽</span></p>
-          <p><strong>Ежемесячный платёж:</strong> <span class="output-value">0 ₽</span></p>
-          <p><strong>Стоимость с наценкой:</strong> <span class="output-value">0 ₽</span></p>
-          <p><strong>Наценка:</strong> <span class="output-value">0 ₽ (0%)</span></p>
-        `;
+        resultsDiv.innerHTML = '<p><strong>Первый взнос:</strong> <span class="output-value">0 ₽</span></p><p><strong>Ежемесячный платёж:</strong> <span class="output-value">0 ₽</span></p><p><strong>Стоимость с наценкой:</strong> <span class="output-value">0 ₽</span></p><p><strong>Наценка:</strong> <span class="output-value">0 ₽ (0%)</span></p>';
         whatsappBtn.href = "https://wa.me/79280222114?text=Здравствуйте, хочу оформить рассрочку.";
         togglePrepaymentSlider();
         return;
-      } else {
-        errorMessage.style.display = 'none';
       }
-
+      errorMessage.style.display = 'none';
       const percent = selectedTariff === 'with' ? markupWithDown[months] : markupNoDownPayment[months];
       const baseFinalCost = price * (1 + percent / 100);
-
       let prepayment = 0, monthly = 0, finalCost = 0, message = "";
-
       if (selectedTariff === 'with') {
         const minPrepayment = roundUpTo100(baseFinalCost * 0.15);
         const maxPrepayment = roundUpTo100(baseFinalCost * 0.65);
         conditionalPrepayment = roundUpTo100(baseFinalCost * 0.25);
-
         prepaymentSlider.min = minPrepayment;
         prepaymentSlider.max = maxPrepayment;
-
-        if (resetPrepayment) {
-          prepaymentSlider.value = conditionalPrepayment;
-        }
-
+        if (resetPrepayment) prepaymentSlider.value = conditionalPrepayment;
         prepayment = parseInt(prepaymentSlider.value);
         prepaymentInput.value = prepayment;
-
         if (prepayment === conditionalPrepayment) {
           const remaining = baseFinalCost - prepayment;
           monthly = roundUpTo100(remaining / months);
@@ -678,59 +363,35 @@
           monthly = roundUpTo100(remainingWithMarkup / months);
           finalCost = monthly * months + prepayment;
         }
-
         message = `Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${price.toLocaleString()} ₽, Тариф: С первым взносом, Первый взнос: ${prepayment.toLocaleString()} ₽, Срок: ${months} мес.`;
-
       } else {
         monthly = roundUpTo100(baseFinalCost / months);
         finalCost = monthly * months;
         prepaymentInput.value = "0";
-        prepayment = 0;
         message = `Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${price.toLocaleString()} ₽, Тариф: Без первого взноса, Срок: ${months} мес.`;
       }
-
       const markup = finalCost - price;
       const markupPercent = Math.round((markup / price) * 100);
-
-      resultsDiv.innerHTML = `
-        <p><strong>Первый взнос:</strong> <span class="output-value">${prepayment.toLocaleString()} ₽</span></p>
-        <p><strong>Ежемесячный платёж:</strong> <span class="output-value">${monthly.toLocaleString()} ₽</span></p>
-        <p><strong>Стоимость с наценкой:</strong> <span class="output-value">${finalCost.toLocaleString()} ₽</span></p>
-        <p><strong>Наценка:</strong> <span class="output-value">${markup.toLocaleString()} ₽ (${markupPercent}%)</span></p>
-      `;
-
-      resultsDiv.style.animation = 'none';
-      setTimeout(() => {
-        resultsDiv.style.animation = 'resultAppear 0.6s ease-out';
-      }, 10);
-
+      resultsDiv.innerHTML = `<p><strong>Первый взнос:</strong> <span class="output-value">${prepayment.toLocaleString()} ₽</span></p><p><strong>Ежемесячный платёж:</strong> <span class="output-value">${monthly.toLocaleString()} ₽</span></p><p><strong>Стоимость с наценкой:</strong> <span class="output-value">${finalCost.toLocaleString()} ₽</span></p><p><strong>Наценка:</strong> <span class="output-value">${markup.toLocaleString()} ₽ (${markupPercent}%)</span></p>`;
       whatsappBtn.href = `https://wa.me/79280222114?text=${encodeURIComponent(message)}`;
-      prepaymentError.style.display = 'none';
       togglePrepaymentSlider();
     }
 
     tariffButtons.forEach(button => {
       button.addEventListener('click', () => {
-        tariffButtons.forEach(btn => {
-          btn.classList.remove('active');
-          btn.style.transform = 'scale(1)';
-        });
+        tariffButtons.forEach(btn => btn.classList.remove('active'));
         button.classList.add('active');
-        button.style.transform = 'scale(1.02)';
         selectedTariff = button.dataset.tariff;
         updateCalculator(true);
       });
     });
-
     priceInput.addEventListener('input', () => updateCalculator(true));
     monthsInput.addEventListener('input', () => updateCalculator(true));
     prepaymentSlider.addEventListener('input', () => updateCalculator(false));
-
     prepaymentInput.addEventListener('input', () => {
       const val = roundUpTo100(parseInt(prepaymentInput.value || '0'));
       const min = parseInt(prepaymentSlider.min);
       const max = parseInt(prepaymentSlider.max);
-
       if (val >= min && val <= max) {
         prepaymentError.style.display = 'none';
         prepaymentSlider.value = val;
@@ -740,7 +401,6 @@
         prepaymentError.style.display = 'block';
       }
     });
-
     updateCalculator(true);
   </script>
 </body>
