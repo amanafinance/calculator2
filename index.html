@@ -255,7 +255,7 @@
 
     .month-label {
       position: relative;
-      transition: opacity 0.3s ease;
+      transition: all 0.3s ease;
     }
 
     .month-label.active {
@@ -495,9 +495,9 @@
     <div class="input-group">
       <label for="price">Стоимость товара</label>
       <div class="input-wrapper">
-        <input type="number" id="price" placeholder="не менее 50 000 ₽" min="0" />
+        <input type="number" id="price" placeholder="не менее 40 000 ₽" min="0" />
       </div>
-      <div class="error-message" id="errorMessage">⚠️ Стоимость товара должна быть<br>не менее 50 000₽</div>
+      <div class="error-message" id="errorMessage">⚠️ Стоимость товара должна быть<br>не менее 40 000₽</div>
     </div>
 
     <div class="input-group">
@@ -575,18 +575,14 @@
 
     const roundUpTo100 = val => Math.ceil(val / 100) * 100;
 
-    function updateMonthLabels(selectedMonth) {
-      const maxMonths = parseInt(monthsInput.max);
-      
+    function updateMonthLabels(selectedMonth, maxMonths) {
       monthLabels.forEach((label, index) => {
         const monthValue = [3, 6, 9, 12][index];
         
         if (monthValue > maxMonths) {
-          label.style.opacity = '0.3';
-          label.style.pointerEvents = 'none';
+          label.style.display = 'none';
         } else {
-          label.style.opacity = '1';
-          label.style.pointerEvents = 'auto';
+          label.style.display = 'block';
         }
         
         label.classList.toggle('active', monthValue === selectedMonth);
@@ -633,9 +629,9 @@
       
       const monthText = months === 1 ? 'месяц' : (months < 5 ? 'месяца' : 'месяцев');
       monthsLabel.textContent = `Срок: ${months} ${monthText}`;
-      updateMonthLabels(months);
+      updateMonthLabels(months, maxMonths);
 
-      if (isNaN(price) || price < 50000) {
+      if (isNaN(price) || price < 40000) {
         errorMessage.style.display = 'block';
         prepaymentInput.value = 0;
         prepaymentError.style.display = 'none';
