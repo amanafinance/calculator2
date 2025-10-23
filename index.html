@@ -71,14 +71,10 @@
       }
     }
 
-
-
     .header {
       text-align: center;
       margin-bottom: 32px;
     }
-
-
 
     .header .title {
       font-size: 28px;
@@ -220,7 +216,6 @@
       appearance: none;
       cursor: pointer;
       position: relative;
-      transition: background 0.3s ease;
     }
 
     .slider::-webkit-slider-thumb {
@@ -260,13 +255,6 @@
 
     .month-label {
       position: relative;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .month-label:hover:not([style*="opacity: 0.3"]) {
-      color: #95C11F;
-      transform: scale(1.1);
     }
 
     .month-label.active {
@@ -298,47 +286,16 @@
       line-height: 1.4;
     }
 
-    @keyframes shake {
-      0%, 20%, 40%, 60%, 80%, 100% { transform: translateX(0); }
-      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-    }
-
     .helper-text {
       background: linear-gradient(135deg, #FEF7ED, #FED7AA);
       color: #EA580C;
-      padding: 16px 20px;
+      padding: 12px 16px;
       border-radius: 10px;
       font-size: 13px;
       font-weight: 500;
       margin: 24px 0;
       border-left: 4px solid #EA580C;
       animation: pulseGlow 2s ease-in-out infinite;
-      line-height: 1.6;
-    }
-
-    .helper-text strong {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 14px;
-    }
-
-    .helper-text ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .helper-text li {
-      margin: 6px 0;
-      padding-left: 20px;
-      position: relative;
-    }
-
-    .helper-text li::before {
-      content: '•';
-      position: absolute;
-      left: 6px;
-      font-weight: bold;
     }
 
     @keyframes pulseGlow {
@@ -476,7 +433,6 @@
       z-index: 1;
     }
 
-    /* Responsive Design */
     @media (max-width: 768px) {
       body {
         padding: 16px;
@@ -499,18 +455,11 @@
         grid-template-columns: 1fr;
       }
 
-      .prepayment-input-group {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
-      }
-
       .prepayment-input-group input[type="number"] {
         width: 100%;
       }
     }
 
-    /* Accessibility improvements */
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         animation-duration: 0.01ms !important;
@@ -519,7 +468,6 @@
       }
     }
 
-    /* Focus styles for better accessibility */
     .tariff-button:focus-visible,
     .btn:focus-visible {
       outline: 2px solid #95C11F;
@@ -546,9 +494,9 @@
     <div class="input-group">
       <label for="price">Стоимость товара</label>
       <div class="input-wrapper">
-        <input type="number" id="price" placeholder="не менее 30 000 ₽" min="0" />
+        <input type="number" id="price" placeholder="не менее 50 000 ₽" min="0" />
       </div>
-      <div class="error-message" id="errorMessage">⚠️ Стоимость товара должна быть<br>не менее 30 000₽</div>
+      <div class="error-message" id="errorMessage">⚠️ Стоимость товара должна быть<br>не менее 50 000₽</div>
     </div>
 
     <div class="input-group">
@@ -582,14 +530,14 @@
       <p><strong>Наценка:</strong> <span class="output-value">0 ₽ (0%)</span></p>
     </div>
 
-    <div class="helper-text" id="helperText">
-      <strong>💡 Обязательные требования:</strong>
-      <ul>
-        <li>Покупатель 22-60 лет</li>
-        <li>Поручитель муж. пола 25-60 лет</li>
-        <li>Паспорт обоих лиц (Лицевая и страница с пропиской)</li>
-        <li>Фактический адрес проживания</li>
-      </ul>
+    <div class="helper-text" id="requirements">
+      <div style="font-weight: 600; margin-bottom: 8px;">💡 Обязательные требования:</div>
+      <div style="line-height: 1.8;">
+        • Покупатель 22-60 лет<br>
+        • Поручитель муж. пола 25-60 лет<br>
+        • Паспорт обоих лиц (Лицевая и страница с пропиской)<br>
+        • Фактический адрес проживания
+      </div>
     </div>
 
     <div class="buttons">
@@ -615,7 +563,7 @@
     const errorMessage = document.getElementById('errorMessage');
     const tariffButtons = document.querySelectorAll('.tariff-button');
     const monthLabels = document.querySelectorAll('.month-label');
-    const helperText = document.getElementById('helperText');
+    const requirementsDiv = document.getElementById('requirements');
 
     let selectedTariff = 'with';
     let conditionalPrepayment = 0;
@@ -625,30 +573,6 @@
     const markupNoDownPayment = {3:14,4:18,5:23,6:28,7:31,8:34,9:37,10:40,11:43,12:46};
 
     const roundUpTo100 = val => Math.ceil(val / 100) * 100;
-
-    function updateHelperText() {
-      if (selectedTariff === 'with') {
-        helperText.innerHTML = `
-          <strong>💡 Обязательные требования:</strong>
-          <ul>
-            <li>Покупатель 22-60 лет</li>
-            <li>Поручитель муж. пола 25-60 лет</li>
-            <li>Паспорт обоих лиц (Лицевая и страница с пропиской)</li>
-            <li>Фактический адрес проживания</li>
-          </ul>
-        `;
-      } else {
-        helperText.innerHTML = `
-          <strong>💡 Обязательные требования:</strong>
-          <ul>
-            <li>Покупатель 22-60 лет</li>
-            <li>Поручитель муж. пола 25-60 лет</li>
-            <li>Паспорт обоих лиц (Лицевая и страница с пропиской)</li>
-            <li>Фактический адрес проживания</li>
-          </ul>
-        `;
-      }
-    }
 
     function updateMonthLabels(selectedMonth) {
       monthLabels.forEach((label, index) => {
@@ -663,84 +587,26 @@
       if (isVisible) {
         prepaymentBlock.style.animation = 'fadeInUp 0.4s ease-out';
       }
-    }
-
-    function updateMaxMonths(price) {
-      let maxMonths = 12;
-      if (price < 50000) {
-        maxMonths = 6;
-      } else if (price < 100000) {
-        maxMonths = 9;
-      }
       
-      monthsInput.max = maxMonths;
-      
-      // Если текущее значение больше максимального, сбрасываем на максимальное
-      if (parseInt(monthsInput.value) > maxMonths) {
-        monthsInput.value = maxMonths;
-      }
-      
-      // Обновляем отображение доступных месяцев
-      const monthValues = [3, 6, 9, 12];
-      monthLabels.forEach((label, index) => {
-        const monthValue = monthValues[index];
-        if (monthValue > maxMonths) {
-          label.style.opacity = '0.3';
-          label.style.pointerEvents = 'none';
-        } else {
-          label.style.opacity = '1';
-          label.style.pointerEvents = 'auto';
-        }
-      });
-      
-      // Обновляем визуальное отображение ползунка
-      updateSliderBackground(parseInt(monthsInput.value), maxMonths);
-    }
-
-    function updateSliderBackground(currentValue, maxValue) {
-      const percentage = ((currentValue - 3) / (maxValue - 3)) * 100;
-      const slider = monthsInput;
-      
-      // Создаем градиент для активной и неактивной части
-      const activeColor = '#95C11F';
-      const inactiveColor = '#E2E8F0';
-      const disabledColor = '#F1F5F9';
-      
-      if (maxValue < 12) {
-        const maxPercentage = ((maxValue - 3) / (12 - 3)) * 100;
-        slider.style.background = `linear-gradient(to right, 
-          ${activeColor} 0%, 
-          ${activeColor} ${percentage}%, 
-          ${inactiveColor} ${percentage}%, 
-          ${inactiveColor} ${maxPercentage}%, 
-          ${disabledColor} ${maxPercentage}%, 
-          ${disabledColor} 100%)`;
-      } else {
-        slider.style.background = `linear-gradient(to right, 
-          ${activeColor} 0%, 
-          ${activeColor} ${percentage}%, 
-          ${inactiveColor} ${percentage}%, 
-          ${inactiveColor} 100%)`;
-      }
+      requirementsDiv.innerHTML = `
+        <div style="font-weight: 600; margin-bottom: 8px;">💡 Обязательные требования:</div>
+        <div style="line-height: 1.8;">
+          • Покупатель 22-60 лет<br>
+          • Поручитель муж. пола 25-60 лет<br>
+          • Паспорт обоих лиц (Лицевая и страница с пропиской)<br>
+          • Фактический адрес проживания
+        </div>
+      `;
     }
 
     function updateCalculator(resetPrepayment = false) {
-      const price = parseInt(priceInput.value);
-      
-      // Сначала обновляем ограничения по месяцам на основе цены
-      if (!isNaN(price) && price >= 30000) {
-        updateMaxMonths(price);
-      }
-      
       const months = parseInt(monthsInput.value);
-      
-      // Обновляем текст лейбла в зависимости от количества месяцев
       const monthText = months === 1 ? 'месяц' : (months < 5 ? 'месяца' : 'месяцев');
       monthsLabel.textContent = `Срок: ${months} ${monthText}`;
-      
       updateMonthLabels(months);
 
-      if (isNaN(price) || price < 30000) {
+      const price = parseInt(priceInput.value);
+      if (isNaN(price) || price < 50000) {
         errorMessage.style.display = 'block';
         prepaymentInput.value = 0;
         prepaymentError.style.display = 'none';
@@ -808,7 +674,6 @@
         <p><strong>Наценка:</strong> <span class="output-value">${markup.toLocaleString()} ₽ (${markupPercent}%)</span></p>
       `;
 
-      // Trigger animation
       resultsDiv.style.animation = 'none';
       setTimeout(() => {
         resultsDiv.style.animation = 'resultAppear 0.6s ease-out';
@@ -828,42 +693,12 @@
         button.classList.add('active');
         button.style.transform = 'scale(1.02)';
         selectedTariff = button.dataset.tariff;
-        // Добавляем обработчик кликов на лейблы месяцев
-    monthLabels.forEach((label, index) => {
-      label.addEventListener('click', () => {
-        const monthValue = [3, 6, 9, 12][index];
-        const maxMonths = parseInt(monthsInput.max) || 12;
-        
-        if (monthValue <= maxMonths) {
-          monthsInput.value = monthValue;
-          updateSliderBackground(monthValue, maxMonths);
-          updateCalculator(true);
-        }
+        updateCalculator(true);
       });
-    });
-
-    // Инициализация
-    updateCalculator(true);
-    const initialMaxMonths = parseInt(monthsInput.max) || 12;
-    updateSliderBackground(3, initialMaxMonths);
-      });
-    });
-
-    // Add visual feedback for input interactions
-    priceInput.addEventListener('focus', () => {
-      priceInput.parentElement.style.transform = 'translateY(-2px)';
-    });
-
-    priceInput.addEventListener('blur', () => {
-      priceInput.parentElement.style.transform = 'translateY(0)';
     });
 
     priceInput.addEventListener('input', () => updateCalculator(true));
-    monthsInput.addEventListener('input', () => {
-      updateCalculator(true);
-      const maxMonths = parseInt(monthsInput.max) || 12;
-      updateSliderBackground(parseInt(monthsInput.value), maxMonths);
-    });
+    monthsInput.addEventListener('input', () => updateCalculator(true));
     prepaymentSlider.addEventListener('input', () => updateCalculator(false));
 
     prepaymentInput.addEventListener('input', () => {
@@ -881,47 +716,7 @@
       }
     });
 
-    // Add ripple effect to buttons
-    document.querySelectorAll('.btn').forEach(button => {
-      button.addEventListener('click', function(e) {
-        const ripple = document.createElement('div');
-        const rect = this.getBoundingClientRect();
-        const size = Math.max(rect.width, rect.height);
-        const x = e.clientX - rect.left - size / 2;
-        const y = e.clientY - rect.top - size / 2;
-        
-        ripple.style.cssText = `
-          position: absolute;
-          width: ${size}px;
-          height: ${size}px;
-          left: ${x}px;
-          top: ${y}px;
-          background: rgba(255, 255, 255, 0.3);
-          border-radius: 50%;
-          transform: scale(0);
-          animation: ripple 0.6s ease-out;
-          pointer-events: none;
-        `;
-        
-        this.appendChild(ripple);
-        
-        const style = document.createElement('style');
-        style.textContent = `
-          @keyframes ripple {
-            to {
-              transform: scale(4);
-              opacity: 0;
-            }
-          }
-        `;
-        document.head.appendChild(style);
-        
-        setTimeout(() => {
-          ripple.remove();
-          style.remove();
-        }, 600);
-      });
-    });
-
     updateCalculator(true);
   </script>
+</body>
+</html>
