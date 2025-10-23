@@ -255,6 +255,7 @@
 
     .month-label {
       position: relative;
+      transition: opacity 0.3s ease;
     }
 
     .month-label.active {
@@ -575,8 +576,19 @@
     const roundUpTo100 = val => Math.ceil(val / 100) * 100;
 
     function updateMonthLabels(selectedMonth) {
+      const maxMonths = parseInt(monthsInput.max);
+      
       monthLabels.forEach((label, index) => {
         const monthValue = [3, 6, 9, 12][index];
+        
+        if (monthValue > maxMonths) {
+          label.style.opacity = '0.3';
+          label.style.pointerEvents = 'none';
+        } else {
+          label.style.opacity = '1';
+          label.style.pointerEvents = 'auto';
+        }
+        
         label.classList.toggle('active', monthValue === selectedMonth);
       });
     }
@@ -600,12 +612,29 @@
     }
 
     function updateCalculator(resetPrepayment = false) {
-      const months = parseInt(monthsInput.value);
+      const price = parseInt(priceInput.value);
+      
+      let maxMonths = 12;
+      if (price >= 1 && price <= 49999) {
+        maxMonths = 6;
+      } else if (price >= 50000 && price <= 99999) {
+        maxMonths = 9;
+      } else if (price >= 100000) {
+        maxMonths = 12;
+      }
+      
+      monthsInput.max = maxMonths;
+      
+      let months = parseInt(monthsInput.value);
+      if (months > maxMonths) {
+        months = maxMonths;
+        monthsInput.value = maxMonths;
+      }
+      
       const monthText = months === 1 ? 'месяц' : (months < 5 ? 'месяца' : 'месяцев');
       monthsLabel.textContent = `Срок: ${months} ${monthText}`;
       updateMonthLabels(months);
 
-      const price = parseInt(priceInput.value);
       if (isNaN(price) || price < 50000) {
         errorMessage.style.display = 'block';
         prepaymentInput.value = 0;
