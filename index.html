@@ -275,7 +275,10 @@
     .btn-whatsapp:hover { background: #20b558; box-shadow: 0 4px 16px rgba(37,211,102,0.3); }
     .btn-call { background: var(--green-primary); color: white; }
     .btn-call:hover { background: #0f5230; box-shadow: 0 4px 16px rgba(17,92,48,0.3); }
-    .hidden { display: none !important; }
+    .map-block { margin-top: 20px; }
+    .map-label { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+    .map-address { font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 10px; }
+    .map-wrap { border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(17,92,48,0.1); }
     #prepayBlock {
       transition: opacity 0.3s ease, max-height 0.35s ease, margin-bottom 0.35s ease;
       max-height: 200px;
@@ -455,6 +458,18 @@
         <div class="actions">
           <a id="whatsappBtn" class="btn-action btn-whatsapp" href="#" target="_blank">Написать на WhatsApp</a>
           <a class="btn-action btn-call" href="tel:+79280222114">Позвонить</a>
+        </div>
+        <div class="map-block">
+          <div class="map-label">Наш адрес</div>
+          <div class="map-address">ул. С-А. Альбекова, 146, Гудермес</div>
+          <div class="map-wrap">
+            <iframe
+              src="https://yandex.ru/map-widget/v1/?ll=46.123387%2C43.328912&z=16&pt=46.123387,43.328912,pm2rdm"
+              width="100%" height="200" frameborder="0"
+              allowfullscreen loading="lazy"
+              style="border-radius:12px; display:block;">
+            </iframe>
+          </div>
         </div>
       </div>
     </div>
