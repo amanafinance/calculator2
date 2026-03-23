@@ -289,35 +289,21 @@
 
     /* ─── Sticky bottom bar ─── */
     .sticky-bar {
-      position: fixed; bottom: 0; left: 50%; z-index: 100;
-      transform: translateX(-50%);
-      width: 100%; max-width: 100%;
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
       display: flex; gap: 8px; padding: 6px 16px 8px;
       background: rgba(255,255,255,0.95);
       box-shadow: 0 -4px 20px rgba(17,92,48,0.12);
       border-top: 1px solid rgba(17,92,48,0.08);
     }
-    .sticky-bar {
-      position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
-      display: flex; gap: clamp(5px, 1.5vw, 8px); 
-      padding: 6px clamp(10px, 3.5vw, 16px) 8px;
-      background: rgba(255,255,255,0.95);
-      box-shadow: 0 -4px 20px rgba(17,92,48,0.12);
-      border-top: 1px solid rgba(17,92,48,0.08);
-    }
     .sticky-btn {
-      display: flex; align-items: center; justify-content: center;
-      gap: clamp(4px, 1.5vw, 8px);
-      padding: clamp(10px, 2.8vw, 13px) clamp(6px, 2vw, 10px);
-      border-radius: var(--radius-md);
-      font-family: 'Manrope', sans-serif;
-      font-size: clamp(11px, 3vw, 14px);
-      font-weight: 700;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 13px 10px; border-radius: var(--radius-md);
+      font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 700;
       text-decoration: none; border: none; cursor: pointer;
       transition: all 0.2s ease; flex: 1;
-      white-space: nowrap;
+      white-space: nowrap; overflow: hidden;
     }
-    .sticky-btn svg { flex-shrink: 0; width: clamp(16px, 4vw, 20px); height: clamp(16px, 4vw, 20px); }
+    .sticky-btn svg { flex-shrink: 0; }
     .sticky-btn:active { transform: scale(0.97); }
     .sticky-wa { background: #25D366; color: white; flex: 2; }
     .sticky-call { background: var(--green-primary); color: white; flex: 1; }
