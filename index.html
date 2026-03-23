@@ -42,9 +42,8 @@
     .app-wrapper.fonts-loaded {
       opacity: 1;
     }
-    .card { background: var(--white); border-radius: 0; box-shadow: none; overflow: hidden; }
+    .card { background: var(--white); border-radius: 0; box-shadow: none; overflow: visible; }
 
-    /* ─── Hero ─── */
     .card-hero {
       background: linear-gradient(135deg, rgb(8,50,25) 0%, rgb(17,92,48) 45%, rgb(35,110,60) 100%);
       padding: 26px 24px 22px;
@@ -293,7 +292,7 @@
       position: fixed; bottom: 0; left: 50%; z-index: 100;
       transform: translateX(-50%);
       width: 100%; max-width: 100%;
-      display: flex; gap: 8px; padding: 8px 16px 12px;
+      display: flex; gap: 8px; padding: 6px 16px 8px;
       background: rgba(255,255,255,0.95);
       box-shadow: 0 -4px 20px rgba(17,92,48,0.12);
       border-top: 1px solid rgba(17,92,48,0.08);
