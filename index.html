@@ -301,28 +301,24 @@
       position: fixed; bottom: 0; left: 50%; z-index: 100;
       transform: translateX(-50%);
       width: 100%; max-width: 100%;
-      display: flex; gap: 6px; padding: 6px 12px 8px;
+      display: flex; gap: 8px; padding: 6px 16px 8px;
       background: rgba(255,255,255,0.95);
       box-shadow: 0 -4px 20px rgba(17,92,48,0.12);
       border-top: 1px solid rgba(17,92,48,0.08);
     }
     .sticky-btn {
-      display: flex; align-items: center; justify-content: center; gap: 6px;
-      padding: 11px 6px; border-radius: var(--radius-md);
-      font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 13px 10px; border-radius: var(--radius-md);
+      font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 700;
       text-decoration: none; border: none; cursor: pointer;
       transition: all 0.2s ease; flex: 1;
-      white-space: nowrap; min-width: 0;
+      white-space: nowrap;
     }
     .sticky-btn svg { flex-shrink: 0; }
     .sticky-btn:active { transform: scale(0.97); }
     .sticky-wa { background: #25D366; color: white; flex: 2; }
     .sticky-call { background: var(--green-primary); color: white; flex: 1; }
     .sticky-insta { background: var(--green-bg); color: var(--green-primary); border: 1.5px solid rgba(17,92,48,0.15); flex: 1; }
-    @media (max-width: 360px) {
-      .sticky-btn { font-size: 11px; padding: 11px 4px; gap: 4px; }
-      .sticky-btn svg { width: 16px; height: 16px; }
-    }
 
     /* Extra padding so content isn't hidden behind sticky bar */
     .card { margin-bottom: 80px; }
@@ -759,7 +755,27 @@
     }
     calculate(true);
 
-    // Show content only after fonts loaded to prevent flash
+    // Scale sticky bar on small screens to match iPhone 16 Pro Max look
+    (function() {
+      const TARGET = 430;
+      function scaleBar() {
+        const bar = document.querySelector('.sticky-bar');
+        if (!bar) return;
+        const w = window.innerWidth;
+        if (w >= TARGET) {
+          bar.style.transform = 'translateX(-50%)';
+          bar.style.width = '100%';
+          return;
+        }
+        const s = w / TARGET;
+        bar.style.transformOrigin = 'bottom center';
+        bar.style.transform = `translateX(-50%) scale(${s})`;
+        bar.style.width = TARGET + 'px';
+        bar.style.bottom = `-${bar.offsetHeight * (1 - s) / 2}px`;
+      }
+      window.addEventListener('load', scaleBar);
+      window.addEventListener('resize', scaleBar);
+    })();
     const wrapper = document.querySelector('.app-wrapper');
     document.fonts.ready.then(() => wrapper.classList.add('fonts-loaded'));
     setTimeout(() => wrapper.classList.add('fonts-loaded'), 800);
