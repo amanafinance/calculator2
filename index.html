@@ -33,9 +33,6 @@
       font-family: 'Manrope', sans-serif;
       background: #f2f6f4;
       min-height: 100vh;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
       padding: 0;
     }
     .app-wrapper {
@@ -45,6 +42,7 @@
       opacity: 0;
       transition: opacity 0.15s ease;
     }
+
     .app-wrapper.fonts-loaded { opacity: 1; }
     .card { background: transparent; border-radius: 0; box-shadow: none; overflow: visible; }
     .card-hero {
@@ -73,7 +71,7 @@
     .hero-title span { color: var(--green-light); text-shadow: none; }
     .hero-logo-wrap { position: absolute; right: 5px; top: -5px; z-index: 1; }
     .hero-logo { width: 150px; height: 150px; object-fit: contain; animation: float 3.5s ease-in-out infinite; will-change: transform; }
-    .card-body { padding: 24px 24px 28px; max-width: 480px; margin: 9px auto; background: white; border-radius: var(--radius-xl); box-shadow: var(--shadow-md); width: calc(100% - 32px); }
+    .card-body { padding: 24px 24px 28px; max-width: 480px; margin: 9px auto 0; background: white; border-radius: var(--radius-xl); box-shadow: var(--shadow-md); width: calc(100% - 32px); overflow: hidden; }
     .tariff-hint { display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 12px; font-weight: 600; color: var(--green-primary); margin-bottom: 10px; margin-top: -10px; opacity: 1; transition: opacity 0.4s ease; }
     .tariff-hint.hidden { opacity: 0; pointer-events: none; }
     .tariff-hint svg { animation: arrowBounce 1s ease-in-out infinite; }
@@ -139,17 +137,17 @@
     .map-address { font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 10px; }
     .map-wrap { border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(17,92,48,0.1); }
     /* ─── Contact icons ─── */
-    .contact-icons { display: flex; justify-content: center; gap: 20px; padding-top: 20px; border-top: 1px solid var(--border); margin-top: 4px; }
+    .contact-icons { display: flex; justify-content: center; gap: 20px; padding-top: 20px; border-top: 1px solid var(--border); margin-top: -1px; }
     .contact-icon { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: var(--green-bg); color: var(--green-primary); text-decoration: none; transition: all 0.2s; }
     .contact-icon:active { transform: scale(0.93); }
     /* ─── Sticky bottom bar ─── */
-    .sticky-bar { position: fixed; bottom: 60px; left: 0; right: 0; z-index: 100; display: flex; align-items: center; gap: 12px; padding: 10px 16px 12px; background: rgba(255,255,255,0.97); box-shadow: 0 -4px 20px rgba(17,92,48,0.12); border-top: 1px solid rgba(17,92,48,0.08); }
+    .sticky-bar { position: fixed; bottom: 56px; left: 0; right: 0; z-index: 100; display: flex; align-items: center; gap: 12px; padding: 10px 16px 12px; background: #f7f9f8; box-shadow: none; border-top: 1px solid #e8edea; }
     .sticky-info { flex: 1; }
     .sticky-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; }
     .sticky-amount { font-size: 22px; font-weight: 800; color: var(--green-primary); letter-spacing: -0.5px; margin-top: 1px; }
     .sticky-wa-btn { display: flex; align-items: center; gap: 8px; padding: 13px 18px; border-radius: var(--radius-md); font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 700; text-decoration: none; background: #25D366; color: white; white-space: nowrap; flex-shrink: 0; transition: all 0.2s; }
     .sticky-wa-btn:active { transform: scale(0.97); }
-    .card { margin-bottom: 130px; }
+    .card { margin-bottom: 0; }
     #prepayBlock { transition: opacity 0.3s ease, max-height 0.35s ease, margin-bottom 0.35s ease; max-height: 200px; opacity: 1; margin-bottom: 0; overflow: visible; }
     #prepayBlock.hiding { max-height: 0; opacity: 0; margin-bottom: 0; overflow: hidden; }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
@@ -208,14 +206,17 @@
     /* ─── Многостраничная навигация ─── */
     .page { display: none; }
     .page.active { display: block; }
-    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 200; display: flex; background: white; border-top: 1px solid var(--border); box-shadow: 0 -2px 12px rgba(17,92,48,0.08); padding-bottom: env(safe-area-inset-bottom); }
-    .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 4px 6px; cursor: pointer; text-decoration: none; color: var(--text-muted); transition: color 0.2s; border: none; background: none; font-family: 'Manrope', sans-serif; }
+    #page-calc { padding-bottom: 130px; }
+    #page-contract { padding-bottom: 80px; }
+    #page-contract { padding-bottom: 75px; }
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 200; display: flex; background: white; border-top: 1px solid var(--border); box-shadow: 0 -2px 12px rgba(17,92,48,0.08); padding-bottom: env(safe-area-inset-bottom); height: 56px; }
+    .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px 4px 5px; cursor: pointer; text-decoration: none; color: var(--text-muted); transition: color 0.2s; border: none; background: none; font-family: 'Manrope', sans-serif; }
     .nav-item.active { color: var(--green-primary); }
     .nav-item svg { width: 22px; height: 22px; margin-bottom: 3px; }
     .nav-label { font-size: 10px; font-weight: 600; letter-spacing: 0.3px; }
 
     /* ─── Страница «Мой договор» ─── */
-    .contract-page { background: #f2f6f4; min-height: 100vh; padding-bottom: 80px; width: 100%; }
+    .contract-page { background: #f2f6f4; min-height: 100vh; padding-bottom: 70px; width: 100%; }
     #page-contract { max-width: 480px; width: 100%; margin: 0 auto; }
     .contract-hero { background: linear-gradient(135deg, rgb(8,50,25) 0%, rgb(17,92,48) 45%, rgb(35,110,60) 100%); padding: 26px 24px 22px; position: relative; overflow: hidden; }
     .contract-hero-title { font-size: 24px; font-weight: 800; color: white; line-height: 1.25; }
@@ -279,12 +280,86 @@
 
     @media (min-width: 600px) {
       body { background: #e8f0eb; }
-      .app-wrapper { box-shadow: 0 8px 40px rgba(17,92,48,0.15); border-radius: var(--radius-xl); margin-top: 24px; margin-bottom: 120px; overflow: hidden; }
-      .card { border-radius: 0; }
-      .card-body { max-width: 100%; width: 100%; margin: 0; border-radius: 0; }
-      .sticky-bar { left: 50%; transform: translateX(-50%); right: auto; width: 480px; bottom: 60px; }
-      .bottom-nav { left: 50%; transform: translateX(-50%); right: auto; width: 480px; }
-      .contract-page { min-height: auto; }
+
+      /* ── Калькулятор: центрированная колонка ── */
+      .app-wrapper {
+        max-width: 520px;
+        margin: 32px auto 0;
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+        box-shadow: 0 8px 40px rgba(17,92,48,0.18);
+      }
+      .card { border-radius: 0; margin-bottom: 0; }
+      .card-body {
+        max-width: calc(100% - 32px); width: calc(100% - 32px);
+        margin: 9px auto;
+        border-radius: var(--radius-xl);
+        padding-bottom: 28px;
+      }
+      #page-calc { padding-bottom: 130px; }
+      .sticky-bar {
+        left: 50%; transform: translateX(-50%);
+        right: auto; width: 520px; bottom: 56px;
+      }
+      .bottom-nav {
+        left: 50%; transform: translateX(-50%);
+        right: auto; width: 520px;
+      }
+
+      /* ── Договор: десктоп ── */
+      #page-contract {
+        max-width: 520px;
+        margin: 32px auto 0;
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+        box-shadow: 0 8px 40px rgba(17,92,48,0.18);
+      }
+      .contract-page {
+        min-height: 0;
+        padding-bottom: 80px;
+        background: white;
+        border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+      }
+      .contract-hero {
+        border-radius: 0;
+        padding: 28px 28px 24px;
+      }
+      .login-card {
+        margin: 20px 20px 0;
+        padding: 28px;
+        box-shadow: none;
+        border: 1px solid var(--border);
+      }
+      .login-title { font-size: 22px; }
+      .login-btn { padding: 16px; font-size: 16px; }
+      .dash-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin: 20px 20px 0;
+      }
+      .dash-stat { padding: 18px; }
+      .dash-stat-value { font-size: 22px; }
+      .dash-card {
+        margin: 12px 20px;
+        padding: 22px;
+        box-shadow: none;
+        border: 1px solid var(--border);
+      }
+      .dash-card-title { font-size: 12px; margin-bottom: 16px; }
+      .dash-info-row { padding: 10px 0; }
+      .dash-info-label, .dash-info-value { font-size: 14px; }
+      .payment-row { padding: 14px 0; }
+      .payment-month { font-size: 14px; }
+      .payment-amount { font-size: 15px; }
+      .logout-btn {
+        margin: 16px 20px;
+        width: calc(100% - 40px);
+        padding: 15px;
+        font-size: 15px;
+      }
+      .loader { padding: 48px 20px; font-size: 15px; }
+      #loginSection { padding-bottom: 8px; }
     }
   </style>
 </head>
@@ -446,14 +521,14 @@
           <div class="login-sub">Введите номер договора и ваш номер телефона для входа</div>
           <div class="login-field">
             <div class="login-field-label">Номер договора</div>
-            <input class="login-input" id="inputContract" type="text" placeholder="AF-2024-001" autocomplete="off" />
+            <input class="login-input" id="inputContract" type="text" placeholder="00000" autocomplete="off" />
           </div>
           <div class="login-field">
             <div class="login-field-label">Номер телефона</div>
-            <input class="login-input" id="inputPhone" type="tel" placeholder="+7 (900) 000-00-00" autocomplete="off" />
+            <input class="login-input" id="inputPhone" type="tel" placeholder="8900-000-00-00" autocomplete="off" />
           </div>
           <button class="login-btn" id="loginBtn" onclick="doLogin()">Войти</button>
-          <div class="login-error" id="loginError">Договор не найден. Проверьте данные.</div>
+          <div class="login-error" id="loginError">Неверный номер договора или телефон</div>
         </div>
       </div>
 
@@ -528,7 +603,7 @@
       var err      = document.getElementById('loginError');
       var loader   = document.getElementById('loginLoader');
       err.classList.remove('visible');
-      if (!contract || phone.length < 10) { err.textContent = 'Введите номер договора и телефон.'; err.classList.add('visible'); return; }
+      if (!contract || phone.length < 10) { err.textContent = 'Введите номер договора и номер телефона.'; err.classList.add('visible'); return; }
       loader.classList.add('visible');
       document.getElementById('loginSection').style.opacity = '0.4';
       fetch(API_URL + '?contract=' + encodeURIComponent(contract) + '&phone=' + encodeURIComponent(phone))
@@ -536,7 +611,7 @@
         .then(data => {
           loader.classList.remove('visible');
           document.getElementById('loginSection').style.opacity = '1';
-          if (data.error) { err.textContent = 'Договор не найден. Проверьте данные.'; err.classList.add('visible'); return; }
+          if (data.error) { err.textContent = 'Неверный номер договора или телефон'; err.classList.add('visible'); return; }
           showDashboard(data);
         })
         .catch(() => {
@@ -670,7 +745,7 @@
       var err      = document.getElementById('loginError');
       var loader   = document.getElementById('loginLoader');
       err.classList.remove('visible');
-      if (!contract || phone.length < 10) { err.textContent = 'Введите номер договора и телефон.'; err.classList.add('visible'); return; }
+      if (!contract || phone.length < 10) { err.textContent = 'Введите номер договора и номер телефона.'; err.classList.add('visible'); return; }
       loader.classList.add('visible');
       document.getElementById('loginSection').style.opacity = '0.4';
       fetch(API_URL + '?contract=' + encodeURIComponent(contract) + '&phone=' + encodeURIComponent(phone))
@@ -678,7 +753,7 @@
         .then(data => {
           loader.classList.remove('visible');
           document.getElementById('loginSection').style.opacity = '1';
-          if (data.error) { err.textContent = 'Договор не найден. Проверьте данные.'; err.classList.add('visible'); return; }
+          if (data.error) { err.textContent = 'Неверный номер договора или телефон'; err.classList.add('visible'); return; }
           showDashboard(data);
         })
         .catch(() => {
@@ -981,7 +1056,7 @@
       var err      = document.getElementById('loginError');
       var loader   = document.getElementById('loginLoader');
       err.classList.remove('visible');
-      if (!contract || phone.length < 10) { err.textContent = 'Введите номер договора и телефон.'; err.classList.add('visible'); return; }
+      if (!contract || phone.length < 10) { err.textContent = 'Введите номер договора и номер телефона.'; err.classList.add('visible'); return; }
       loader.classList.add('visible');
       document.getElementById('loginSection').style.opacity = '0.4';
       fetch(API_URL + '?contract=' + encodeURIComponent(contract) + '&phone=' + encodeURIComponent(phone))
@@ -989,7 +1064,7 @@
         .then(data => {
           loader.classList.remove('visible');
           document.getElementById('loginSection').style.opacity = '1';
-          if (data.error) { err.textContent = 'Договор не найден. Проверьте данные.'; err.classList.add('visible'); return; }
+          if (data.error) { err.textContent = 'Неверный номер договора или телефон'; err.classList.add('visible'); return; }
           showDashboard(data);
         })
         .catch(() => {
