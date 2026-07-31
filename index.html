@@ -298,7 +298,7 @@
     .partner-body{padding:12px 12px 14px;text-align:center;}
     .partner-card{cursor:pointer;}
     .partner-name{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .partner-desc{font-size:12.5px;line-height:1.5;color:rgba(255,255,255,.6);margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+    .partner-desc{font-size:12px;line-height:1.45;color:rgba(255,255,255,.55);margin-top:6px;text-align:center;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
     .partner-map{width:100%;height:200px;border:0;border-radius:12px;display:block;background:var(--ink-3);}
     .partner-maplink{display:inline-flex;align-items:center;gap:6px;margin-top:10px;text-decoration:none;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:var(--gold);}
     .partners-empty{font-size:13px;color:rgba(255,255,255,.45);padding:6px 0;}
@@ -360,6 +360,30 @@
     .crop-actions button{flex:1;padding:14px;border:none;border-radius:11px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px;cursor:pointer;}
     .crop-ok{color:var(--ink);background:linear-gradient(180deg,var(--gold-2),var(--gold));}
     .crop-cancel{color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);}
+
+    /* Кнопка "Все партнёры" */
+    #partnersMoreWrap{text-align:center;margin-top:16px;}
+    .partners-more{background:none;border:1px solid rgba(201,162,75,.5);color:var(--gold);font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;padding:12px 24px;border-radius:999px;cursor:pointer;}
+    .partners-more:active{background:rgba(201,162,75,.12);}
+    /* Модалка всех партнёров */
+    .allp{position:fixed;inset:0;z-index:530;background:rgba(9,10,12,.8);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;visibility:hidden;transition:.25s;display:flex;align-items:flex-end;justify-content:center;}
+    .allp.open{opacity:1;visibility:visible;}
+    .allp-inner{width:100%;max-width:480px;max-height:88vh;display:flex;flex-direction:column;background:var(--ink);border-radius:20px 20px 0 0;border:1px solid rgba(201,162,75,.25);border-bottom:0;transform:translateY(24px);transition:transform .28s;}
+    .allp.open .allp-inner{transform:translateY(0);}
+    .allp-top{display:flex;justify-content:space-between;align-items:center;padding:18px 18px 12px;border-bottom:1px solid rgba(255,255,255,.08);}
+    .allp-title{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:#fff;}
+    .allp-close{background:none;border:none;color:var(--gold);font-size:26px;line-height:1;cursor:pointer;}
+    .allp-list{overflow-y:auto;padding:14px 16px calc(20px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;}
+    .allp-item{display:flex;gap:12px;align-items:center;border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:10px;background:rgba(255,255,255,.02);cursor:pointer;}
+    .allp-item img,.allp-noimg{width:60px;height:60px;object-fit:contain;background:#0f1115;border-radius:10px;flex:0 0 auto;}
+    .allp-ibody{min-width:0;}
+    .allp-name{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;color:#fff;}
+    .allp-desc{font-size:12.5px;line-height:1.45;color:rgba(255,255,255,.55);margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+    /* Админ: чекбокс и переключатель "в строке" */
+    .admin-check{display:flex;align-items:center;gap:9px;font-size:13.5px;color:var(--t1);margin:2px 0 14px;cursor:pointer;}
+    .admin-check input{width:18px;height:18px;accent-color:var(--gold);flex:0 0 auto;}
+    .admin-feat{background:none;border:1px solid var(--line);border-radius:9px;padding:8px 12px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;color:var(--t3);}
+    .admin-feat.on{color:var(--ink);border-color:var(--gold);background:rgba(201,162,75,.18);}
 
   </style>
 </head>
@@ -443,6 +467,7 @@
   <section class="sec partners" id="partners">
     <div class="sec-lab">Партнёры</div>
     <div class="partners-list" id="partnersList"></div>
+    <div id="partnersMoreWrap" style="display:none"><button class="partners-more" onclick="openAllPartners()">Все партнёры →</button></div>
   </section>
 
   <!-- FORM -->
@@ -568,10 +593,11 @@
         <div class="sub">Добавляйте и удаляйте магазины-партнёры.</div>
 
         <div class="admin-sec-title" id="pFormTitle" style="border-top:0;padding-top:0;margin-top:0;">Добавить партнёра</div>
-        <div class="admin-field"><label>Название</label><input class="admin-input" id="pName" placeholder="ТРЦ Мега Сити"></div>
+        <div class="admin-field"><label>Название</label><input class="admin-input" id="pName" placeholder="Название магазина"></div>
         <div class="admin-field"><label>Описание</label><textarea class="admin-area" id="pDesc" placeholder="Короткое описание магазина…"></textarea></div>
         <div class="admin-field"><label>Координаты (широта, долгота из Яндекс.Карт)</label><input class="admin-input" id="pCoords" placeholder="43.348, 45.685"></div>
         <div class="admin-field"><label>Фото / логотип</label><input class="admin-file" type="file" id="pImage" accept="image/*"><img class="admin-thumb admin-hide" id="pThumb" alt=""></div>
+        <label class="admin-check"><input type="checkbox" id="pFeatured" checked> Показывать в строке партнёров на главной</label>
         <button class="admin-btn gold" id="pSaveBtn" onclick="adminAddPartner()">Добавить партнёра</button>
         <button class="admin-btn admin-hide" id="pCancelBtn" style="margin-top:10px" onclick="adminCancelEdit()">Отмена</button>
         <div class="admin-msg" id="adminAddMsg"></div>
@@ -581,6 +607,14 @@
 
         <button class="admin-btn" style="margin-top:22px" onclick="adminLogout()">Выйти</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ALL PARTNERS -->
+  <div class="allp" id="allPartners" onclick="if(event.target===this)closeAllPartners()">
+    <div class="allp-inner">
+      <div class="allp-top"><div class="allp-title">Все партнёры</div><button class="allp-close" onclick="closeAllPartners()" aria-label="Закрыть">&times;</button></div>
+      <div class="allp-list" id="allPartnersList"></div>
     </div>
   </div>
 
@@ -903,7 +937,8 @@
   function cardHTML(p){
     const img=p.image?'<img class="partner-img" src="'+p.image+'" alt="">':'<div class="partner-img"></div>';
     return '<div class="partner-card" role="button" tabindex="0" onclick="partnerOpen(\''+p.id+'\')">'+img+
-      '<div class="partner-body"><div class="partner-name">'+esc(p.name||'')+'</div></div></div>';
+      '<div class="partner-body"><div class="partner-name">'+esc(p.name||'')+'</div>'+
+      (p.desc?'<div class="partner-desc">'+esc(p.desc)+'</div>':'')+'</div></div>';
   }
   let marqRAF=null, marqPaused=false, marqTimer=null;
   function bindMarq(el){
@@ -936,12 +971,22 @@
     }
     marqRAF=requestAnimationFrame(step);
   }
+  const STRIP_MAX=10;
   function renderPublic(items){
     if(!listEl) return;
-    if(!items.length){ listEl.innerHTML='<div class="partners-empty">Партнёры скоро появятся.</div>'; listEl.style.justifyContent='flex-start'; setupMarquee(); return; }
-    listEl.innerHTML=items.map(cardHTML).join('');   // ровно столько карточек, сколько партнёров
+    const moreWrap=document.getElementById('partnersMoreWrap');
+    if(!items.length){
+      listEl.innerHTML='<div class="partners-empty">Партнёры скоро появятся.</div>';
+      listEl.style.justifyContent='flex-start';
+      if(moreWrap) moreWrap.style.display='none';
+      setupMarquee(); return;
+    }
+    const feat=items.filter(function(p){return p.featured!==false;}).slice(0,STRIP_MAX);
+    const strip=feat.length?feat:items.slice(0,STRIP_MAX);
+    listEl.innerHTML=strip.map(cardHTML).join('');
     listEl.scrollLeft=0;
     listEl.style.justifyContent = (listEl.scrollWidth>listEl.clientWidth+4) ? 'flex-start' : 'center';
+    if(moreWrap) moreWrap.style.display = (items.length>strip.length) ? 'block' : 'none';
     setupMarquee();
   }
 
@@ -952,7 +997,8 @@
       '<div class="admin-item">'+
         (p.image?'<img src="'+p.image+'" alt="">':'<img alt="">')+
         '<div class="ai-body"><div class="ai-name">'+esc(p.name||'')+'</div><div class="ai-desc">'+esc(p.desc||p.coords||'')+'</div></div>'+
-        '<div class="admin-actions"><button class="admin-edit" onclick="adminEditPartner(\''+p.id+'\')">Изменить</button>'+
+        '<div class="admin-actions"><button class="admin-feat'+(p.featured!==false?' on':'')+'" onclick="adminToggleFeatured(\''+p.id+'\',this)">'+(p.featured!==false?'В строке ✓':'Скрыт')+'</button>'+
+        '<button class="admin-edit" onclick="adminEditPartner(\''+p.id+'\')">Изменить</button>'+
         '<button class="admin-del" onclick="adminDelPartner(\''+p.id+'\',this)">Удалить</button></div>'+
       '</div>').join('') : '<div class="partners-empty" style="color:var(--t3)">Пока пусто.</div>';
   }
@@ -1054,6 +1100,7 @@
     document.getElementById('pSaveBtn').textContent='Добавить партнёра';
     document.getElementById('pFormTitle').textContent='Добавить партнёра';
     document.getElementById('pCancelBtn').classList.add('admin-hide');
+    var pf=document.getElementById('pFeatured'); if(pf) pf.checked=true;
   }
   window.adminCancelEdit=function(){ resetForm(); document.getElementById('adminAddMsg').textContent=''; };
 
@@ -1069,6 +1116,7 @@
     document.getElementById('pFormTitle').textContent='Изменить партнёра';
     document.getElementById('pCancelBtn').classList.remove('admin-hide');
     document.getElementById('adminAddMsg').textContent='';
+    var pf=document.getElementById('pFeatured'); if(pf) pf.checked=(p.featured!==false);
     const inner=document.querySelector('.admin-inner'); if(inner) inner.scrollTop=0;
   };
 
@@ -1079,7 +1127,8 @@
     const msg=document.getElementById('adminAddMsg'); msg.className='admin-msg';
     if(!name){ msg.classList.add('err'); msg.textContent='Укажите название.'; return; }
     if(coords && !parseCoords(coords)){ msg.classList.add('err'); msg.textContent='Координаты в формате: 43.348, 45.685'; return; }
-    const rec={name:name,desc:desc,coords:coords,image:pendingImage};
+    const feat=document.getElementById('pFeatured')?document.getElementById('pFeatured').checked:true;
+    const rec={name:name,desc:desc,coords:coords,image:pendingImage,featured:feat};
     function ok(t){ msg.classList.add('ok'); msg.textContent=t; resetForm(); }
     function fail(){ msg.classList.add('err'); msg.textContent='Ошибка сохранения.'; }
     if(editingId){
@@ -1130,6 +1179,26 @@
     document.getElementById('pdMap').src='about:blank';
     document.getElementById('partnerDetail').classList.remove('open'); document.body.classList.remove('noscroll');
   };
+
+  window.adminToggleFeatured=function(id, btn){
+    const p=cache.filter(function(x){return x.id===id;})[0]; if(!p) return;
+    const nv = !(p.featured!==false);
+    if(USE_FB){ db.collection('partners').doc(id).update({featured:nv}).catch(function(e){console.error(e);}); }
+    else { for(var i=0;i<demo.length;i++){ if(demo[i].id===id){ demo[i].featured=nv; break; } } cache=demo.slice(); renderPublic(cache); renderAdmin(cache); }
+  };
+
+  const allListEl=document.getElementById('allPartnersList');
+  function renderAllPartners(items){
+    if(!allListEl) return;
+    allListEl.innerHTML = items.length ? items.map(function(p){
+      const img=p.image?'<img src="'+p.image+'" alt="">':'<div class="allp-noimg"></div>';
+      return '<div class="allp-item" onclick="closeAllPartners();partnerOpen(\''+p.id+'\')">'+img+
+        '<div class="allp-ibody"><div class="allp-name">'+esc(p.name||'')+'</div>'+
+        (p.desc?'<div class="allp-desc">'+esc(p.desc)+'</div>':'')+'</div></div>';
+    }).join('') : '<div class="partners-empty" style="color:var(--t3)">Пока нет партнёров.</div>';
+  }
+  window.openAllPartners=function(){ renderAllPartners(cache); document.getElementById('allPartners').classList.add('open'); document.body.classList.add('noscroll'); };
+  window.closeAllPartners=function(){ document.getElementById('allPartners').classList.remove('open'); document.body.classList.remove('noscroll'); };
 
   load();
 })();
