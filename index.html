@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
   <style>
     :root{
       --ink:#15171C; --ink-2:#1B1E25; --ink-3:#262A33;
@@ -99,8 +100,6 @@
     .months-tick{font-family:'Space Mono',monospace;font-size:11px;color:var(--t3);transition:.2s;}
     .months-tick.active{color:var(--gold);font-weight:700;}
 
-    #prepayBlock{overflow:hidden;max-height:220px;opacity:1;transition:max-height .35s ease,opacity .3s ease,margin-top .35s ease;}
-    #prepayBlock.hiding{max-height:0;opacity:0;margin-top:0;}
 
     /* ─── READOUT (signature: terminal panel + corner brackets) ─── */
     .readout{position:relative;margin-top:22px;background:var(--ink);border-radius:13px;padding:20px 18px 16px;}
@@ -291,6 +290,77 @@
     .calc-sec{background:var(--paper);padding:40px 20px 46px;}
     .calc-sec .console{margin:8px 0 0;box-shadow:0 14px 34px -22px rgba(20,22,27,.55);}
 
+    /* ═══════════ ПАРТНЁРЫ (динамические) ═══════════ */
+    .partners-list{display:flex;flex-direction:row;gap:14px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px;scrollbar-width:none;}
+    .partners-list::-webkit-scrollbar{display:none;height:0;}
+    .partner-card{flex:0 0 220px;width:220px;border:1px solid rgba(255,255,255,.1);border-radius:16px;overflow:hidden;background:rgba(255,255,255,.03);}
+    .partner-img{width:100%;aspect-ratio:1/1;object-fit:contain;background:#0f1115;display:block;padding:8px;}
+    .partner-body{padding:12px 12px 14px;text-align:center;}
+    .partner-card{cursor:pointer;}
+    .partner-name{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .partner-desc{font-size:12.5px;line-height:1.5;color:rgba(255,255,255,.6);margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+    .partner-map{width:100%;height:200px;border:0;border-radius:12px;display:block;background:var(--ink-3);}
+    .partner-maplink{display:inline-flex;align-items:center;gap:6px;margin-top:10px;text-decoration:none;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:var(--gold);}
+    .partners-empty{font-size:13px;color:rgba(255,255,255,.45);padding:6px 0;}
+
+    /* ═══════════ АДМИН-ПАНЕЛЬ ═══════════ */
+    .admin{position:fixed;inset:0;z-index:500;background:var(--paper);overflow-y:auto;opacity:0;visibility:hidden;transition:.25s;}
+    .admin.open{opacity:1;visibility:visible;}
+    .admin-inner{max-width:480px;margin:0 auto;padding:18px 18px calc(30px + env(safe-area-inset-bottom));}
+    .admin-top{display:flex;justify-content:space-between;align-items:center;padding:4px 0 18px;}
+    .admin-top .hd-mx{font-size:16px}.admin-top .hd-fin{font-size:16px}
+    .admin-close{background:none;border:none;font-size:28px;line-height:1;color:var(--t2);cursor:pointer;}
+    .admin h2{font-family:'Space Grotesk',sans-serif;font-size:21px;font-weight:700;color:var(--t1);margin-bottom:4px;}
+    .admin .sub{font-size:13px;color:var(--t2);margin-bottom:16px;}
+    .admin-badge{display:inline-block;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.5px;color:var(--gold);border:1px solid rgba(201,162,75,.5);border-radius:6px;padding:3px 9px;margin-bottom:18px;}
+    .admin-field{margin-bottom:12px;}
+    .admin-field label{display:block;font-size:11px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:var(--t3);margin-bottom:7px;}
+    .admin-input,.admin-area{width:100%;padding:13px 14px;font-family:'Inter',sans-serif;font-size:15px;color:var(--t1);background:var(--panel);border:1.5px solid var(--line);border-radius:11px;outline:none;-webkit-appearance:none;}
+    .admin-area{min-height:82px;resize:vertical;line-height:1.5;}
+    .admin-input:focus,.admin-area:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,162,75,.14);}
+    .admin-file{font-size:13px;color:var(--t2);width:100%;}
+    .admin-btn{width:100%;padding:15px;border:none;border-radius:12px;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;color:#fff;background:var(--ink);}
+    .admin-btn.gold{color:var(--ink);background:linear-gradient(180deg,var(--gold-2),var(--gold));}
+    .admin-btn:active{transform:translateY(1px);}
+    .admin-msg{margin-top:10px;font-size:13px;font-weight:600;text-align:center;min-height:16px;}
+    .admin-msg.ok{color:var(--ok);}.admin-msg.err{color:var(--err);}
+    .admin-thumb{display:block;width:100%;max-width:200px;aspect-ratio:1/1;object-fit:contain;background:#0f1115;border-radius:10px;margin:10px auto 0;border:1px solid var(--line);}
+    .admin-sec-title{font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin:24px 0 12px;padding-top:20px;border-top:1px solid var(--line);}
+    .admin-item{display:flex;gap:12px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:10px;background:var(--panel);}
+    .admin-item img{width:50px;height:50px;object-fit:cover;border-radius:8px;flex:0 0 auto;background:var(--mist);}
+    .admin-item .ai-body{flex:1;min-width:0;}
+    .admin-item .ai-name{font-size:14px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .admin-item .ai-desc{font-size:12px;color:var(--t3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .admin-actions{display:flex;flex-direction:column;gap:6px;flex:0 0 auto;}
+    .admin-edit,.admin-del{background:none;border:1px solid var(--line);border-radius:9px;padding:8px 12px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;}
+    .admin-edit{color:var(--t1);} .admin-del{color:var(--err);}
+    .admin-hide{display:none!important;}
+
+    /* ═══ КАРТОЧКА ПАРТНЁРА (детально) ═══ */
+    .pd{position:fixed;inset:0;z-index:520;background:rgba(9,10,12,.75);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;visibility:hidden;transition:.25s;display:flex;align-items:flex-end;justify-content:center;}
+    .pd.open{opacity:1;visibility:visible;}
+    .pd-inner{position:relative;width:100%;max-width:480px;max-height:92vh;overflow-y:auto;background:var(--ink);border-radius:20px 20px 0 0;border:1px solid rgba(201,162,75,.25);border-bottom:0;padding:16px 18px calc(24px + env(safe-area-inset-bottom));transform:translateY(24px);transition:transform .28s;}
+    .pd.open .pd-inner{transform:translateY(0);}
+    .pd-close{position:absolute;top:12px;right:14px;z-index:2;width:34px;height:34px;border-radius:50%;border:none;background:rgba(0,0,0,.45);color:#fff;font-size:20px;line-height:1;cursor:pointer;}
+    .pd-img{width:100%;max-height:44vh;object-fit:contain;background:#0f1115;border-radius:14px;display:block;margin-bottom:14px;}
+    .pd-name{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#fff;margin-bottom:8px;letter-spacing:-.3px;}
+    .pd-desc{font-size:14px;line-height:1.6;color:rgba(255,255,255,.66);margin-bottom:16px;white-space:pre-wrap;}
+    .pd-map{width:100%;height:240px;border:0;border-radius:14px;display:block;background:var(--ink-3);}
+    .pd-maplink{display:inline-flex;align-items:center;gap:6px;margin-top:12px;text-decoration:none;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;color:var(--gold);}
+
+    /* ═══ ОБРЕЗКА ФОТО ═══ */
+    .crop{position:fixed;inset:0;z-index:560;background:rgba(9,10,12,.88);display:none;align-items:center;justify-content:center;padding:18px;}
+    .crop.open{display:flex;}
+    .crop-box{width:100%;max-width:440px;background:var(--ink);border-radius:16px;padding:16px;border:1px solid rgba(201,162,75,.25);}
+    .crop-title{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:#fff;text-align:center;}
+    .crop-hint{font-size:12px;color:rgba(255,255,255,.5);text-align:center;margin:6px 0 12px;}
+    .crop-area{width:100%;height:300px;background:#0f1115;border-radius:10px;overflow:hidden;}
+    .crop-area img{max-width:100%;display:block;}
+    .crop-actions{display:flex;gap:10px;margin-top:14px;}
+    .crop-actions button{flex:1;padding:14px;border:none;border-radius:11px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px;cursor:pointer;}
+    .crop-ok{color:var(--ink);background:linear-gradient(180deg,var(--gold-2),var(--gold));}
+    .crop-cancel{color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);}
+
   </style>
 </head>
 <body>
@@ -372,9 +442,7 @@
   <!-- PARTNERS -->
   <section class="sec partners" id="partners">
     <div class="sec-lab">Партнёры</div>
-    <div class="pt-row">
-      <div class="pt-chip">PARTNER</div><div class="pt-chip">PARTNER</div><div class="pt-chip">PARTNER</div><div class="pt-chip">PARTNER</div>
-    </div>
+    <div class="partners-list" id="partnersList"></div>
   </section>
 
   <!-- FORM -->
@@ -394,50 +462,38 @@
 <!-- CONSOLE / CALCULATOR -->
   <div class="console">
 
-    <div class="tabs">
-      <button class="segment-btn active" data-tariff="with">С первым взносом</button>
-      <button class="segment-btn" data-tariff="without">Без первого взноса</button>
-    </div>
-    <div class="tariff-conds open" id="tariffCondsWith"><div class="tc-inner">
-      <div class="tc-title">Условия тарифа</div>
-      <div class="tc-item">До <b>250 000 ₽</b> — 1 поручитель (муж.)</div>
-      <div class="tc-item">От <b>250 000 ₽</b> — 2 поручителя (муж.)</div>
-      <div class="tc-item">Возраст покупателя и поручителя — от 22 лет</div>
-      <div class="tc-item">Прописка в ЧР</div>
-    </div></div>
-    <div class="tariff-conds" id="tariffCondsWithout"><div class="tc-inner">
-      <div class="tc-title">Условия тарифа</div>
-      <div class="tc-item">До <b>100 000 ₽</b> — 1 поручитель (муж.)</div>
-      <div class="tc-item">От <b>100 000 ₽</b> — 2 поручителя (муж.)</div>
+    <div class="tariff-conds open"><div class="tc-inner">
+      <div class="tc-title">Условия</div>
+      <div class="tc-item">До <b>250 000 ₽</b> — 1 поручитель (муж.), от <b>250 000 ₽</b> — 2</div>
       <div class="tc-item">Возраст покупателя и поручителя — от 22 лет</div>
       <div class="tc-item">Прописка в ЧР</div>
     </div></div>
 
     <div class="ctrl">
-      <div class="ctrl-row"><span class="ctrl-lab">Стоимость товара</span><span class="ctrl-hint" id="priceHint">30 000 – 1 500 000 ₽</span></div>
+      <div class="ctrl-row"><span class="ctrl-lab">Стоимость товара</span><span class="ctrl-hint" id="priceHint"></span></div>
       <div class="inp">
         <input type="text" inputmode="numeric" id="price" placeholder="0" autocomplete="off" value="30 000"/>
         <span class="cur">₽</span>
       </div>
-      <div class="field-error" id="priceError">Стоимость товара должна быть не менее 30 000 ₽</div>
-      <input type="range" id="priceSlider" class="sber-slider" min="30000" max="1500000" value="30000" step="1000"/>
+      <div class="field-error" id="priceError"></div>
+      <input type="range" id="priceSlider" class="sber-slider" min="0" max="2000000" value="30000" step="5000"/>
     </div>
 
     <div class="ctrl">
       <div class="ctrl-row"><span class="ctrl-lab">Срок рассрочки</span><span class="ctrl-hint" id="monthsValue">3 месяца</span></div>
-      <input type="range" id="months" class="sber-slider" min="3" max="12" value="3" step="1"/>
+      <input type="range" id="months" class="sber-slider" min="3" max="18" value="3" step="1"/>
       <div class="ticks" id="monthsTicks">
-        <span class="months-tick active">3</span><span class="months-tick">6</span><span class="months-tick">9</span><span class="months-tick">12</span>
+        <span class="months-tick active">3</span><span class="months-tick">6</span><span class="months-tick">12</span><span class="months-tick">18</span>
       </div>
     </div>
 
-    <div class="ctrl" id="prepayBlock">
-      <div class="ctrl-row"><span class="ctrl-lab">Первый взнос</span></div>
+    <div class="ctrl">
+      <div class="ctrl-row"><span class="ctrl-lab">Первый взнос</span><span class="ctrl-hint" id="prepayHint">25%</span></div>
       <div class="inp">
         <input type="text" inputmode="numeric" id="prepayInput" placeholder="0" autocomplete="off"/>
         <span class="cur">₽</span>
       </div>
-      <input type="range" id="prepaySlider" class="sber-slider" min="0" max="0" step="100" value="0"/>
+      <input type="range" id="prepaySlider" class="sber-slider" min="0" max="100" value="25" step="1"/>
       <div class="field-error" id="prepayError"></div>
     </div>
 
@@ -477,6 +533,70 @@
     <button class="st-cta" onclick="window.open(document.getElementById('whatsappBtn').href,'_blank');return false;"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg> Оформить</button>
   </div>
 
+  <!-- PARTNER DETAIL -->
+  <div class="pd" id="partnerDetail" onclick="if(event.target===this)partnerClose()">
+    <div class="pd-inner">
+      <button class="pd-close" onclick="partnerClose()" aria-label="Закрыть">&times;</button>
+      <img class="pd-img" id="pdImg" alt="">
+      <h2 class="pd-name" id="pdName"></h2>
+      <p class="pd-desc" id="pdDesc"></p>
+      <iframe class="pd-map" id="pdMap" src="about:blank" allowfullscreen></iframe>
+      <a class="pd-maplink" id="pdLink" target="_blank" rel="noopener">В Яндекс.Картах →</a>
+    </div>
+  </div>
+
+  <!-- ADMIN -->
+  <div class="admin" id="adminPanel">
+    <div class="admin-inner">
+      <div class="admin-top">
+        <div><span class="hd-mx">MX</span><span class="hd-fin">ADMIN</span></div>
+        <button class="admin-close" onclick="adminClose()" aria-label="Закрыть">&times;</button>
+      </div>
+
+      <div id="adminLogin">
+        <h2>Вход для админа</h2>
+        <div class="sub">Управление партнёрами на сайте.</div>
+        <div class="admin-badge" id="adminMode">DEMO-режим</div>
+        <div class="admin-field"><label>Логин (email)</label><input class="admin-input" type="email" id="adminEmail" placeholder="admin@mxfinance.ru" autocomplete="username"></div>
+        <div class="admin-field"><label>Пароль</label><input class="admin-input" type="password" id="adminPass" placeholder="········" autocomplete="current-password"></div>
+        <button class="admin-btn gold" onclick="adminLogin()">Войти</button>
+        <div class="admin-msg" id="adminLoginMsg"></div>
+      </div>
+
+      <div id="adminDash" class="admin-hide">
+        <h2>Партнёры</h2>
+        <div class="sub">Добавляйте и удаляйте магазины-партнёры.</div>
+
+        <div class="admin-sec-title" id="pFormTitle" style="border-top:0;padding-top:0;margin-top:0;">Добавить партнёра</div>
+        <div class="admin-field"><label>Название</label><input class="admin-input" id="pName" placeholder="ТРЦ Мега Сити"></div>
+        <div class="admin-field"><label>Описание</label><textarea class="admin-area" id="pDesc" placeholder="Короткое описание магазина…"></textarea></div>
+        <div class="admin-field"><label>Координаты (широта, долгота из Яндекс.Карт)</label><input class="admin-input" id="pCoords" placeholder="43.348, 45.685"></div>
+        <div class="admin-field"><label>Фото / логотип</label><input class="admin-file" type="file" id="pImage" accept="image/*"><img class="admin-thumb admin-hide" id="pThumb" alt=""></div>
+        <button class="admin-btn gold" id="pSaveBtn" onclick="adminAddPartner()">Добавить партнёра</button>
+        <button class="admin-btn admin-hide" id="pCancelBtn" style="margin-top:10px" onclick="adminCancelEdit()">Отмена</button>
+        <div class="admin-msg" id="adminAddMsg"></div>
+
+        <div class="admin-sec-title">На сайте сейчас</div>
+        <div id="adminList"></div>
+
+        <button class="admin-btn" style="margin-top:22px" onclick="adminLogout()">Выйти</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CROP -->
+  <div class="crop" id="cropModal">
+    <div class="crop-box">
+      <div class="crop-title">Обрежьте фото до квадрата</div>
+      <div class="crop-hint">Двигайте и масштабируйте — в рамке останется то, что попадёт на сайт.</div>
+      <div class="crop-area"><img id="cropImg" alt=""></div>
+      <div class="crop-actions">
+        <button class="crop-cancel" onclick="cropCancel()">Отмена</button>
+        <button class="crop-ok" onclick="cropConfirm()">Обрезать</button>
+      </div>
+    </div>
+  </div>
+
   <!-- DRAWER -->
   <div class="mx-drawer" id="mxDrawer">
     <div class="mx-drawer-panel">
@@ -489,6 +609,7 @@
         <a href="#why"><span>02</span>Преимущества</a>
         <a href="#reviews"><span>03</span>Отзывы</a>
         <a href="#calc"><span>04</span>Калькулятор</a>
+        <a href="#" onclick="mxClose();adminOpen();return false;"><span>05</span>Для админа</a>
       </nav>
       <a class="mx-drawer-cta" href="#form">Подать заявку</a>
     </div>
@@ -496,26 +617,27 @@
 
 </div>
 <script>
-  // ═══ КОНФИГУРАЦИЯ ═══
-  // ═══ ДАННЫЕ ТАРИФОВ ═══
-  const markupWithDown     = {3:9,4:12,5:15,6:18,7:20,8:22,9:24,10:26,11:28,12:30};
-  const markupWithoutDown  = {3:13,4:17,5:21,6:25.5,7:28.5,8:32,9:35,10:38,11:41.5,12:45};
-  const markupNoDownPayment= {3:14,4:18,5:23,6:28,7:31,8:34,9:37,10:40,11:43,12:46};
-  const tariffLimits = { with: {min:30000,max:1500000,label:'от 30 000 до 1 500 000 ₽'}, without: {min:30000,max:500000,label:'от 30 000 до 500 000 ₽'} };
+  // ═══ МОДЕЛЬ РАСЧЁТА ═══
+  // Прибыль считается от финансируемой суммы (цена − первый взнос).
+  // Доходность за срок: базово 12% при взносе 25% → 12/0,75 = 16% на 3 мес, далее +4/0,75 за месяц.
+  function yieldPct(m){ return (12 + 4 * (m - 3)) / 0.75; }   // 16% на 3 мес, ~+5,33%/мес
+  const MONTH_MIN = 3, MONTH_MAX = 18;
+  const DEFAULT_PREPAY = 25;   // стандартный первый взнос, %
+  const MAGNET = 3;            // зона магнита вокруг 25%, п.п.
   const roundUpTo100 = v => Math.ceil(v / 100) * 100;
   const fmt = v => v.toLocaleString('ru-RU') + ' ₽';
-  let selectedTariff = 'with';
 
   const priceEl = document.getElementById('price');
   const monthsEl = document.getElementById('months');
   const monthsVal = document.getElementById('monthsValue');
   const monthsTicks = document.getElementById('monthsTicks');
-  const prepayBlock = document.getElementById('prepayBlock');
+  const priceError = document.getElementById('priceError');
+  const priceSlider = document.getElementById('priceSlider');
+  const priceHint = document.getElementById('priceHint');
   const prepaySlider = document.getElementById('prepaySlider');
   const prepayInput = document.getElementById('prepayInput');
   const prepayError = document.getElementById('prepayError');
-  const priceError = document.getElementById('priceError');
-  const priceSlider = document.getElementById('priceSlider');
+  const prepayHint = document.getElementById('prepayHint');
   const whatsappBtn = document.getElementById('whatsappBtn');
   const stickyMonthly = document.getElementById('stickyMonthly');
   const resMonthly = document.getElementById('resMonthly');
@@ -525,20 +647,7 @@
   const resMarkup = document.getElementById('resMarkup');
   const resMarkupPct = document.getElementById('resMarkupPct');
 
-  // ═══ ОБРАБОТЧИКИ КАЛЬКУЛЯТОРА ═══
-  document.querySelectorAll('.segment-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      selectedTariff = btn.dataset.tariff;
-      document.getElementById('tariffCondsWith').classList.toggle('open', selectedTariff === 'with');
-      document.getElementById('tariffCondsWithout').classList.toggle('open', selectedTariff === 'without');
-      document.getElementById('priceHint').textContent = tariffLimits[selectedTariff].label;
-      updateSliderFill(priceSlider);
-  calculate(true);
-    });
-  });
-
+  // ═══ ОБРАБОТЧИКИ ═══
   priceEl.addEventListener('input', () => {
     const raw = priceEl.value.replace(/\D/g, '');
     const cursor = priceEl.selectionStart;
@@ -548,69 +657,42 @@
     const diff = formatted.length - oldLen;
     priceEl.setSelectionRange(cursor + diff, cursor + diff);
     const pNum = parseInt(raw) || 0;
-    if (pNum >= parseInt(priceSlider.min) && pNum <= parseInt(priceSlider.max)) {
-      priceSlider.value = pNum;
-      updateSliderFill(priceSlider);
-    }
-    calculate(true);
-  });
-
-  monthsEl.addEventListener('input', () => { updateSliderFill(monthsEl); calculate(true); });
-
-  prepaySlider.addEventListener('input', () => {
-    const min = parseInt(prepaySlider.min);
-    const max = parseInt(prepaySlider.max);
-    const defaultPrepay = roundUpTo100((parseInt(priceEl.value.replace(/\D/g,'')) || 0) * (1 + (selectedTariff === 'with' ? markupWithDown[parseInt(monthsEl.value)] : 0) / 100) * 0.25);
-    const val = parseInt(prepaySlider.value);
-    const magnetZone = Math.round((max - min) * 0.04);
-    if (Math.abs(val - defaultPrepay) <= magnetZone) {
-      prepaySlider.value = defaultPrepay;
-      prepayInput.value = defaultPrepay.toLocaleString('ru-RU');
-    } else {
-      prepayInput.value = parseInt(prepaySlider.value).toLocaleString('ru-RU');
-    }
-    prepayError.classList.remove('visible');
-    updateSliderFill(prepaySlider);
-    calculate(false);
+    if (pNum <= parseInt(priceSlider.max)) { priceSlider.value = pNum; updateSliderFill(priceSlider); }
+    calculate();
   });
 
   priceSlider.addEventListener('input', () => {
-    const val = parseInt(priceSlider.value);
-    priceEl.value = val.toLocaleString('ru-RU');
+    priceEl.value = parseInt(priceSlider.value).toLocaleString('ru-RU');
     updateSliderFill(priceSlider);
-    calculate(true);
+    calculate();
+  });
+
+  monthsEl.addEventListener('input', () => { updateSliderFill(monthsEl); calculate(); });
+
+  prepaySlider.addEventListener('input', () => {
+    let pct = parseInt(prepaySlider.value);
+    if (Math.abs(pct - DEFAULT_PREPAY) <= MAGNET) { pct = DEFAULT_PREPAY; prepaySlider.value = pct; }
+    updateSliderFill(prepaySlider);
+    calculate();
   });
 
   prepayInput.addEventListener('input', () => {
+    const price = parseInt(priceEl.value.replace(/\D/g, '')) || 0;
     const raw = prepayInput.value.replace(/\D/g, '');
-    if (!raw) { prepayInput.value = ''; prepayError.classList.remove('visible'); return; }
-    const num = parseInt(raw);
-    const min = parseInt(prepaySlider.min);
-    const max = parseInt(prepaySlider.max);
-    if (num < min) {
-      prepayError.textContent = `Допустимо от ${min.toLocaleString('ru-RU')} до ${max.toLocaleString('ru-RU')} ₽`;
-      prepayError.classList.add('visible'); return;
-    }
     const cursor = prepayInput.selectionStart;
     const oldLen = prepayInput.value.length;
-    let val = roundUpTo100(num);
-    const priceRaw = parseInt(priceEl.value.replace(/\D/g, '')) || 0;
-    const months = parseInt(monthsEl.value);
-    const defaultPrepay = roundUpTo100(priceRaw * (1 + markupWithDown[months] / 100) * 0.25);
-    const magnetZone = Math.round((max - min) * 0.04);
-    if (Math.abs(val - defaultPrepay) <= magnetZone) val = defaultPrepay;
-    const formatted = val.toLocaleString('ru-RU');
+    let rub = parseInt(raw) || 0;
+    if (price && rub > price) rub = price;
+    const formatted = rub ? rub.toLocaleString('ru-RU') : '';
     prepayInput.value = formatted;
     const diff = formatted.length - oldLen;
     try { prepayInput.setSelectionRange(cursor + diff, cursor + diff); } catch(e) {}
-    if (val <= max) {
-      prepayError.classList.remove('visible');
-      prepaySlider.value = val;
-      calculate(false);
-    } else {
-      prepayError.textContent = `Допустимо от ${min.toLocaleString('ru-RU')} до ${max.toLocaleString('ru-RU')} ₽`;
-      prepayError.classList.add('visible');
-    }
+    let pct = price ? Math.round(rub / price * 100) : DEFAULT_PREPAY;
+    if (pct < 0) pct = 0; if (pct > 100) pct = 100;
+    if (Math.abs(pct - DEFAULT_PREPAY) <= MAGNET) pct = DEFAULT_PREPAY;
+    prepaySlider.value = pct;
+    updateSliderFill(prepaySlider);
+    calculate(true);
   });
 
   function updateSliderFill(slider) {
@@ -621,17 +703,11 @@
     slider.style.background = `linear-gradient(to right, var(--green-light) 0%, var(--green-light) ${pct}%, var(--border) ${pct}%, var(--border) 100%)`;
   }
 
-  function monthWord(n) {
-    if (n === 1) return 'месяц';
-    if (n >= 2 && n <= 4) return 'месяца';
-    return 'месяцев';
-  }
+  function monthWord(n){ if(n===1)return 'месяц'; if(n>=2&&n<=4)return 'месяца'; return 'месяцев'; }
 
-  function updateMonthsUI(months, maxMonths) {
-    const labels = maxMonths === 6 ? [3,4,5,6] : maxMonths === 9 ? [3,6,9] : [3,6,9,12];
-    monthsTicks.innerHTML = labels.map(l =>
-      `<span class="months-tick ${l === months ? 'active' : ''}">${l} мес</span>`
-    ).join('');
+  const TICKS = [3, 6, 12, 18];
+  function updateMonthsUI(months){
+    monthsTicks.innerHTML = TICKS.map(l => `<span class="months-tick ${l===months?'active':''}">${l}</span>`).join('');
     monthsVal.textContent = `${months} ${monthWord(months)}`;
   }
 
@@ -656,106 +732,61 @@
     el._raf = requestAnimationFrame(tick);
   }
 
-  function togglePrepay(show) {
-    const block = document.getElementById('prepayBlock');
-    if (show) block.classList.remove('hiding');
-    else block.classList.add('hiding');
-  }
-
-  function calculate(resetPrepay = false) {
+  // ═══ РАСЧЁТ ═══
+  function calculate(skipPrepayInput){
     const raw = priceEl.value.replace(/\D/g, '');
     const price = parseInt(raw) || 0;
-    const limits = tariffLimits[selectedTariff];
-    priceSlider.min = limits.min;
-    priceSlider.max = limits.max;
-    const pRaw = parseInt(priceEl.value.replace(/\D/g, '')) || 0;
-    if (pRaw >= limits.min && pRaw <= limits.max) {
-      priceSlider.value = pRaw;
-    } else if (pRaw < limits.min) {
-      priceSlider.value = limits.min;
-    } else {
-      priceSlider.value = limits.max;
-    }
+
+    priceSlider.value = (price <= parseInt(priceSlider.max)) ? price : priceSlider.max;
     updateSliderFill(priceSlider);
-    let maxMonths = 12;
-    if (price >= 1 && price <= 49999) maxMonths = 6;
-    else if (price >= 50000 && price <= 99999) maxMonths = 9;
-    monthsEl.max = maxMonths;
-    let months = parseInt(monthsEl.value);
-    if (months > maxMonths) { months = maxMonths; monthsEl.value = maxMonths; }
+
+    let months = parseInt(monthsEl.value) || MONTH_MIN;
+    if (months < MONTH_MIN){ months = MONTH_MIN; monthsEl.value = months; }
+    if (months > MONTH_MAX){ months = MONTH_MAX; monthsEl.value = months; }
     updateSliderFill(monthsEl);
-    updateMonthsUI(months, maxMonths);
-    if (!price) {
+    updateMonthsUI(months);
+    priceHint.textContent = '';
+
+    let pct = parseInt(prepaySlider.value) || 0;
+    prepayHint.textContent = pct + '%';
+
+    if (!price){
       priceError.textContent = 'Введите стоимость товара';
       priceError.classList.add('visible');
-      resMonthly.textContent = '— ₽'; resPrepay.textContent = '— ₽';
-      resFinal.textContent = '— ₽'; resMarkup.textContent = '— ₽';
+      ['resMonthly','resPrepay','resFinal','resMarkup'].forEach(id => document.getElementById(id).textContent = '— ₽');
       resMarkupPct.textContent = '—'; resMonthsSub.textContent = '—';
-      prepayInput.value = ''; prepaySlider.value = 0;
-      prepaySlider.min = 0; prepaySlider.max = 0;
-      prepayError.classList.remove('visible');
+      if (!skipPrepayInput) prepayInput.value = '';
       Object.keys(_counters).forEach(k => delete _counters[k]);
-      togglePrepay(selectedTariff === 'with');
-      whatsappBtn.href = 'https://wa.me/79280222114?text=Здравствуйте, хочу оформить рассрочку.';
-      return;
-    }
-    if (price < limits.min || price > limits.max) {
-      priceError.textContent = price < limits.min
-        ? 'Минимальная сумма — ' + limits.min.toLocaleString('ru-RU') + ' ₽'
-        : 'Максимальная сумма по этому тарифу — ' + limits.max.toLocaleString('ru-RU') + ' ₽';
-      priceError.classList.add('visible');
-      resMonthly.textContent = '— ₽'; resPrepay.textContent = '— ₽';
-      resFinal.textContent = '— ₽'; resMarkup.textContent = '— ₽';
-      resMarkupPct.textContent = '—'; resMonthsSub.textContent = '—';
-      prepayInput.value = ''; prepaySlider.value = 0;
-      prepaySlider.min = 0; prepaySlider.max = 0;
-      prepayError.classList.remove('visible');
-      Object.keys(_counters).forEach(k => delete _counters[k]);
-      togglePrepay(selectedTariff === 'with');
+      if (stickyMonthly) stickyMonthly.textContent = '— ₽';
       whatsappBtn.href = 'https://wa.me/79280222114?text=Здравствуйте, хочу оформить рассрочку.';
       return;
     }
     priceError.classList.remove('visible');
-    togglePrepay(selectedTariff === 'with');
-    const percent = selectedTariff === 'with' ? markupWithDown[months] : markupNoDownPayment[months];
-    const baseFinalCost = price * (1 + percent / 100);
-    let prepayment = 0, monthly = 0, finalCost = 0;
-    if (selectedTariff === 'with') {
-      const minPrepay = roundUpTo100(baseFinalCost * 0.15);
-      const maxPrepay = price < 100000 ? roundUpTo100(baseFinalCost * 0.25) : roundUpTo100(baseFinalCost * 0.65);
-      const defaultPrepay = roundUpTo100(baseFinalCost * 0.25);
-      prepaySlider.min = minPrepay; prepaySlider.max = maxPrepay;
-      if (resetPrepay) { prepaySlider.value = defaultPrepay; prepayInput.value = defaultPrepay.toLocaleString('ru-RU'); prepayError.classList.remove('visible'); }
-      updateSliderFill(prepaySlider);
-      prepayment = parseInt(prepaySlider.value);
-      if (prepayment === defaultPrepay) {
-        const remaining = baseFinalCost - prepayment;
-        monthly = roundUpTo100(remaining / months); finalCost = monthly * months + prepayment;
-      } else {
-        const remaining = price - prepayment;
-        const remainingWithMarkup = remaining * (1 + markupWithoutDown[months] / 100);
-        monthly = roundUpTo100(remainingWithMarkup / months); finalCost = monthly * months + prepayment;
-      }
-    } else {
-      monthly = roundUpTo100(baseFinalCost / months); finalCost = monthly * months; prepayment = 0;
-    }
+
+    let down = Math.min(roundUpTo100(price * pct / 100), price);
+    if (!skipPrepayInput) prepayInput.value = down.toLocaleString('ru-RU');
+
+    const financed = price - down;
+    const profit = financed * yieldPct(months) / 100;
+    let monthly = months > 0 ? roundUpTo100((financed + profit) / months) : 0;
+    const finalCost = down + monthly * months;
     const markup = finalCost - price;
     const markupPct = Math.round((markup / price) * 1000) / 10;
+
     setVal(resMonthly, fmt(monthly));
     resMonthsSub.textContent = `× ${months} ${monthWord(months)}`;
-    setVal(resPrepay, fmt(prepayment));
+    setVal(resPrepay, fmt(down));
     setVal(resFinal, fmt(finalCost));
     setVal(resMarkup, fmt(markup));
     setVal(resMarkupPct, markupPct.toFixed(1) + '%');
     if (stickyMonthly) stickyMonthly.textContent = fmt(monthly);
-    const tariffLabel = selectedTariff === 'with' ? 'С первым взносом' : 'Без первого взноса';
+
     const msgLines = [
       '*Здравствуйте, хочу оформить рассрочку*',
       `- Стоимость товара: *${price.toLocaleString('ru-RU')} ₽*`,
-      `- Тариф: *${tariffLabel}*`,
       `- Срок: *${months} ${monthWord(months)}*`,
+      `- Первый взнос: *${down.toLocaleString('ru-RU')} ₽ (${pct}%)*`,
       '', '     *Расчёт:*',
-      ...(selectedTariff === 'with' ? [`- Первый взнос: *${prepayment.toLocaleString('ru-RU')} ₽*`] : []),
       `- Ежемесячный платёж: *${monthly.toLocaleString('ru-RU')} ₽*`,
       `- Итоговая стоимость: *${finalCost.toLocaleString('ru-RU')} ₽*`,
       `- Наценка: *${markup.toLocaleString('ru-RU')} ₽ (${markupPct.toFixed(1)}%)*`,
@@ -823,6 +854,284 @@
   window.mxClose=function(){d.classList.remove('open');document.body.classList.remove('noscroll');};
   Array.prototype.forEach.call(d.querySelectorAll('a'),function(a){a.addEventListener('click',window.mxClose);});
   d.addEventListener('click',function(e){if(e.target===d)window.mxClose();});
+})();
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+(function(){
+  // ====== FIREBASE: вставь сюда конфиг СВОЕГО нового проекта ======
+  const firebaseConfig = {
+    apiKey: "PASTE_API_KEY",
+    authDomain: "PASTE.firebaseapp.com",
+    projectId: "PASTE_PROJECT_ID",
+    storageBucket: "PASTE.appspot.com",
+    messagingSenderId: "PASTE",
+    appId: "PASTE"
+  };
+  // ================================================================
+
+  let db=null, auth=null, USE_FB=false;
+  try{
+    if(window.firebase && firebaseConfig.apiKey.indexOf('PASTE')<0){
+      firebase.initializeApp(firebaseConfig);
+      db=firebase.firestore(); auth=firebase.auth();
+      USE_FB=true;
+    }
+  }catch(e){ USE_FB=false; }
+
+  const modeBadge=document.getElementById('adminMode');
+  if(modeBadge) modeBadge.textContent = USE_FB ? 'Firebase подключён' : 'DEMO-режим (Firebase не подключён)';
+
+  // демо-данные, пока нет Firebase
+  let demo=[];
+
+  function esc(s){return (s+'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+  function parseCoords(str){
+    const m=(str||'').replace(/;/g,',').match(/-?\d+\.?\d*/g);
+    if(!m||m.length<2) return null;
+    return {lat:parseFloat(m[0]), lon:parseFloat(m[1])};
+  }
+  function mapWidgetURL(c){ return 'https://yandex.ru/map-widget/v1/?ll='+c.lon+'%2C'+c.lat+'&z=17&pt='+c.lon+'%2C'+c.lat+'%2Cpm2rdm'; }
+  function osmEmbedURL(c){ var d=0.006; var bbox=(c.lon-d)+','+(c.lat-d)+','+(c.lon+d)+','+(c.lat+d); return 'https://www.openstreetmap.org/export/embed.html?bbox='+encodeURIComponent(bbox)+'&layer=mapnik&marker='+c.lat+'%2C'+c.lon; }
+  function mapLinkURL(c){ return 'https://yandex.ru/maps/?ll='+c.lon+','+c.lat+'&z=17&pt='+c.lon+','+c.lat; }
+
+  const listEl=document.getElementById('partnersList');
+  function cardHTML(p){
+    const img=p.image?'<img class="partner-img" src="'+p.image+'" alt="">':'<div class="partner-img"></div>';
+    return '<div class="partner-card" role="button" tabindex="0" onclick="partnerOpen(\''+p.id+'\')">'+img+
+      '<div class="partner-body"><div class="partner-name">'+esc(p.name||'')+'</div></div></div>';
+  }
+  let marqRAF=null, marqPaused=false, marqTimer=null;
+  function bindMarq(el){
+    if(el._marqBound) return;
+    const pause=function(){ marqPaused=true; clearTimeout(marqTimer); };
+    const resume=function(){ clearTimeout(marqTimer); marqTimer=setTimeout(function(){marqPaused=false;},2500); };
+    ['pointerdown','touchstart','mouseenter','wheel'].forEach(function(ev){ el.addEventListener(ev,pause,{passive:true}); });
+    ['pointerup','touchend','mouseleave'].forEach(function(ev){ el.addEventListener(ev,resume,{passive:true}); });
+    el._marqBound=true;
+  }
+  // Авто-прокрутка «туда-обратно», без дублирования карточек
+  function setupMarquee(){
+    const el=listEl; if(!el) return;
+    if(marqRAF) cancelAnimationFrame(marqRAF);
+    bindMarq(el);
+    let acc=0, dir=1;
+    function step(){
+      const maxScroll=el.scrollWidth-el.clientWidth;
+      if(!marqPaused && maxScroll>30){
+        acc+=0.4;
+        const whole=Math.floor(acc);
+        if(whole>=1){
+          acc-=whole;
+          el.scrollLeft += whole*dir;
+          if(el.scrollLeft>=maxScroll){ el.scrollLeft=maxScroll; dir=-1; }
+          else if(el.scrollLeft<=0){ el.scrollLeft=0; dir=1; }
+        }
+      }
+      marqRAF=requestAnimationFrame(step);
+    }
+    marqRAF=requestAnimationFrame(step);
+  }
+  function renderPublic(items){
+    if(!listEl) return;
+    if(!items.length){ listEl.innerHTML='<div class="partners-empty">Партнёры скоро появятся.</div>'; listEl.style.justifyContent='flex-start'; setupMarquee(); return; }
+    listEl.innerHTML=items.map(cardHTML).join('');   // ровно столько карточек, сколько партнёров
+    listEl.scrollLeft=0;
+    listEl.style.justifyContent = (listEl.scrollWidth>listEl.clientWidth+4) ? 'flex-start' : 'center';
+    setupMarquee();
+  }
+
+  const adminListEl=document.getElementById('adminList');
+  function renderAdmin(items){
+    if(!adminListEl) return;
+    adminListEl.innerHTML = items.length? items.map(p=>
+      '<div class="admin-item">'+
+        (p.image?'<img src="'+p.image+'" alt="">':'<img alt="">')+
+        '<div class="ai-body"><div class="ai-name">'+esc(p.name||'')+'</div><div class="ai-desc">'+esc(p.desc||p.coords||'')+'</div></div>'+
+        '<div class="admin-actions"><button class="admin-edit" onclick="adminEditPartner(\''+p.id+'\')">Изменить</button>'+
+        '<button class="admin-del" onclick="adminDelPartner(\''+p.id+'\',this)">Удалить</button></div>'+
+      '</div>').join('') : '<div class="partners-empty" style="color:var(--t3)">Пока пусто.</div>';
+  }
+
+  let cache=[];
+  function load(){
+    if(USE_FB){
+      db.collection('partners').orderBy('created','desc').onSnapshot(function(snap){
+        cache=snap.docs.map(function(d){ var o=d.data(); o.id=d.id; return o; });
+        renderPublic(cache); renderAdmin(cache);
+      }, function(err){ console.warn('firestore', err); });
+    } else {
+      cache=demo.slice(); renderPublic(cache); renderAdmin(cache);
+    }
+  }
+
+  // сжатие изображения в dataURL
+  function compress(file, cb){
+    const r=new FileReader();
+    r.onload=function(){ const img=new Image(); img.onload=function(){
+      const max=900; let w=img.width, h=img.height;
+      if(w>max){ h=Math.round(h*max/w); w=max; }
+      const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+      cv.getContext('2d').drawImage(img,0,0,w,h);
+      cb(cv.toDataURL('image/jpeg',0.7));
+    }; img.src=r.result; };
+    r.readAsDataURL(file);
+  }
+  let pendingImage='', editingId=null, cropper=null;
+  const pImage=document.getElementById('pImage'), pThumb=document.getElementById('pThumb');
+  const cropModal=document.getElementById('cropModal'), cropImg=document.getElementById('cropImg');
+
+  if(pImage) pImage.addEventListener('change',function(){
+    const f=pImage.files[0]; if(!f) return;
+    const r=new FileReader();
+    r.onload=function(){ openCropper(r.result); };
+    r.readAsDataURL(f);
+  });
+
+  function setThumb(url){ pendingImage=url; pThumb.src=url; pThumb.classList.remove('admin-hide'); }
+
+  // центральная обрезка в квадрат — запасной вариант, если библиотека не загрузилась
+  function centerCropSquare(dataURL, cb){
+    const img=new Image();
+    img.onload=function(){
+      const sq=Math.min(img.width,img.height);
+      const cv=document.createElement('canvas'); cv.width=900; cv.height=900;
+      cv.getContext('2d').drawImage(img,(img.width-sq)/2,(img.height-sq)/2,sq,sq,0,0,900,900);
+      cb(cv.toDataURL('image/jpeg',0.75));
+    };
+    img.src=dataURL;
+  }
+
+  function openCropper(dataURL){
+    if(!window.Cropper){ centerCropSquare(dataURL, setThumb); return; }
+    cropImg.src=dataURL;
+    cropModal.classList.add('open');
+    document.body.classList.add('noscroll');
+    if(cropper){ cropper.destroy(); cropper=null; }
+    setTimeout(function(){
+      cropper=new Cropper(cropImg,{aspectRatio:1,viewMode:1,dragMode:'move',autoCropArea:1,background:false,responsive:true,checkOrientation:true});
+    },50);
+  }
+  window.cropConfirm=function(){
+    if(cropper){
+      const canvas=cropper.getCroppedCanvas({width:900,height:900,imageSmoothingQuality:'high'});
+      if(canvas) setThumb(canvas.toDataURL('image/jpeg',0.75));
+    }
+    cropCancel();
+  };
+  window.cropCancel=function(){
+    if(cropper){ cropper.destroy(); cropper=null; }
+    cropModal.classList.remove('open');
+    document.body.classList.remove('noscroll');
+  };
+
+  window.adminOpen=function(){ document.getElementById('adminPanel').classList.add('open'); document.body.classList.add('noscroll'); };
+  window.adminClose=function(){ document.getElementById('adminPanel').classList.remove('open'); document.body.classList.remove('noscroll'); };
+  function showDash(){ document.getElementById('adminLogin').classList.add('admin-hide'); document.getElementById('adminDash').classList.remove('admin-hide'); }
+  function showLogin(){ document.getElementById('adminDash').classList.add('admin-hide'); document.getElementById('adminLogin').classList.remove('admin-hide'); }
+
+  window.adminLogin=function(){
+    const email=document.getElementById('adminEmail').value.trim();
+    const pass=document.getElementById('adminPass').value;
+    const msg=document.getElementById('adminLoginMsg'); msg.className='admin-msg'; msg.textContent='';
+    if(USE_FB){
+      auth.signInWithEmailAndPassword(email,pass).catch(function(){ msg.classList.add('err'); msg.textContent='Неверный логин или пароль.'; });
+    } else {
+      if(pass){ showDash(); } else { msg.classList.add('err'); msg.textContent='Введите пароль (в демо — любой).'; }
+    }
+  };
+  window.adminLogout=function(){ if(USE_FB) auth.signOut(); else showLogin(); };
+  if(USE_FB){ auth.onAuthStateChanged(function(u){ if(u) showDash(); else showLogin(); }); }
+
+  function resetForm(){
+    editingId=null; pendingImage='';
+    document.getElementById('pName').value=''; document.getElementById('pDesc').value=''; document.getElementById('pCoords').value='';
+    pThumb.classList.add('admin-hide'); if(pImage) pImage.value='';
+    document.getElementById('pSaveBtn').textContent='Добавить партнёра';
+    document.getElementById('pFormTitle').textContent='Добавить партнёра';
+    document.getElementById('pCancelBtn').classList.add('admin-hide');
+  }
+  window.adminCancelEdit=function(){ resetForm(); document.getElementById('adminAddMsg').textContent=''; };
+
+  window.adminEditPartner=function(id){
+    const p=cache.filter(function(x){return x.id===id;})[0]; if(!p) return;
+    editingId=id;
+    document.getElementById('pName').value=p.name||'';
+    document.getElementById('pDesc').value=p.desc||'';
+    document.getElementById('pCoords').value=p.coords||'';
+    pendingImage=p.image||'';
+    if(p.image){ pThumb.src=p.image; pThumb.classList.remove('admin-hide'); } else { pThumb.classList.add('admin-hide'); }
+    document.getElementById('pSaveBtn').textContent='Сохранить изменения';
+    document.getElementById('pFormTitle').textContent='Изменить партнёра';
+    document.getElementById('pCancelBtn').classList.remove('admin-hide');
+    document.getElementById('adminAddMsg').textContent='';
+    const inner=document.querySelector('.admin-inner'); if(inner) inner.scrollTop=0;
+  };
+
+  window.adminAddPartner=function(){
+    const name=document.getElementById('pName').value.trim();
+    const desc=document.getElementById('pDesc').value.trim();
+    const coords=document.getElementById('pCoords').value.trim();
+    const msg=document.getElementById('adminAddMsg'); msg.className='admin-msg';
+    if(!name){ msg.classList.add('err'); msg.textContent='Укажите название.'; return; }
+    if(coords && !parseCoords(coords)){ msg.classList.add('err'); msg.textContent='Координаты в формате: 43.348, 45.685'; return; }
+    const rec={name:name,desc:desc,coords:coords,image:pendingImage};
+    function ok(t){ msg.classList.add('ok'); msg.textContent=t; resetForm(); }
+    function fail(){ msg.classList.add('err'); msg.textContent='Ошибка сохранения.'; }
+    if(editingId){
+      if(USE_FB){ db.collection('partners').doc(editingId).update(rec).then(function(){ok('Изменения сохранены.');}).catch(fail); }
+      else { for(var i=0;i<demo.length;i++){ if(demo[i].id===editingId){ demo[i]=Object.assign(demo[i],rec); break; } } cache=demo.slice(); renderPublic(cache); renderAdmin(cache); ok('Изменения сохранены.'); }
+    } else {
+      rec.created=Date.now();
+      if(USE_FB){ db.collection('partners').add(rec).then(function(){ok('Партнёр добавлен.');}).catch(fail); }
+      else { demo.unshift(Object.assign({id:'d'+Date.now()},rec)); cache=demo.slice(); renderPublic(cache); renderAdmin(cache); ok('Партнёр добавлен.'); }
+    }
+  };
+
+  window.adminDelPartner=function(id, btn){
+    // Подтверждение прямо на кнопке (без системного окна confirm, которое телефон может блокировать)
+    if(btn && !btn._armed){
+      btn._armed=true;
+      btn.textContent='Удалить?';
+      btn.style.background='var(--err)'; btn.style.color='#fff'; btn.style.borderColor='var(--err)';
+      clearTimeout(btn._t);
+      btn._t=setTimeout(function(){ btn._armed=false; btn.textContent='Удалить'; btn.style.background=''; btn.style.color=''; btn.style.borderColor=''; },3000);
+      return;
+    }
+    if(btn){ clearTimeout(btn._t); btn.textContent='Удаляю…'; }
+    if(USE_FB){
+      db.collection('partners').doc(id).delete()
+        .catch(function(e){
+          if(btn){ btn._armed=false; btn.textContent='Ошибка'; btn.style.background=''; btn.style.color='var(--err)'; }
+          console.error('Не удалось удалить партнёра:', e);
+        });
+    } else {
+      demo=demo.filter(function(p){return p.id!==id;});
+      cache=demo.slice(); renderPublic(cache); renderAdmin(cache);
+    }
+  };
+
+  window.partnerOpen=function(id){
+    const p=cache.filter(function(x){return x.id===id;})[0]; if(!p) return;
+    document.getElementById('pdName').textContent=p.name||'';
+    const d=document.getElementById('pdDesc'); d.textContent=p.desc||''; d.style.display=p.desc?'block':'none';
+    const img=document.getElementById('pdImg');
+    if(p.image){ img.src=p.image; img.style.display='block'; } else { img.removeAttribute('src'); img.style.display='none'; }
+    const c=parseCoords(p.coords), mp=document.getElementById('pdMap'), lk=document.getElementById('pdLink');
+    if(c){ mp.src=osmEmbedURL(c); mp.style.display='block'; lk.href=mapLinkURL(c); lk.style.display='inline-flex'; }
+    else { mp.src='about:blank'; mp.style.display='none'; lk.style.display='none'; }
+    document.getElementById('partnerDetail').classList.add('open'); document.body.classList.add('noscroll');
+  };
+  window.partnerClose=function(){
+    document.getElementById('pdMap').src='about:blank';
+    document.getElementById('partnerDetail').classList.remove('open'); document.body.classList.remove('noscroll');
+  };
+
+  load();
 })();
 </script>
 
