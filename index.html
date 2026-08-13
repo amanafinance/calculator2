@@ -65,11 +65,10 @@
     .con-label::before{content:"";width:16px;height:1px;background:var(--gold);}
 
     /* tariff tabs = underlined text tabs */
-    .tabs{display:flex;gap:24px;border-bottom:1px solid var(--line);margin-bottom:2px;}
-    .segment-btn{position:relative;background:none;border:none;cursor:pointer;padding:0 0 12px;
-      font-family:'Inter',sans-serif;font-size:13.5px;font-weight:600;color:var(--t3);transition:color .2s;}
-    .segment-btn.active{color:var(--ink);}
-    .segment-btn.active::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--gold);}
+    .tabs{display:flex;gap:5px;background:var(--mist);border-radius:13px;padding:5px;margin-bottom:20px;}
+    .segment-btn{flex:1;text-align:center;background:none;border:none;cursor:pointer;padding:11px 6px;border-radius:9px;
+      font-family:'Inter',sans-serif;font-size:13.5px;font-weight:600;color:var(--t2);transition:.2s;}
+    .segment-btn.active{background:linear-gradient(180deg,var(--gold-2),var(--gold));color:var(--ink);box-shadow:0 4px 12px rgba(201,162,75,.35);}
 
     .tariff-conds{display:none;}
     .tariff-conds.open{display:block;margin:12px 0 4px;}
@@ -405,6 +404,37 @@
     .hero-l h1{position:relative;z-index:2;}
     .hero-desc{position:relative;z-index:2;}
 
+    .svc-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+    /* ═══════════ ПЛАНШЕТ ═══════════ */
+    @media (min-width:720px){
+      body{background:#0b0c0e;}
+      .app-wrapper{max-width:880px;box-shadow:0 0 80px rgba(0,0,0,.5);}
+      .hero-l{padding:60px 44px 84px;}
+      .hero-l h1{font-size:46px;max-width:640px;}
+      .hero-desc{font-size:15px;max-width:600px;}
+      .sec{padding:60px 44px;}
+      .calc-sec{padding:56px 44px 64px;}
+      .calc-sec .console{max-width:620px;margin:12px auto 0;}
+      .svc-row{overflow:visible;flex-wrap:wrap;justify-content:center;}
+      .services .svc{flex:0 0 calc(50% - 8px);width:auto;}
+      .why-grid,.rev-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;}
+      .why-card,.rev{margin-bottom:0;}
+      .why-intro{max-width:640px;}
+    }
+    /* ═══════════ ПК ═══════════ */
+    @media (min-width:1040px){
+      .app-wrapper{max-width:1160px;}
+      .hero-l{padding:84px 64px 104px;}
+      .hero-l h1{font-size:56px;}
+      .hero-desc{font-size:16px;}
+      .sec{padding:76px 64px;}
+      .calc-sec{padding:72px 64px 80px;}
+      .services .svc{flex:0 0 calc(25% - 11px);}
+      .why-grid,.rev-grid{grid-template-columns:1fr 1fr 1fr;gap:20px;}
+      .sticky{display:none;}
+      .app-wrapper{padding-bottom:0;}
+    }
+
   </style>
 </head>
 <body>
@@ -442,12 +472,6 @@
       <button class="segment-btn active" data-tariff="with">С первым взносом</button>
       <button class="segment-btn" data-tariff="without">Без первого взноса</button>
     </div>
-    <div class="tariff-conds open"><div class="tc-inner">
-      <div class="tc-title">Условия</div>
-      <div class="tc-item">До <b>250 000 ₽</b> — 1 поручитель (муж.), от <b>250 000 ₽</b> — 2</div>
-      <div class="tc-item">Возраст покупателя и поручителя — от 22 лет</div>
-      <div class="tc-item">Прописка в ЧР</div>
-    </div></div>
 
     <div class="ctrl">
       <div class="ctrl-row"><span class="ctrl-lab">Стоимость товара</span><span class="ctrl-hint" id="priceHint"></span></div>
@@ -500,48 +524,28 @@
   <section class="sec services" id="services">
     <div class="sec-lab">Наши услуги</div>
     <div class="svc-row" id="servicesRow">
-    <div class="svc">
-      <div class="svc-media"><span class="cnr tl"></span><span class="cnr tr"></span><span class="cnr bl"></span><span class="cnr br"></span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l1.6-4.8A2 2 0 0 1 8.5 7h7a2 2 0 0 1 1.9 1.2L19 13"/><path d="M3 13h18v4h-2v-1H5v1H3z"/><circle cx="7.5" cy="15.5" r="1.1"/><circle cx="16.5" cy="15.5" r="1.1"/></svg></div>
-      <div class="svc-body">
-        <div class="svc-idx">01</div>
-        <div class="svc-title">Автомобили в рассрочку</div>
-        <p class="svc-desc">Поможем купить новый или подержанный автомобиль на условиях исламской рассрочки.</p>
-      </div>
+    <div class="svc"><div class="svc-media"><span class="cnr tl"></span><span class="cnr tr"></span><span class="cnr bl"></span><span class="cnr br"></span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l1.6-4.8A2 2 0 0 1 8.5 7h7a2 2 0 0 1 1.9 1.2L19 13"/><path d="M3 13h18v4h-2v-1H5v1H3z"/><circle cx="7.5" cy="15.5" r="1.1"/><circle cx="16.5" cy="15.5" r="1.1"/></svg><img class="svc-photo" src="images/auto.jpg" alt="" onerror="this.remove()"></div><div class="svc-body"><div class="svc-idx">01</div><div class="svc-title">Автомобили в рассрочку</div><p class="svc-desc">Поможем купить новый или подержанный автомобиль на условиях рассрочки.</p></div></div>
+    <div class="svc"><div class="svc-media"><span class="cnr tl"></span><span class="cnr tr"></span><span class="cnr bl"></span><span class="cnr br"></span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="1"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2"/><path d="M10 21v-3h4v3"/></svg><img class="svc-photo" src="images/apartments.jpg" alt="" onerror="this.remove()"></div><div class="svc-body"><div class="svc-idx">02</div><div class="svc-title">Квартиры в рассрочку</div><p class="svc-desc">Поможем приобрести квартиру. Прозрачные условия и быстрое рассмотрение заявки.</p></div></div>
+    <div class="svc"><div class="svc-media"><span class="cnr tl"></span><span class="cnr tr"></span><span class="cnr bl"></span><span class="cnr br"></span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><img class="svc-photo" src="images/goods.jpg" alt="" onerror="this.remove()"></div><div class="svc-body"><div class="svc-idx">03</div><div class="svc-title">Потребительские товары</div><p class="svc-desc">Техника, электроника, мебель и другие товары для дома в рассрочку.</p></div></div>
+    <div class="svc"><div class="svc-media"><span class="cnr tl"></span><span class="cnr tr"></span><span class="cnr bl"></span><span class="cnr br"></span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h9v8H3zM12 10h4l3 3v2h-7z"/><circle cx="7" cy="17.5" r="1.6"/><circle cx="16.5" cy="17.5" r="1.6"/></svg><img class="svc-photo" src="images/machinery.jpg" alt="" onerror="this.remove()"></div><div class="svc-body"><div class="svc-idx">04</div><div class="svc-title">Спецтехника в рассрочку</div><p class="svc-desc">Спецтехника и оборудование для бизнеса на условиях рассрочки.</p></div></div>
     </div>
-    <div class="svc">
-      <div class="svc-media"><span class="cnr tl"></span><span class="cnr tr"></span><span class="cnr bl"></span><span class="cnr br"></span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="1"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2"/><path d="M10 21v-3h4v3"/></svg></div>
-      <div class="svc-body">
-        <div class="svc-idx">02</div>
-        <div class="svc-title">Квартиры в рассрочку</div>
-        <p class="svc-desc">Поможем приобрести квартиру. Прозрачные условия и быстрое рассмотрение заявки.</p>
-      </div>
-    </div>
-    <div class="svc">
-      <div class="svc-media"><span class="cnr tl"></span><span class="cnr tr"></span><span class="cnr bl"></span><span class="cnr br"></span><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 15l1 4h15l1-4"/><path d="M5.5 15V9a1 1 0 0 1 1-1h11a1 1 0 0 1 1 1v6"/><path d="M9 8V6h6v2"/><path d="M9.5 11h5M9.5 13h5"/></svg></div>
-      <div class="svc-body">
-        <div class="svc-idx">03</div>
-        <div class="svc-title">Товар из Китая</div>
-        <p class="svc-desc">Организуем выкуп товаров из Китая с продажей в рассрочку: найдём поставщика, оформим заказ и доставим без лишних сложностей.</p>
-      </div>
-    </div>
-  </div>
   </section>
 
   <!-- WHY -->
   <section class="sec why" id="why">
     <div class="sec-lab">Почему выбирают нас</div>
     <p class="why-intro">Работаем по принципам исламского финансирования — честные, прозрачные и удобные условия для каждого клиента.</p>
-    <div class="why-card"><div class="why-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="7.5" cy="7.5" r="2.4"/><circle cx="16.5" cy="16.5" r="2.4"/></svg></div><h3>Без процентов</h3><p>Сделки проходят без риба (процентов), в соответствии с принципами исламского финансирования.</p></div>
+    <div class="why-grid"><div class="why-card"><div class="why-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="7.5" cy="7.5" r="2.4"/><circle cx="16.5" cy="16.5" r="2.4"/></svg></div><h3>Без процентов</h3><p>Сделки проходят без риба (процентов), в соответствии с принципами исламского финансирования.</p></div>
     <div class="why-card"><div class="why-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></div><h3>Прозрачные условия</h3><p>Стоимость товара и график платежей известны заранее. Без скрытых комиссий и неожиданных платежей.</p></div>
-    <div class="why-card"><div class="why-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg></div><h3>Надёжность и доверие</h3><p>Сопровождаем клиента на каждом этапе сделки и гарантируем честный, ответственный подход.</p></div>
+    <div class="why-card"><div class="why-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg></div><h3>Надёжность и доверие</h3><p>Сопровождаем клиента на каждом этапе сделки и гарантируем честный, ответственный подход.</p></div></div>
   </section>
 
   <!-- REVIEWS -->
   <section class="sec reviews" id="reviews">
     <div class="sec-lab">Отзывы клиентов</div>
-    <div class="rev"><div class="rev-q">&#8220;</div><p class="rev-text">Оформил автомобиль в рассрочку. Все условия были понятны с самого начала, без скрытых платежей. Остался очень доволен сервисом.</p><div class="rev-name">Ахмед</div><div class="rev-role">Клиент MX Finance</div></div>
+    <div class="rev-grid"><div class="rev"><div class="rev-q">&#8220;</div><p class="rev-text">Оформил автомобиль в рассрочку. Все условия были понятны с самого начала, без скрытых платежей. Остался очень доволен сервисом.</p><div class="rev-name">Ахмед</div><div class="rev-role">Клиент MX Finance</div></div>
     <div class="rev"><div class="rev-q">&#8220;</div><p class="rev-text">Приобрёл стройматериалы через MX Finance. Сделка прошла быстро, сотрудники сопровождали меня на каждом этапе.</p><div class="rev-name">Мухаммад</div><div class="rev-role">Клиент MX Finance</div></div>
-    <div class="rev"><div class="rev-q">&#8220;</div><p class="rev-text">Спасибо компании за честный подход и соблюдение принципов. Буду рекомендовать знакомым и родственникам.</p><div class="rev-name">Иса</div><div class="rev-role">Клиент MX Finance</div></div>
+    <div class="rev"><div class="rev-q">&#8220;</div><p class="rev-text">Спасибо компании за честный подход и соблюдение принципов. Буду рекомендовать знакомым и родственникам.</p><div class="rev-name">Иса</div><div class="rev-role">Клиент MX Finance</div></div></div>
   </section>
 
   <footer class="ft" id="kontakty">
