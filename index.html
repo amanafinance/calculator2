@@ -423,7 +423,7 @@
     }
     /* ═══════════ ПК ═══════════ */
     @media (min-width:1040px){
-      .app-wrapper{max-width:1160px;}
+      .app-wrapper{max-width:1440px;}
       .hero-l{padding:84px 64px 104px;}
       .hero-l h1{font-size:56px;}
       .hero-desc{font-size:16px;}
@@ -433,6 +433,28 @@
       .why-grid,.rev-grid{grid-template-columns:1fr 1fr 1fr;gap:20px;}
       .sticky{display:none;}
       .app-wrapper{padding-bottom:0;}
+    }
+
+    /* ═══════════ ШИРОКИЙ ЭКРАН ═══════════ */
+    @media (min-width:1500px){
+      .app-wrapper{max-width:100%;}
+      .hd{padding:20px 6vw;}
+      .hero-l{padding:110px 6vw 130px;}
+      .hero-l h1{font-size:68px;max-width:900px;}
+      .hero-desc{font-size:17px;max-width:760px;}
+      .sec{padding:90px 6vw;}
+      .calc-sec{padding:90px 6vw 100px;}
+      .calc-sec .console{max-width:700px;}
+      .services .svc{flex:0 0 calc(25% - 11px);}
+      .why-grid,.rev-grid{grid-template-columns:repeat(3,1fr);gap:24px;max-width:1500px;}
+      .ft{padding:56px 6vw 48px;}
+      .hero-cnr.tl{top:24px;left:3vw;}
+      .hero-cnr.br{bottom:28px;right:3vw;}
+    }
+    @media (min-width:1900px){
+      .hero-l h1{font-size:76px;}
+      .sec,.calc-sec,.hero-l,.hd,.ft{padding-left:9vw;padding-right:9vw;}
+      .why-grid,.rev-grid{max-width:1700px;}
     }
 
   </style>
