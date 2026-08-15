@@ -208,11 +208,12 @@
     .mx-burger{width:42px;height:42px;border:1px solid rgba(201,162,75,.4);border-radius:11px;background:none;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;cursor:pointer;}
     .mx-burger span{display:block;width:18px;height:1.6px;background:var(--gold);border-radius:2px;}
 
-    .mx-drawer{position:fixed;inset:0;z-index:400;background:rgba(9,10,12,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;visibility:hidden;transition:.28s;}
+    .mx-drawer{position:fixed;inset:0;z-index:400;background:rgba(9,10,12,.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);opacity:0;visibility:hidden;transition:.24s;}
     .mx-drawer.open{opacity:1;visibility:visible;}
-    .mx-drawer-panel{position:absolute;top:0;right:0;height:100%;width:80%;max-width:330px;background:var(--ink);border-left:1px solid rgba(201,162,75,.3);
-      padding:24px 22px calc(24px + env(safe-area-inset-bottom));transform:translateX(100%);transition:transform .3s ease;display:flex;flex-direction:column;}
-    .mx-drawer.open .mx-drawer-panel{transform:translateX(0);}
+    .mx-drawer-panel{position:absolute;top:0;left:0;right:0;width:100%;max-width:none;height:auto;background:var(--ink);
+      border-bottom:1px solid rgba(201,162,75,.35);border-left:0;padding:18px 20px 22px;
+      transform:translateY(-14px);opacity:0;transition:transform .26s ease,opacity .22s ease;display:flex;flex-direction:column;}
+    .mx-drawer.open .mx-drawer-panel{transform:translateY(0);opacity:1;}
     .mx-drawer-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;}
     .mx-drawer-top .hd-mx{font-size:16px;}.mx-drawer-top .hd-fin{font-size:16px;}
     .mx-drawer-close{background:none;border:none;color:var(--gold);font-size:26px;line-height:1;cursor:pointer;padding:0 4px;}
@@ -482,6 +483,15 @@
       .hero-orb.b{width:460px;height:460px;}
     }
 
+    .hd-ic{width:38px;height:38px;border-radius:10px;border:1px solid rgba(201,162,75,.35);display:flex;align-items:center;justify-content:center;
+      color:var(--gold);text-decoration:none;flex:0 0 auto;}
+    .hd-ic:active{background:rgba(201,162,75,.15);}
+    .hd-ic svg{width:17px;height:17px;}
+    .hd-ic.ic-phone svg{width:19px;height:19px;}
+    .ft-ic.ic-phone svg{width:20px;height:20px;}
+    .st-cta svg{width:18px;height:18px;}
+    @media (max-width:400px){ .hd-ic{width:34px;height:34px;} .hd-ic svg{width:15px;height:15px;} .hd-actions{gap:6px;} }
+
   </style>
 </head>
 <body>
@@ -493,6 +503,9 @@
       <span class="hd-mx">MX</span><span class="hd-fin">FINANCE</span>
     </div>
     <div class="hd-actions">
+      <a class="hd-ic ic-phone" href="tel:+79311010201" aria-label="Позвонить"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2c.28-.28.68-.36 1.04-.24 1.18.39 2.45.6 3.76.6.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.31.21 2.58.6 3.76.11.35.03.75-.25 1.04l-2.2 2.2z"/></svg></a>
+      <a class="hd-ic" href="https://wa.me/79311010201" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.96L2 22l5.25-1.38c1.45.79 3.08 1.21 4.79 1.21 5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm0 18.15c-1.54 0-3.04-.41-4.35-1.19l-.31-.19-3.24.85.87-3.16-.2-.33a8.19 8.19 0 0 1-1.26-4.37c0-4.54 3.7-8.23 8.24-8.23 4.54 0 8.23 3.69 8.23 8.23 0 4.54-3.69 8.23-8.23 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.7-.81-.23-.08-.39-.12-.56.13-.16.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-2-1.24-.74-.66-1.24-1.47-1.38-1.72-.15-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.13-.15.17-.25.25-.42.08-.16.04-.31-.02-.43-.06-.13-.56-1.35-.77-1.85-.2-.48-.41-.42-.56-.43h-.48c-.16 0-.43.06-.66.31s-.87.85-.87 2.07c0 1.22.89 2.4 1.01 2.57.12.16 1.75 2.67 4.24 3.74.59.26 1.05.41 1.41.52.6.19 1.14.16 1.56.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.14-1.18-.06-.11-.23-.17-.48-.29z"/></svg></a>
+      <a class="hd-ic" href="https://instagram.com/mx_finance_" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg></a>
       <button class="mx-burger" onclick="mxOpen()" aria-label="Меню"><span></span><span></span><span></span></button>
     </div>
   </header>
@@ -511,6 +524,10 @@
     <svg class="hero-skyline" viewBox="0 0 1200 150" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" fill="#C9A24B"><rect x="20" y="81" width="60" height="69"/><rect x="92" y="91" width="43" height="59"/><rect x="154" y="88" width="74" height="62"/><rect x="239" y="93" width="77" height="57"/><rect x="336" y="73" width="72" height="77"/><rect x="414" y="45" width="45" height="105"/><rect x="471" y="70" width="44" height="80"/><rect x="522" y="46" width="75" height="104"/><rect x="603" y="85" width="76" height="65"/><rect x="688" y="20" width="80" height="130"/><rect x="783" y="27" width="43" height="123"/><rect x="841" y="94" width="65" height="56"/><rect x="915" y="29" width="42" height="121"/><rect x="976" y="63" width="48" height="87"/><rect x="1036" y="31" width="49" height="119"/><rect x="1092" y="61" width="76" height="89"/></svg>
     <h1>Рассрочка<br>по нормам <em>ислама</em></h1>
     <p class="hero-desc">Помогаем приобрести автомобили, квартиры, стройматериалы, оплатить ремонт, обучение и другие разрешённые товары на условиях рассрочки по нормам ислама. Быстрое рассмотрение и прозрачные условия.</p>
+    <div class="hero-cta">
+      <a class="btn-gold" href="#calc">Рассчитать рассрочку</a>
+      <a class="btn-ghost" href="https://wa.me/79311010201?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%2C%20%D1%85%D0%BE%D1%87%D1%83%20%D0%BE%D1%84%D0%BE%D1%80%D0%BC%D0%B8%D1%82%D1%8C%20%D1%80%D0%B0%D1%81%D1%81%D1%80%D0%BE%D1%87%D0%BA%D1%83!" target="_blank" rel="noopener">Оставить заявку</a>
+    </div>
   </section>
 
   <!-- CALCULATOR -->
@@ -564,9 +581,9 @@
       </div>
     </div>
 
-    <a id="whatsappBtn" class="con-cta" href="https://wa.me/79280222114" target="_blank" rel="noopener">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
-      Оформить в WhatsApp
+    <a id="whatsappBtn" class="con-cta" href="https://wa.me/79311010201" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.96L2 22l5.25-1.38c1.45.79 3.08 1.21 4.79 1.21 5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm0 18.15c-1.54 0-3.04-.41-4.35-1.19l-.31-.19-3.24.85.87-3.16-.2-.33a8.19 8.19 0 0 1-1.26-4.37c0-4.54 3.7-8.23 8.24-8.23 4.54 0 8.23 3.69 8.23 8.23 0 4.54-3.69 8.23-8.23 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.7-.81-.23-.08-.39-.12-.56.13-.16.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-2-1.24-.74-.66-1.24-1.47-1.38-1.72-.15-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.13-.15.17-.25.25-.42.08-.16.04-.31-.02-.43-.06-.13-.56-1.35-.77-1.85-.2-.48-.41-.42-.56-.43h-.48c-.16 0-.43.06-.66.31s-.87.85-.87 2.07c0 1.22.89 2.4 1.01 2.57.12.16 1.75 2.67 4.24 3.74.59.26 1.05.41 1.41.52.6.19 1.14.16 1.56.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.14-1.18-.06-.11-.23-.17-.48-.29z"/></svg>
+      Оформить рассрочку
     </a>
 </div>
   </section>
@@ -604,17 +621,18 @@
     <div class="sec-lab" style="margin-bottom:14px">Контакты</div>
     <div class="ft-mark">MX <span>FINANCE</span></div>
     <div class="ft-tag">Исламская рассрочка без процентов</div>
-    <a class="ft-phone" href="tel:+79280222114">+7 928 022-21-14</a>
+    <a class="ft-phone" href="tel:+79311010201">+7 931 101-02-01</a>
     <div class="ft-links">
-      <a class="ft-ic" href="https://wa.me/79280222114" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg></a>
-      <a class="ft-ic" href="https://instagram.com/amana_fin" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg></a>
+      <a class="ft-ic ic-phone" href="tel:+79311010201" aria-label="Позвонить"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2c.28-.28.68-.36 1.04-.24 1.18.39 2.45.6 3.76.6.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.31.21 2.58.6 3.76.11.35.03.75-.25 1.04l-2.2 2.2z"/></svg></a>
+      <a class="ft-ic" href="https://wa.me/79311010201" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.96L2 22l5.25-1.38c1.45.79 3.08 1.21 4.79 1.21 5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm0 18.15c-1.54 0-3.04-.41-4.35-1.19l-.31-.19-3.24.85.87-3.16-.2-.33a8.19 8.19 0 0 1-1.26-4.37c0-4.54 3.7-8.23 8.24-8.23 4.54 0 8.23 3.69 8.23 8.23 0 4.54-3.69 8.23-8.23 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.7-.81-.23-.08-.39-.12-.56.13-.16.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-2-1.24-.74-.66-1.24-1.47-1.38-1.72-.15-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.13-.15.17-.25.25-.42.08-.16.04-.31-.02-.43-.06-.13-.56-1.35-.77-1.85-.2-.48-.41-.42-.56-.43h-.48c-.16 0-.43.06-.66.31s-.87.85-.87 2.07c0 1.22.89 2.4 1.01 2.57.12.16 1.75 2.67 4.24 3.74.59.26 1.05.41 1.41.52.6.19 1.14.16 1.56.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.14-1.18-.06-.11-.23-.17-.48-.29z"/></svg></a>
+      <a class="ft-ic" href="https://instagram.com/mx_finance_" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg></a>
     </div>
     <div class="ft-fine">MX Finance — рассрочка без процентов и переплат. Расчёт на калькуляторе носит предварительный характер, точные условия подтверждаются при оформлении договора.</div>
   </footer>
 
   <div class="sticky" id="stickyBar">
     <div><span class="st-lab">Ежемесячно</span><span class="st-num" id="stickyMonthly">— ₽</span></div>
-    <button class="st-cta" onclick="window.open(document.getElementById('whatsappBtn').href,'_blank');return false;"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg> Оформить</button>
+    <button class="st-cta" onclick="window.open(document.getElementById('whatsappBtn').href,'_blank');return false;"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.96L2 22l5.25-1.38c1.45.79 3.08 1.21 4.79 1.21 5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm0 18.15c-1.54 0-3.04-.41-4.35-1.19l-.31-.19-3.24.85.87-3.16-.2-.33a8.19 8.19 0 0 1-1.26-4.37c0-4.54 3.7-8.23 8.24-8.23 4.54 0 8.23 3.69 8.23 8.23 0 4.54-3.69 8.23-8.23 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.7-.81-.23-.08-.39-.12-.56.13-.16.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-2-1.24-.74-.66-1.24-1.47-1.38-1.72-.15-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.13-.15.17-.25.25-.42.08-.16.04-.31-.02-.43-.06-.13-.56-1.35-.77-1.85-.2-.48-.41-.42-.56-.43h-.48c-.16 0-.43.06-.66.31s-.87.85-.87 2.07c0 1.22.89 2.4 1.01 2.57.12.16 1.75 2.67 4.24 3.74.59.26 1.05.41 1.41.52.6.19 1.14.16 1.56.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.14-1.18-.06-.11-.23-.17-.48-.29z"/></svg> Оформить</button>
   </div>
 
   <!-- DRAWER -->
@@ -629,7 +647,7 @@
         <a href="#services"><span>02</span>Услуги</a>
         <a href="#kontakty"><span>03</span>Контакты</a>
       </nav>
-      <a class="mx-drawer-cta" href="https://wa.me/79280222114?text=Здравствуйте, хочу оформить рассрочку." target="_blank" rel="noopener">Написать в WhatsApp</a>
+      <a class="mx-drawer-cta" href="https://wa.me/79311010201?text=Здравствуйте, хочу оформить рассрочку." target="_blank" rel="noopener">Написать в WhatsApp</a>
     </div>
   </div>
 
@@ -795,7 +813,7 @@
       if (!skipPrepayInput) prepayInput.value = '';
       Object.keys(_counters).forEach(k => delete _counters[k]);
       if (stickyMonthly) stickyMonthly.textContent = '— ₽';
-      whatsappBtn.href = 'https://wa.me/79280222114?text=Здравствуйте, хочу оформить рассрочку.';
+      whatsappBtn.href = 'https://wa.me/79311010201?text=Здравствуйте, хочу оформить рассрочку.';
       return;
     }
     priceError.classList.remove('visible');
@@ -830,7 +848,7 @@
       `- Итоговая стоимость: *${finalCost.toLocaleString('ru-RU')} ₽*`,
       `- Наценка: *${markup.toLocaleString('ru-RU')} ₽ (${markupPct.toFixed(1)}%)*`,
     ];
-    whatsappBtn.href = `https://wa.me/79280222114?text=${encodeURIComponent(msgLines.join('\n'))}`;
+    whatsappBtn.href = `https://wa.me/79311010201?text=${encodeURIComponent(msgLines.join('\n'))}`;
   }
 
   // ═══ ИНИЦИАЛИЗАЦИЯ ═══
