@@ -548,7 +548,7 @@
         <span class="cur">₽</span>
       </div>
       <div class="field-error" id="priceError"></div>
-      <input type="range" id="priceSlider" class="sber-slider" min="10000" max="2000000" value="10000" step="5000"/>
+      <input type="range" id="priceSlider" class="sber-slider" min="10000" max="10000000" value="10000" step="10000"/>
     </div>
 
     <div class="ctrl">
@@ -661,6 +661,7 @@
   const DEFAULT_PREPAY = 25;   // стандартный первый взнос, %
   const MAGNET = 3;            // зона магнита вокруг 25%, п.п.
   const PREPAY_MIN = 10, PREPAY_MAX = 80;
+  const PRICE_MIN = 10000, PRICE_MAX = 10000000;
   let selectedTariff = 'with';
   const roundUpTo100 = v => Math.ceil(v / 100) * 100;
   const fmt = v => v.toLocaleString('ru-RU') + ' ₽';
@@ -799,7 +800,7 @@
     if (months > MONTH_MAX){ months = MONTH_MAX; monthsEl.value = months; }
     updateSliderFill(monthsEl);
     updateMonthsUI(months);
-    priceHint.textContent = '10 000 – 2 000 000 ₽';
+    priceHint.textContent = '10 000 – 10 000 000 ₽';
 
     let pct = (selectedTariff === 'with') ? (parseInt(prepaySlider.value) || 0) : 0;
     prepayHint.textContent = pct + '%';
@@ -816,7 +817,16 @@
       whatsappBtn.href = 'https://wa.me/79311010201?text=Здравствуйте, хочу оформить рассрочку.';
       return;
     }
-    priceError.classList.remove('visible');
+    // предупреждение по диапазону стоимости
+    if (price < PRICE_MIN){
+      priceError.textContent = 'Минимальная стоимость товара — ' + PRICE_MIN.toLocaleString('ru-RU') + ' ₽';
+      priceError.classList.add('visible');
+    } else if (price > PRICE_MAX){
+      priceError.textContent = 'Максимальная стоимость товара — ' + PRICE_MAX.toLocaleString('ru-RU') + ' ₽';
+      priceError.classList.add('visible');
+    } else {
+      priceError.classList.remove('visible');
+    }
 
     let down = (selectedTariff === 'with') ? Math.min(roundUpTo100(price * pct / 100), price) : 0;
     if (selectedTariff === 'with' && !skipPrepayInput) prepayInput.value = down.toLocaleString('ru-RU');
