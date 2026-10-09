@@ -729,6 +729,8 @@
   // ═══ ОБРАБОТЧИКИ ═══
   priceEl.addEventListener('input', () => {
     downOverride = null;
+    prepayError.classList.remove('visible');
+    priceError.classList.remove('visible');
     const raw = priceEl.value.replace(/\D/g, '');
     const cursor = priceEl.selectionStart;
     const oldLen = priceEl.value.length;
@@ -743,10 +745,34 @@
 
   priceSlider.addEventListener('input', () => {
     downOverride = null;
+    priceError.classList.remove('visible');
     priceEl.value = parseInt(priceSlider.value).toLocaleString('ru-RU');
     updateSliderFill(priceSlider);
     calculate();
   });
+
+  // Цена: пока печатают — не трогаем, по завершении ввода подгоняем в 10 000 – 10 000 000
+  function commitPrice(){
+    const raw = priceEl.value.replace(/\D/g, '');
+    if (!raw) return;                       // пустое поле — своё сообщение в calculate()
+    let price = parseInt(raw);
+    if (price >= PRICE_MIN && price <= PRICE_MAX) return;   // в норме — ничего не трогаем
+    if (price < PRICE_MIN){
+      price = PRICE_MIN;
+      priceError.textContent = 'Минимальная стоимость товара — ' + PRICE_MIN.toLocaleString('ru-RU') + ' ₽';
+      priceError.classList.add('visible');
+    } else if (price > PRICE_MAX){
+      price = PRICE_MAX;
+      priceError.textContent = 'Максимальная стоимость товара — ' + PRICE_MAX.toLocaleString('ru-RU') + ' ₽';
+      priceError.classList.add('visible');
+    }
+    priceEl.value = price.toLocaleString('ru-RU');
+    priceSlider.value = price; updateSliderFill(priceSlider);
+    calculate();
+  }
+  priceEl.addEventListener('blur', commitPrice);
+  priceEl.addEventListener('change', commitPrice);
+  priceEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') priceEl.blur(); });
 
   monthsEl.addEventListener('input', () => { updateSliderFill(monthsEl); calculate(); });
 
@@ -755,7 +781,7 @@
       document.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       selectedTariff = btn.dataset.tariff;
-      downOverride = null;
+      prepayError.classList.remove('visible');   // сумму взноса не сбрасываем — вернётся как была
       prepayBlock.style.display = (selectedTariff === 'with') ? '' : 'none';
       calculate();
     });
@@ -763,36 +789,71 @@
 
   prepaySlider.addEventListener('input', () => {
     downOverride = null;
+    prepayError.classList.remove('visible');
     let pct = parseInt(prepaySlider.value);
     if (Math.abs(pct - DEFAULT_PREPAY) <= MAGNET) { pct = DEFAULT_PREPAY; prepaySlider.value = pct; }
     updateSliderFill(prepaySlider);
     calculate();
   });
 
+  function prepayBounds(price){
+    return { min: Math.ceil(price * PREPAY_MIN / 100), max: Math.floor(price * PREPAY_MAX / 100) };
+  }
+  function syncPrepaySlider(price, rub){
+    const pctExact = price ? rub / price * 100 : DEFAULT_PREPAY;
+    prepaySlider.value = Math.max(PREPAY_MIN, Math.min(PREPAY_MAX, Math.round(pctExact)));
+    updateSliderFill(prepaySlider);
+  }
+
+  // Ввод суммы вручную: НЕ подгоняем под границы пока человек печатает —
+  // иначе промежуточное число (20 000 по пути к 200 000) затирается минимумом.
   prepayInput.addEventListener('input', () => {
     const price = parseInt(priceEl.value.replace(/\D/g, '')) || 0;
     const raw = prepayInput.value.replace(/\D/g, '');
     const cursor = prepayInput.selectionStart;
     const oldLen = prepayInput.value.length;
     let rub = parseInt(raw) || 0;
-    if (price && rub > price) rub = price;
+    if (price && rub > price) rub = price;            // больше стоимости товара нельзя
     const formatted = rub ? rub.toLocaleString('ru-RU') : '';
     prepayInput.value = formatted;
     const diff = formatted.length - oldLen;
     try { prepayInput.setSelectionRange(cursor + diff, cursor + diff); } catch(e) {}
-    if (price){
-      const minRub = Math.round(price * PREPAY_MIN / 100);
-      const maxRub = Math.round(price * PREPAY_MAX / 100);
-      if (rub > maxRub) rub = maxRub;
-      if (rub < minRub && raw.length >= String(minRub).length) rub = minRub;
-      if (rub !== (parseInt(raw) || 0)) prepayInput.value = rub.toLocaleString('ru-RU');
+
+    // подсказка, если вышли за 10–80% (поправится автоматически после ввода)
+    prepayError.classList.remove('visible');
+    if (price && rub){
+      const b = prepayBounds(price);
+      if (rub < b.min){
+        prepayError.textContent = 'Минимальный взнос — ' + PREPAY_MIN + '% (' + b.min.toLocaleString('ru-RU') + ' ₽)';
+        prepayError.classList.add('visible');
+      } else if (rub > b.max){
+        prepayError.textContent = 'Максимальный взнос — ' + PREPAY_MAX + '% (' + b.max.toLocaleString('ru-RU') + ' ₽)';
+        prepayError.classList.add('visible');
+      }
     }
-    downOverride = rub;                               // берём сумму как есть, без округления через %
-    const pctExact = price ? rub / price * 100 : DEFAULT_PREPAY;
-    prepaySlider.value = Math.max(PREPAY_MIN, Math.min(PREPAY_MAX, Math.round(pctExact)));
-    updateSliderFill(prepaySlider);
+
+    downOverride = rub;                               // сумма берётся как есть
+    syncPrepaySlider(price, rub);
     calculate(true);
   });
+
+  // Когда ввод закончен — подгоняем в допустимые 10–80%
+  function commitPrepay(){
+    const price = parseInt(priceEl.value.replace(/\D/g, '')) || 0;
+    let rub = parseInt(prepayInput.value.replace(/\D/g, '')) || 0;
+    prepayError.classList.remove('visible');
+    if (!price) return;
+    const b = prepayBounds(price);
+    if (rub < b.min) rub = b.min;
+    if (rub > b.max) rub = b.max;
+    prepayInput.value = rub.toLocaleString('ru-RU');
+    downOverride = rub;
+    syncPrepaySlider(price, rub);
+    calculate(true);
+  }
+  prepayInput.addEventListener('blur', commitPrepay);
+  prepayInput.addEventListener('change', commitPrepay);
+  prepayInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') prepayInput.blur(); });
 
   function updateSliderFill(slider) {
     const min = parseInt(slider.min) || 0;
@@ -881,16 +942,6 @@
       whatsappBtn.href = 'https://wa.me/79311010201?text=Здравствуйте, хочу оформить рассрочку.';
       return;
     }
-    // предупреждение по диапазону стоимости
-    if (price < PRICE_MIN){
-      priceError.textContent = 'Минимальная стоимость товара — ' + PRICE_MIN.toLocaleString('ru-RU') + ' ₽';
-      priceError.classList.add('visible');
-    } else if (price > PRICE_MAX){
-      priceError.textContent = 'Максимальная стоимость товара — ' + PRICE_MAX.toLocaleString('ru-RU') + ' ₽';
-      priceError.classList.add('visible');
-    } else {
-      priceError.classList.remove('visible');
-    }
 
     let down = 0;
     if (selectedTariff === 'with'){
@@ -901,9 +952,8 @@
     }
     // показываем настоящий процент от суммы взноса
     const pctShown = price ? down / price * 100 : 0;
-    prepayHint.textContent = (selectedTariff === 'with')
-      ? (Math.abs(pctShown - Math.round(pctShown)) < 0.05 ? Math.round(pctShown) : pctShown.toFixed(1)) + '%'
-      : '0%';
+    const pctText = (Math.abs(pctShown - Math.round(pctShown)) < 0.05 ? Math.round(pctShown) : pctShown.toFixed(1)) + '%';
+    prepayHint.textContent = (selectedTariff === 'with') ? pctText : '0%';
 
     const financed = price - down;
     const rate = (selectedTariff === 'with') ? yieldPct(price, months) : noDownPct(months);
@@ -927,7 +977,7 @@
       `- Стоимость товара: *${price.toLocaleString('ru-RU')} ₽*`,
       `- Тариф: *${tariffLabel}*`,
       `- Срок: *${months} ${monthWord(months)}*`,
-      ...(selectedTariff === 'with' ? [`- Первый взнос: *${down.toLocaleString('ru-RU')} ₽ (${pct}%)*`] : []),
+      ...(selectedTariff === 'with' ? [`- Первый взнос: *${down.toLocaleString('ru-RU')} ₽ (${pctText})*`] : []),
       '', '     *Расчёт:*',
       `- Ежемесячный платёж: *${monthly.toLocaleString('ru-RU')} ₽*`,
       `- Итоговая стоимость: *${finalCost.toLocaleString('ru-RU')} ₽*`,
